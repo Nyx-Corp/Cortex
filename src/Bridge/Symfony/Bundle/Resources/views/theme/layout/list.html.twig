@@ -39,7 +39,7 @@
                             <a href="{% block create_link '#' %}" data-shortcut="n"
                                     class="inline-flex items-center gap-2 pl-2 pr-1 py-1 text-xs bg-white hover:bg-light hover:border-dark-lighter hover:text-dark text-dark-light rounded border border-light-darker transition-all cursor-pointer">
                                 <i data-lucide="plus" class="size-3"></i>
-                                <span>Nouveau</span>
+                                <span>{{ 'admin.action.new'|trans({}, 'admin') }}</span>
                                 <kbd class="text-xs bg-transparent px-1 rounded border-light-darker border font-mono opacity-60">N</kbd>
                             </a>
                             {% endif %}
@@ -104,7 +104,7 @@
                 <a href="{{ block('create_link') }}" data-shortcut="n"
                         class="flex items-center gap-2 pl-2 pr-1 py-1 text-xs bg-white hover:bg-light hover:border-dark-lighter hover:text-dark text-dark-light rounded border border-light-darker transition-all cursor-pointer">
                     <i data-lucide="plus" class="size-3"></i>
-                    <span>Nouveau</span>
+                    <span>{{ 'admin.action.new'|trans({}, 'admin') }}</span>
                     <kbd class="text-xs bg-transparent px-1 rounded border-light-darker border font-mono opacity-60">N</kbd>
                 </a>
 
@@ -122,7 +122,7 @@
                 <div class="flex items-center justify-between gap-2 pb-2 border-b border-layout-border-light">
                     <h3 class="text-sm font-semibold flex items-center gap-2 text-dark">
                         <i data-lucide="filter" class="size-4 text-form-label"></i>
-                        <span>Filtres</span>
+                        <span>{{ 'admin.list.filters'|trans({}, 'admin') }}</span>
                     </h3>
                     <span class="text-xs font-normal bg-light-darker rounded-full px-2 py-0.5">
                         {{ collection|length }} / YYYY
@@ -139,7 +139,7 @@
                         <a href="{{ app.request.pathInfo }}" data-shortcut="x"
                         class="flex items-center gap-2 pl-2 pr-1 py-1 text-xs bg-white hover:bg-light hover:border-dark-lighter hover:text-dark text-dark-light rounded border border-light-darker transition-all cursor-pointer">
                             <i data-lucide="x" class="size-3"></i>
-                            <span>Réinitialiser</span>
+                            <span>{{ 'admin.list.reset'|trans({}, 'admin') }}</span>
                             <kbd class="text-xs bg-transparent px-1 rounded border-light-darker border font-mono opacity-60">X</kbd>
                         </a>
                     </div>
