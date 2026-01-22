@@ -1,0 +1,188 @@
+{% block javascripts %}
+	<script type="module" src="{{ asset('page-layout.js') }}"></script>
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('main.css') }}">
+{% endblock %}
+
+<div id="container" class="group/sidebar">
+	<div class="fixed inset-y-0 start-0 z-50 flex flex-col w-72 group-[.closed]/sidebar:w-8 border-r border-(--layout-border)/10 bg-white">
+		<button type="button" id="sidebar-toggle" class="absolute -end-5 top-[50%] p-2.5 text-dark bg-light hover:bg-light-dark border border-dark-lighter rounded-full cursor-col-resize">
+			<span class="sr-only">Toggle sidebar</span>
+			<svg class="size-5" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+			</svg>
+		</button>
+		<div class="flex w-72 grow flex-col gap-y-5 overflow-y-auto px-6 pb-4 group-[.closed]/sidebar:invisible group-[.closed]/sidebar:opacity-0 transition-discrete transition-[visibility,opacity] duration-150 ease-in-out">
+			<div class="flex h-16 shrink-0 items-center">
+				<x-placeholder class="contents" message="render logo">
+					<span class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-indigo-600 bg-white text-[0.625rem] font-black text-indigo-600">L</span>
+				</x-placeholder>
+			</div>
+			<nav class="flex flex-1 flex-col">
+				<ul role="list" class="flex flex-1 flex-col gap-y-7">
+					<li>
+						<ul role="list" class="-mx-2 space-y-1">
+							<li>
+								<a href="#" class="group flex gap-x-3 rounded-md bg-dark-lighter/10 p-2 text-sm/6 font-semibold text-selected">
+									<x-placeholder class="contents" message="render icon">
+										<span class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-selected bg-white text-[0.625rem] font-medium text-selected">D</span>
+									</x-placeholder>
+									Dashboard
+								</a>
+							</li>
+							<li>
+								<a href="#" class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-dark hover:bg-dark-lighter/10 hover:text-selected">
+									<x-placeholder class="contents" message="render icon">
+										<span class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-(--layout-border)/10 bg-white text-[0.625rem] font-medium text-dark-light group-hover:border-selected group-hover:text-selected">T</span>
+									</x-placeholder>
+									Team
+								</a>
+							</li>
+							<li>
+								<a href="#" class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-dark hover:bg-dark-lighter/10 hover:text-selected">
+									<x-placeholder class="contents" message="render icon">
+										<span class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-(--layout-border)/10 bg-white text-[0.625rem] font-medium text-dark-light group-hover:border-selected group-hover:text-selected">P</span>
+									</x-placeholder>
+									Projects
+								</a>
+							</li>
+							<li>
+								<a href="#" class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-dark hover:bg-dark-lighter/10 hover:text-selected">
+									<x-placeholder class="contents" message="render icon">
+										<span class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-(--layout-border)/10 bg-white text-[0.625rem] font-medium text-dark-light group-hover:border-selected group-hover:text-selected">C</span>
+									</x-placeholder>
+									Calendar
+								</a>
+							</li>
+						</ul>
+					</li>
+					<li>
+						<div class="text-xs/6 font-semibold text-dark-lighter whitespace-nowrap">Your teams</div>
+						<ul role="list" class="-mx-2 mt-2 space-y-1">
+							<li>
+								<a href="#" class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-dark hover:bg-dark-lighter/10 hover:text-selected">
+									<x-placeholder class="contents" message="render icon">
+										<span class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-(--layout-border)/10 bg-white text-[0.625rem] font-medium text-dark-light group-hover:border-selected group-hover:text-selected">H</span>
+									</x-placeholder>
+									<span class="truncate">Heroicons</span>
+								</a>
+							</li>
+							<li>
+								<a href="#" class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-dark hover:bg-dark-lighter/10 hover:text-selected">
+									<x-placeholder class="contents" message="render icon">
+										<span class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-(--layout-border)/10 bg-white text-[0.625rem] font-medium text-dark-light group-hover:border-selected group-hover:text-selected">T</span>
+									</x-placeholder>
+									<span class="truncate">Tailwind Labs</span>
+								</a>
+							</li>
+							<li>
+								<a href="#" class="group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-dark hover:bg-dark-lighter/10 hover:text-selected">
+									<x-placeholder class="contents" message="render icon">
+										<span class="flex size-6 shrink-0 items-center justify-center rounded-lg border border-(--layout-border)/10 bg-white text-[0.625rem] font-medium text-dark-light group-hover:border-selected group-hover:text-selected">W</span>
+									</x-placeholder>
+									<span class="truncate">Workcation</span>
+								</a>
+							</li>
+						</ul>
+					</li>
+					<li class="mt-auto">
+						<a href="#" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-dark hover:bg-dark-lighter/10 hover:text-selected">
+							<svg class="size-6 shrink-0 text-dark-light group-hover:text-selected" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/>
+								<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+							</svg>
+							Settings
+						</a>
+					</li>
+				</ul>
+			</nav>
+			<hr
+			role="presentation" class="w-full border-t border-(--divider-border)/10"/>
+			<!-- Profile dropdown -->
+			<div class="relative">
+				<button type="button" class="-m-1.5 flex items-center p-1.5" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+					<span class="sr-only">Open user menu</span>
+					<img class="size-8 rounded-full bg-dark-lighter/10" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+					<span class="flex items-center">
+						<span class="ml-4 text-sm/6 font-semibold text-dark" aria-hidden="true">Tom Cook</span>
+						<svg class="ml-2 size-5 text-dark-light" viewbox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" transform="matrix(1,0,0,-1,0,0)">
+							<path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"></path>
+						</svg>
+					</span>
+				</button>
+				<div class="hidden absolute left-10 z-10 bottom-full mb-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-dark/5 focus:outline-hidden transition-discrete transition-all ease-out duration-100 transform opacity-100 scale-100 starting:opacity-0 starting:scale-95 [.hidden]:opacity-0 [.hidden]:scale-95" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+					<a href="#" class="block px-3 py-1 text-sm/6 text-dark hover:bg-dark-lighter/10" role="menuitem" tabindex="-1" id="user-menu-item-0">Your profile</a>
+					<a href="#" class="block px-3 py-1 text-sm/6 text-dark hover:bg-dark-lighter/10" role="menuitem" tabindex="-1" id="user-menu-item-1">Sign out</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="ps-72 group-[.closed]/sidebar:ps-8 transition-[padding] duration-150 ease-in-out">
+		<header class="sticky top-0 z-40 flex h-16 shrink-0 items-center border-b border-(--layout-border)/10 bg-white shadow-xs gap-x-6 px-8">
+			<div class="flex flex-1 self-stretch gap-x-6">
+				<nav class="flex grow-1" aria-label="Breadcrumb">
+					<ol role="list" class="flex items-center space-x-4">
+						<li>
+							<div>
+								<a href="#" class="text-selected">
+									<svg class="size-5 shrink-0" viewbox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+										<path fill-rule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" clip-rule="evenodd"/>
+									</svg>
+									<span class="sr-only">Home</span>
+								</a>
+							</div>
+						</li>
+						<li>
+							<div class="flex items-center">
+								<svg class="size-5 shrink-0 text-dark-light" viewbox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+									<path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/>
+								</svg>
+								<a href="#" class="ml-4 text-sm font-medium text-dark-light hover:text-gray-700">Projects</a>
+							</div>
+						</li>
+						<li>
+							<div class="flex items-center">
+								<svg class="size-5 shrink-0 text-dark-light" viewbox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+									<path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/>
+								</svg>
+								<a href="#" class="ml-4 text-sm font-medium text-dark-light hover:text-gray-700" aria-current="page">Project Nero</a>
+							</div>
+						</li>
+					</ol>
+				</nav>
+				<button type="button" class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
+					<span class="sr-only">View notifications</span>
+					<svg class="size-6" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+					</svg>
+				</button>
+				<form class="grid grid-cols-1 w-56" action="#" method="GET">
+					<input type="search" name="search" aria-label="Search" class="col-start-1 row-start-1 block size-full bg-white pl-8 text-dark outline-hidden placeholder:text-dark-light text-sm/6" placeholder="Search">
+					<svg class="pointer-events-none col-start-1 row-start-1 size-5 self-center text-dark-light" viewbox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+						<path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd"/>
+					</svg>
+				</form>
+			</div>
+		</header>
+
+		<main class="py-10">
+			<div class="px-8">
+				<x-placeholder class="contents" message="render content">
+					<div class="relative h-full overflow-hidden rounded-xl border border-dashed border-gray-400 opacity-75">
+						<svg class="absolute inset-0 size-full stroke-dark/10" fill="none">
+							<defs>
+								<pattern id="pattern-1526ac66-f54a-4681-8fb8-0859d412f251" x="0" y="0" width="10" height="10" patternunits="userSpaceOnUse">
+									<path d="M-3 13 15-5M-5 5l18-18M-1 21 17 3"></path>
+								</pattern>
+							</defs>
+							<rect stroke="none" fill="url(#pattern-1526ac66-f54a-4681-8fb8-0859d412f251)" width="100%" height="100%"></rect>
+						</svg>
+					</div>
+				</x-placeholder>
+			</div>
+		</main>
+	</div>
+</div>

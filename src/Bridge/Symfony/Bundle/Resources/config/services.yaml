@@ -1,0 +1,40 @@
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        bind:
+            $dbalConnection: '@doctrine.dbal.default_connection'
+
+    _instanceof:
+        Cortex\Bridge\Symfony\Controller\ControllerInterface:
+            tags: ['controller.service_arguments']
+
+    Cortex\Component\Model\Query\Factory\QueryFactory:
+        class: Cortex\Bridge\Symfony\Model\Query\RequestQueryFactory
+
+    Cortex\Bridge\Symfony\Controller\ModelFactoryValueResolver:
+        tags:
+            - { name: controller.argument_value_resolver, priority: 50 }
+
+    Cortex\Bridge\Symfony\Translation\ModuleTranslator:
+        decorates: 'translator'
+        decoration_priority: -10
+        decoration_on_invalid: null
+        arguments:
+            $translator: '@Cortex\Bridge\Symfony\Translation\ModuleTranslator.inner'
+        autowire: true
+        autoconfigure: false
+        public: false
+
+    Cortex\Bridge\:
+        resource: '../../../../../Bridge/'
+        exclude:
+            - '../../../../../Bridge/Symfony/Bundle'
+            - '../../../../../Bridge/Symfony/Translation/'
+
+    Cortex\Component\:
+        resource: '../../../../../Component/'
+        exclude:
+            - '../../../../../Component/Collection/'
+            - '../../../../../Component/Json/'

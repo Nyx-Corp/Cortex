@@ -1,0 +1,638 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+<main class="flex flex-col flex-1 h-[calc(100vh-64px)] max-h-[calc(100vh-64px)]">
+    <!-- Upload et contrôles principaux -->
+    <div class="bg-white border border-gray-200 rounded-lg p-4 mx-4 mt-4 mb-6 shadow-sm">
+            <div class="flex flex-wrap gap-4 items-center">
+                <label class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded cursor-pointer flex items-center gap-2 transition-colors text-white">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
+                    Charger une image
+                    <input type="file" id="imageInput" accept="image/*" class="hidden">
+                </label>
+                <button id="undoBtn" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded disabled:opacity-50 flex items-center gap-2 transition-colors text-white" disabled>
+                    <i data-lucide="undo-2" class="w-4 h-4"></i>
+                    Annuler
+                </button>
+                <button id="redoBtn" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded disabled:opacity-50 flex items-center gap-2 transition-colors text-white" disabled>
+                    <i data-lucide="redo-2" class="w-4 h-4"></i>
+                    Refaire
+                </button>
+                <button id="resetBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded flex items-center gap-2 transition-colors text-white">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    Reset
+                </button>
+                <button id="exportBtn" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded flex items-center gap-2 transition-colors text-white">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    Exporter
+                </button>
+            </div>
+        </div>
+
+    <div class="flex w-full flex-1 min-h-0 overflow-hidden px-4 pb-4">
+        <div class="flex h-full min-h-0 gap-4 w-full">
+            <!-- Panneau de contrôles -->
+            <div class="w-80 bg-white border border-gray-200 rounded-lg p-4 space-y-4 shadow-sm flex flex-col overflow-y-auto">
+                
+                <!-- Ajustements basiques -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-semibold border-b border-gray-200 pb-2 flex items-center gap-2 text-gray-900">
+                        <i data-lucide="sliders" class="w-5 h-5"></i>
+                        Ajustements
+                    </h3>
+                    
+                    <div>
+                        <label class="block text-sm mb-2 flex items-center gap-2 text-gray-700">
+                            <i data-lucide="sun" class="w-4 h-4"></i>
+                            Luminosité: <span id="brightnessValue" class="font-mono">0</span>
+                        </label>
+                        <input type="range" id="brightness" min="-100" max="100" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm mb-2 flex items-center gap-2 text-gray-700">
+                            <i data-lucide="contrast" class="w-4 h-4"></i>
+                            Contraste: <span id="contrastValue" class="font-mono">0</span>
+                        </label>
+                        <input type="range" id="contrast" min="-100" max="100" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm mb-2 flex items-center gap-2 text-gray-700">
+                            <i data-lucide="aperture" class="w-4 h-4"></i>
+                            Exposition: <span id="exposureValue" class="font-mono">0</span>
+                        </label>
+                        <input type="range" id="exposure" min="-100" max="100" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm mb-2 flex items-center gap-2 text-gray-700">
+                            <i data-lucide="droplets" class="w-4 h-4"></i>
+                            Saturation: <span id="saturationValue" class="font-mono">0</span>
+                        </label>
+                        <input type="range" id="saturation" min="-100" max="100" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm mb-2 flex items-center gap-2 text-gray-700">
+                            <i data-lucide="palette" class="w-4 h-4"></i>
+                            Teinte: <span id="hueValue" class="font-mono">0</span>°
+                        </label>
+                        <input type="range" id="hue" min="-180" max="180" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm mb-2 flex items-center gap-2 text-gray-700">
+                            <i data-lucide="circle-dot" class="w-4 h-4"></i>
+                            Gamma: <span id="gammaValue" class="font-mono">1.0</span>
+                        </label>
+                        <input type="range" id="gamma" min="0.1" max="3" value="1" step="0.1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm mb-2 flex items-center gap-2 text-gray-700">
+                            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                            Rotation: <span id="rotationValue" class="font-mono">0</span>°
+                        </label>
+                        <input type="range" id="rotation" min="-180" max="180" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    </div>
+                </div>
+
+                <!-- Crop -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-semibold border-b border-gray-200 pb-2 flex items-center gap-2 text-gray-900">
+                        <i data-lucide="crop" class="w-5 h-5"></i>
+                        Recadrage
+                    </h3>
+                    
+                    <div class="flex gap-2">
+                        <button id="enableCropBtn" class="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors">
+                            <i data-lucide="maximize-2" class="w-4 h-4 inline mr-1"></i>
+                            Activer
+                        </button>
+                        <button id="disableCropBtn" class="px-3 py-1 text-sm bg-gray-500 hover:bg-gray-600 text-white rounded transition-colors hidden">
+                            <i data-lucide="minimize-2" class="w-4 h-4 inline mr-1"></i>
+                            Désactiver
+                        </button>
+                    </div>
+                    
+                    <select id="cropRatio" class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900" disabled>
+                        <option value="">Libre</option>
+                        <option value="1:1">1:1 (Carré)</option>
+                        <option value="5:8">5:8</option>
+                        <option value="4:3">4:3</option>
+                        <option value="16:9">16:9</option>
+                        <option value="4:5">4:5 (Portrait)</option>
+                        <option value="2:3">2:3 (Portrait photo)</option>
+                    </select>
+                    
+                    <div id="cropInfo" class="hidden space-y-2">
+                        <div class="text-xs text-gray-600">
+                            Position: <span id="cropX" class="font-mono">0</span>, <span id="cropY" class="font-mono">0</span>
+                        </div>
+                        <div class="text-xs text-gray-600">
+                            Dimensions: <span id="cropW" class="font-mono">0</span>×<span id="cropH" class="font-mono">0</span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-gray-500 mt-2">
+                        💡 Glissez le cadre pour le déplacer, utilisez les coins pour redimensionner
+                    </p>
+                </div>
+
+                <!-- Remplacement arrière-plan -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold border-b border-gray-200 pb-2 flex items-center gap-2 text-gray-900">
+                        <i data-lucide="layers" class="w-5 h-5"></i>
+                        Arrière-plan
+                    </h3>
+                    
+                    <!-- Couleurs prédéfinies sous forme de radios -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm text-gray-600">Couleur de remplacement :</p>
+                            <button id="aiRemoveBgBtn" class="px-2 py-1 text-xs bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white rounded-full transition-all duration-200 flex items-center gap-1">
+                                <i data-lucide="wand-2" class="w-3 h-3"></i>
+                                Auto
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 italic">💡 Cliquez sur l'image pour choisir la couleur à remplacer ou utilisez la détection automatique</p>
+                        <div class="flex flex-wrap gap-2">
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="bgColor" value="" class="sr-only peer" checked>
+                                <div class="w-8 h-8 rounded border-2 border-gray-300 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200 transition-all duration-200 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center group-hover:scale-110">
+                                    <i data-lucide="x" class="w-3 h-3 text-gray-600"></i>
+                                </div>
+                            </label>
+                            
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="bgColor" value="255,255,255" class="sr-only peer">
+                                <div class="w-8 h-8 rounded border-2 border-gray-300 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200 transition-all duration-200 bg-white group-hover:scale-110"></div>
+                            </label>
+                            
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="bgColor" value="0,0,0" class="sr-only peer">
+                                <div class="w-8 h-8 rounded border-2 border-gray-300 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200 transition-all duration-200 bg-black group-hover:scale-110"></div>
+                            </label>
+                            
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="bgColor" value="0,255,0" class="sr-only peer">
+                                <div class="w-8 h-8 rounded border-2 border-gray-300 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200 transition-all duration-200 bg-green-500 group-hover:scale-110"></div>
+                            </label>
+                            
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="bgColor" value="0,0,255" class="sr-only peer">
+                                <div class="w-8 h-8 rounded border-2 border-gray-300 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200 transition-all duration-200 bg-blue-500 group-hover:scale-110"></div>
+                            </label>
+                            
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="bgColor" value="255,0,0" class="sr-only peer">
+                                <div class="w-8 h-8 rounded border-2 border-gray-300 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200 transition-all duration-200 bg-red-500 group-hover:scale-110"></div>
+                            </label>
+                            
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="bgColor" value="255,255,0" class="sr-only peer">
+                                <div class="w-8 h-8 rounded border-2 border-gray-300 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200 transition-all duration-200 bg-yellow-400 group-hover:scale-110"></div>
+                            </label>
+                            
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="bgColor" value="255,0,255" class="sr-only peer">
+                                <div class="w-8 h-8 rounded border-2 border-gray-300 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200 transition-all duration-200 bg-pink-500 group-hover:scale-110"></div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm mb-2 flex items-center gap-2 text-gray-700">
+                            <i data-lucide="target" class="w-4 h-4"></i>
+                            Seuil: <span id="thresholdValue" class="font-mono">30</span>
+                        </label>
+                        <input type="range" id="threshold" min="1" max="100" value="30" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="flex-1 flex flex-col min-w-0">
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm flex-1 flex flex-col min-h-0">
+                    <div id="canvasContainer" class="flex-1 flex items-center justify-center min-h-0 overflow-hidden relative">
+                        <!-- Canvas sera créé automatiquement par PhotoEditor -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+            /* Style pour le canvas généré */
+            #photo-editor-canvas {
+                max-width: 100%;
+                max-height: 100%;
+                height: auto;
+                border: 1px solid #d1d5db;
+                border-radius: 0.375rem;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            }
+            
+            .slider::-webkit-slider-thumb {
+                appearance: none;
+                height: 20px;
+                width: 20px;
+                border-radius: 50%;
+                background: #3b82f6;
+                cursor: pointer;
+                border: 2px solid white;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                transition: all 0.2s ease;
+            }
+            
+            .slider::-webkit-slider-thumb:hover {
+                background: #2563eb;
+                transform: scale(1.1);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            }
+            
+            .slider::-moz-range-thumb {
+                height: 20px;
+                width: 20px;
+                border-radius: 50%;
+                background: #3b82f6;
+                cursor: pointer;
+                border: 2px solid white;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                transition: all 0.2s ease;
+            }
+            
+            .slider::-moz-range-thumb:hover {
+                background: #2563eb;
+                transform: scale(1.1);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            }
+            
+            .slider::-webkit-slider-track {
+                background: linear-gradient(to right, #e5e7eb, #3b82f6, #e5e7eb);
+                height: 8px;
+                border-radius: 4px;
+            }
+            
+            .slider::-moz-range-track {
+                background: linear-gradient(to right, #e5e7eb, #3b82f6, #e5e7eb);
+                height: 8px;
+                border-radius: 4px;
+            }
+            
+            /* Styles pour le système de crop */
+            .crop-system {
+                pointer-events: none;
+            }
+            
+            .crop-overlay {
+                transition: opacity 0.2s ease;
+            }
+            
+            .crop-handle {
+                transition: all 0.2s ease;
+            }
+            
+            .crop-handle:hover {
+                background: #fff !important;
+                border-color: #3b82f6 !important;
+                transform: scale(1.1);
+            }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Initialisation du PhotoEditor moderne...');
+            
+            // Initialisation avec container et callbacks
+            const container = document.getElementById('canvasContainer');
+            const editor = new PhotoEditor(container, {
+                onRender: async (blob) => {
+                    console.log('Image rendue - taille blob:', blob.size);
+                    // Debug: créer une image temporaire pour vérifier les dimensions
+                    const img = new Image();
+                    img.onload = () => {
+                        console.log('Blob dimensions:', img.width, 'x', img.height);
+                        URL.revokeObjectURL(img.src);
+                    };
+                    img.src = URL.createObjectURL(blob);
+                },
+                onBackgroundColorDetected: (color) => {
+                    console.log('Couleur de fond détectée:', color);
+                    // Optionnel: sélectionner automatiquement la couleur détectée
+                    // updateBackgroundColorUI(color);
+                }
+            });
+            window.editor = editor; // Exposer globalement pour debug
+
+            // Interface utilisateur
+            document.getElementById('imageInput').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const url = URL.createObjectURL(file);
+                    await editor.setImage(url);
+                    URL.revokeObjectURL(url);
+                }
+            });
+
+            // Contrôles avec la nouvelle API fluide
+            const controls = {
+                brightness: (v) => editor.setBrightness(parseInt(v)),
+                contrast: (v) => editor.setContrast(parseInt(v)),
+                exposure: (v) => editor.setExposure(parseInt(v)),
+                saturation: (v) => editor.setSaturation(parseInt(v)),
+                hue: (v) => editor.setHue(parseInt(v)),
+                gamma: (v) => editor.setGamma(parseFloat(v)),
+                rotation: (v) => editor.setRotation(parseInt(v))
+            };
+
+            Object.keys(controls).forEach(id => {
+                const slider = document.getElementById(id);
+                const valueSpan = document.getElementById(id + 'Value');
+                
+                slider.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    controls[id](value);
+                    
+                    let displayValue = value;
+                    if (id === 'gamma') displayValue = parseFloat(value).toFixed(1);
+                    else if (id === 'hue' || id === 'rotation') displayValue += '°';
+                    valueSpan.textContent = displayValue;
+                });
+            });
+
+            // Gestion du crop avec la nouvelle API
+            const enableCropBtn = document.getElementById('enableCropBtn');
+            const disableCropBtn = document.getElementById('disableCropBtn');
+            const cropRatioSelect = document.getElementById('cropRatio');
+            const cropInfo = document.getElementById('cropInfo');
+            
+            enableCropBtn.addEventListener('click', async () => {
+                const ratio = cropRatioSelect.value;
+                let w = null, h = null;
+                
+                if (ratio && ratio !== '') {
+                    const parts = ratio.split(':');
+                    if (parts.length === 2) {
+                        w = parseFloat(parts[0]);
+                        h = parseFloat(parts[1]);
+                    }
+                }
+                
+                await editor.enableCrop(w, h);
+                
+                // Mise à jour UI
+                enableCropBtn.classList.add('hidden');
+                disableCropBtn.classList.remove('hidden');
+                cropRatioSelect.disabled = false;
+                cropInfo.classList.remove('hidden');
+                
+                // Mettre à jour les infos de crop
+                updateCropInfo();
+            });
+            
+            disableCropBtn.addEventListener('click', () => {
+                editor.disableCrop();
+                
+                // Mise à jour UI
+                enableCropBtn.classList.remove('hidden');
+                disableCropBtn.classList.add('hidden');
+                cropRatioSelect.disabled = true;
+                cropInfo.classList.add('hidden');
+            });
+            
+            cropRatioSelect.addEventListener('change', async (e) => {
+                if (editor.cropOverlay && editor.cropOverlay.isActive()) {
+                    const ratio = e.target.value;
+                    let w = null, h = null;
+                    
+                    if (ratio && ratio !== '') {
+                        const parts = ratio.split(':');
+                        if (parts.length === 2) {
+                            w = parseFloat(parts[0]);
+                            h = parseFloat(parts[1]);
+                        }
+                    }
+                    
+                    await editor.enableCrop(w, h);
+                    updateCropInfo();
+                }
+            });
+            
+            // Fonction utilitaire pour mettre à jour les infos de crop
+            function updateCropInfo() {
+                if (editor.cropOverlay && editor.cropOverlay.isActive()) {
+                    const crop = editor.cropOverlay.getCrop();
+                    if (crop) {
+                        document.getElementById('cropX').textContent = Math.round(crop.x);
+                        document.getElementById('cropY').textContent = Math.round(crop.y);
+                        document.getElementById('cropW').textContent = Math.round(crop.width);
+                        document.getElementById('cropH').textContent = Math.round(crop.height);
+                    }
+                }
+            }
+            
+            // Mettre à jour les infos de crop périodiquement
+            setInterval(updateCropInfo, 500);
+
+            // Bouton IA Remove Background avec nouvelle API
+            document.getElementById('aiRemoveBgBtn').addEventListener('click', async () => {
+                console.log('IA Remove Background activé');
+                const selectedRadio = document.querySelector('input[name="bgColor"]:checked');
+                let replacementColor = null;
+                
+                if (selectedRadio && selectedRadio.value !== '') {
+                    const color = selectedRadio.value.split(',').map(Number);
+                    replacementColor = { r: color[0], g: color[1], b: color[2] };
+                }
+                
+                // Afficher un loader
+                document.getElementById('aiRemoveBgBtn').innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Auto';
+                
+                try {
+                    await editor.removeBackgroundAI(replacementColor);
+                } catch (error) {
+                    console.error('Erreur remove background IA:', error);
+                    alert('Erreur lors du traitement IA: ' + error.message);
+                } finally {
+                    // Restaurer le bouton
+                    document.getElementById('aiRemoveBgBtn').innerHTML = '<i data-lucide="wand-2" class="w-3 h-3"></i> Auto';
+                    if (window.createIcons) window.createIcons();
+                }
+            });
+
+            // Gestion du color picker
+            let colorPickerActive = false;
+            
+            // Radio buttons pour les couleurs de remplacement
+            document.querySelectorAll('input[name="bgColor"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        if (e.target.value === '') {
+                            console.log('Désactivation color picker');
+                            editor.disableColorPicker();
+                            colorPickerActive = false;
+                        } else {
+                            const color = e.target.value.split(',').map(Number);
+                            console.log('Couleur sélectionnée:', color);
+                            editor.setBackgroundColor({ r: color[0], g: color[1], b: color[2] });
+                            
+                            // Activer le color picker pour sélectionner la zone à remplacer
+                            editor.enableColorPicker((pickedColor) => {
+                                console.log('Couleur cliquée pour remplacement:', pickedColor);
+                                // Ici on pourrait implémenter le remplacement par couleur
+                                // Pour l'instant, on se contente du remove background IA
+                            });
+                            colorPickerActive = true;
+                        }
+                    }
+                });
+            });
+
+            // Seuil pour le remplacement d'arrière-plan
+            document.getElementById('threshold').addEventListener('input', (e) => {
+                const threshold = parseInt(e.target.value);
+                document.getElementById('thresholdValue').textContent = threshold;
+                console.log('Seuil mis à jour:', threshold);
+            });
+
+            // Boutons d'action (pas d'historique dans la nouvelle version)
+            document.getElementById('undoBtn').style.display = 'none';
+            document.getElementById('redoBtn').style.display = 'none';
+
+            // Reset avec nouvelle API
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                editor.reset().disableCrop();
+                
+                // Réinitialiser l'UI
+                Object.keys(controls).forEach(id => {
+                    const slider = document.getElementById(id);
+                    const valueSpan = document.getElementById(id + 'Value');
+                    
+                    if (id === 'gamma') {
+                        slider.value = 1;
+                        valueSpan.textContent = '1.0';
+                    } else {
+                        slider.value = 0;
+                        let displayValue = '0';
+                        if (id === 'hue' || id === 'rotation') displayValue += '°';
+                        valueSpan.textContent = displayValue;
+                    }
+                });
+                
+                cropRatioSelect.value = '';
+                enableCropBtn.classList.remove('hidden');
+                disableCropBtn.classList.add('hidden');
+                cropRatioSelect.disabled = true;
+                cropInfo.classList.add('hidden');
+                
+                // Remettre le radio "Aucun" par défaut
+                document.querySelector('input[name="bgColor"][value=""]').checked = true;
+                editor.disableColorPicker();
+                colorPickerActive = false;
+            });
+
+            // Export avec nouvelle API getImage()
+            document.getElementById('exportBtn').addEventListener('click', async () => {
+                try {
+                    const blob = await editor.getImage('image/jpeg', 0.9);
+                    console.log('Image exportée - taille:', blob.size);
+                    
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'photo-editee.jpg';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } catch (error) {
+                    console.error('Erreur lors de l\'export:', error);
+                    alert('Erreur lors de l\'export: ' + error.message);
+                }
+            });
+
+            // Raccourcis clavier (simplifiés)
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 'r':
+                            // Désactivé pour éviter d'interférer avec le rafraîchissement
+                            // e.preventDefault();
+                            // editor.reset();
+                            break;
+                    }
+                }
+            });
+
+            // Initialiser les icônes Lucide
+            function initLucideIcons() {
+                if (typeof window.createIcons !== 'undefined') {
+                    window.createIcons();
+                } else {
+                    setTimeout(initLucideIcons, 100);
+                }
+            }
+
+            // Affichage d'une image par défaut pour démonstration
+            setTimeout(async () => {
+                initLucideIcons();
+                
+                // Créer une image de démonstration colorée
+                const demoCanvas = document.createElement('canvas');
+                demoCanvas.width = 600;
+                demoCanvas.height = 400;
+                const demoCtx = demoCanvas.getContext('2d');
+                
+                // Gradient coloré
+                const gradient = demoCtx.createLinearGradient(0, 0, 600, 400);
+                gradient.addColorStop(0, '#ff6b6b');
+                gradient.addColorStop(0.33, '#4ecdc4');
+                gradient.addColorStop(0.66, '#45b7d1');
+                gradient.addColorStop(1, '#96ceb4');
+                
+                demoCtx.fillStyle = gradient;
+                demoCtx.fillRect(0, 0, 600, 400);
+                
+                // Ajouter quelques formes
+                demoCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                demoCtx.beginPath();
+                demoCtx.arc(150, 150, 80, 0, Math.PI * 2);
+                demoCtx.fill();
+                
+                demoCtx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                demoCtx.fillRect(350, 100, 200, 150);
+                
+                demoCtx.fillStyle = 'rgba(255, 255, 0, 0.7)';
+                demoCtx.beginPath();
+                demoCtx.moveTo(450, 280);
+                demoCtx.lineTo(500, 350);
+                demoCtx.lineTo(400, 350);
+                demoCtx.closePath();
+                demoCtx.fill();
+                
+                // Charger l'image de démo avec la nouvelle API fluide
+                try {
+                    await editor.setImage(demoCanvas.toDataURL());
+                    console.log('Image de démo chargée');
+                    
+                    // Exemple de chaînage des méthodes
+                    editor
+                        .setBrightness(10)
+                        .setContrast(5)
+                        .setSaturation(15);
+                } catch (error) {
+                    console.error('Erreur lors du chargement de l\'image de démo:', error);
+                }
+            }, 500);
+        });
+    </script>
+{% endblock %}

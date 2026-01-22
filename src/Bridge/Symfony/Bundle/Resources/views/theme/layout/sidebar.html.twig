@@ -1,0 +1,57 @@
+<button id="sidebar-toggle" class="absolute -end-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-layout-border bg-[var(--color-menu-bg)] p-1 text-white hover:bg-[var(--color-menu-bg-lighter)]">
+	<i data-lucide="chevron-left" class="size-3 group-[.closed]/sidebar:hidden"></i>
+	<i data-lucide="chevron-right" class="size-3 hidden group-[.closed]/sidebar:block"></i>
+</button>
+
+<div class="flex items-center justify-center h-24 group-[.closed]/sidebar:h-14 group-[.closed]/sidebar:pt-0 border-b border-layout-border">
+	<div class="flex items-center justify-center h-full transition-all duration-300 p-0.5 pt-1.5">
+		<img src="{% block logo_url '' %}" alt="Logo" class="w-auto h-full object-contain">
+	</div>
+</div>
+
+<nav class="flex flex-1 overflow-y-auto mt-5">
+	<ul class="flex flex-1 flex-col overflow-hidden gap-y-7">
+	{% for section in menu|default([]) %}
+		{{ render_block('menu_section', '@_theme/components/menu.html.twig', {
+			section: section,
+			active_menu: active_menu,
+		}) }}
+	{% endfor %}
+	</ul>
+</nav>
+
+<hr class="w-full border-t border-layout-border mt-2"/>
+
+{% if app.user %}
+<div class="bottom-0 px-2 py-4 group relative z-50 overflow-visible">
+	<div class="flex items-center gap-4 rounded-md px-3 py-2 cursor-pointer justify-center group-[.closed]/sidebar:justify-center hover:bg-menu-hover group-hover:bg-menu-hover hover:text-white">
+		<div class="w-10 h-10 shrink-0 transition-all duration-300 group-[.closed]/sidebar:scale-90">
+			<div class="size-10 rounded-full bg-secondary flex items-center justify-center text-light font-semibold text-sm">
+				{{ app.user.username|default('?')|first|upper }}
+			</div>
+		</div>
+		<div class="flex-1 min-w-0 group-[.closed]/sidebar:hidden leading-tight">
+			<p class="text-sm font-medium truncate">{{ app.user.firstName|default('') }}</p>
+			<p class="text-sm font-medium truncate">{{ app.user.lastName|default('') }}</p>
+		</div>
+		<i data-lucide="chevron-up" class="size-4 text-gray-400 group-[.closed]/sidebar:hidden"></i>
+	</div>
+
+	<div class="absolute bottom-full inset-x-2 mb-0
+			z-50 pointer-events-none opacity-0 scale-95
+			transition-all duration-150
+			rounded-md bg-menu-hover
+			py-2 shadow-lg ring-1 ring-dark/5
+			w-[222px] left-2
+			group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto">
+		<a href="{{ path('profile/password') }}" class="flex items-center justify-between px-4 py-2 text-sm hover:text-white hover:bg-menu-bg-lighter">
+			<span class="truncate">{{ 'nav.profile.password'|trans({}, 'messages') }}</span>
+			<i data-lucide="key-round" class="size-4"></i>
+		</a>
+		<a href="{{ path('security/logout') }}" class="flex items-center justify-between px-4 py-2 text-sm hover:text-white hover:bg-menu-bg-lighter">
+			<span class="truncate">{{ 'nav.logout'|trans({}, 'messages') }}</span>
+			<i data-lucide="log-out" class="size-4"></i>
+		</a>
+	</div>
+</div>
+{% endif %}

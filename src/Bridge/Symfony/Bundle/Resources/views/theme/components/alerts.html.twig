@@ -1,0 +1,9 @@
+{% macro form_error(error, namespace, translations_domain) %}
+    <div role="alert" class="rounded-md border border-red-300 bg-red-50 my-8 px-4 py-2 text-sm/6 text-red-800">
+        <strong>{{ (namespace ~ '.error.label')|trans({}, translations_domain) }}</strong>
+        - {{ (namespace ~ '.error.' ~ error.messageKey)|trans(error.messageData, translations_domain) }}
+        {% if error.code is defined %}
+            <span class="mt-1 text-xs italic text-red-900 font-mono">(#{{ error.code }})</span>
+        {% endif %}
+    </div>
+{% endmacro %}

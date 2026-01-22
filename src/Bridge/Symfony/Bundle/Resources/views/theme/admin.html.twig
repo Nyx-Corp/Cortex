@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}" class="h-full bg-white">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>{% block html_title 'meta.title'|trans %}</title>
+		<meta name="description" content="{% block html_meta_description %}{% trans %}meta.description{% endtrans %}{% endblock %}">
+		<meta name="robots" content="index, follow">
+
+		<link rel="canonical" href="{{ url('index') }}"/>
+		<link rel="icon" type="image/x-icon" href="{{ asset('assets/public/images/favicon.ico') }}">
+
+		{% block stylesheets vite_entry_link_tags('main') %}
+		{% block javascripts vite_entry_script_tags('app') %}
+	</head>
+
+	<body class="h-full min-h-0 bg-layout-bg text-layout-text">
+	{% block body %}
+        <div id="container" class="group/sidebar">
+			<script>
+				if (localStorage.getItem('sidebar-collapsed') === 'true') {
+					document.querySelector('#container').classList.add('closed');
+				}
+			</script>
+			<aside class="fixed inset-y-0 start-0 z-50 flex flex-col bg-menu-bg text-light border-r border-menu-border transition-all duration-300 w-60 group-[.closed]/sidebar:w-16 overflow-visible">
+			{% block sidebar %}
+				{% embed '@_theme/layout/sidebar.html.twig' %}{% endembed %}
+			{% endblock %}
+			</aside>
+			<div class="ps-60 group-[.closed]/sidebar:ps-16 transition-[padding] duration-150 ease-in-out min-h-screen">
+			{% block content %}
+				<header class="sticky top-0 z-40 flex h-14 shrink-0 items-center border-b border-layout-border bg-white shadow-xs gap-x-6 px-4 text-dark flex flex-1 self-stretch gap-x-4">
+            	{% block header %}
+					{% block breadcrumbs %}
+					<nav class="flex grow-1 text-dark-lighter text-sm" aria-label="Breadcrumb">
+						<ol role="list" class="flex items-center space-x-3">
+						{% block breadcrumb '' %}
+						</ol>
+					</nav>
+					{% endblock %}
+					{% block notifications include("@_theme/components/notifications.html.twig") %}
+					{% block search_bar include("@_theme/components/searchbar.html.twig") %}
+				{% endblock %}
+				</header>
+				<main class="flex flex-col flex-1 h-[calc(100vh-57px)] max-h-[calc(100vh-57px)] relative z-30">
+					{% block main '' %}
+				</main>
+			{% endblock %}
+            </div>
+        </div>
+	{% endblock %}
+	</body>
+</html>

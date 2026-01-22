@@ -1,0 +1,207 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+	<script type="module" src="{{ asset('layouts.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+	<main class="py-20">
+		<div class="container mx-auto">
+			<h1 class="text-3xl font-bold mb-6">Layouts</h1>
+
+			<hr role="presentation" class="w-full border-t border-(--divider-border)/10 my-10"/>
+			<h2 class="text-2xl font-bold mb-5">Picture dashboards</h2>
+		</div>
+
+
+		<div class="grid grid-cols-[minmax(var(--layout-col-min-width),_var(--layout-col-max-width))_minmax(var(--layout-col-min-width),_var(--layout-col-max-width))_1fr] min-h-screen max-h-screen">
+
+			<div class="border-r border-(--layout-border)/10 p-2 pb-6 space-y-1 max-h-screen overflow-y-auto overflow-x-clip snap-y snap-mandatory scroll-py-2">
+
+				<a href="" class="snap-start block rounded-md py-2 px-3 space-y-1 text-balance text-sm text-dark bg-dark-lighter/10">
+					<p class="font-semibold text-selected">Reference selected</p>
+					<p>Color Variant</p>
+					<p class="text-xs/6 flex whitespace-nowrap gap-2">
+						<span class="text-dark-light">#ref-selected</span>
+						<span class="ml-auto w-9 min-w-max rounded-full bg-white/25 px-2.5 py-0.5 text-center text-xs/5 font-medium ring-1 text-selected ring-selected ring-inset">2 / 12</span>
+					</p>
+				</a>
+
+				<a href="" class="snap-start block rounded-md py-2 px-3 space-y-1 text-balance text-sm text-dark hover:bg-dark-lighter/10 ">
+					<p class="font-semibold">Reference base</p>
+					<p>Color Variant</p>
+					<p class="text-xs/6 flex whitespace-nowrap gap-2">
+						<span class="text-dark-light">#ref-base</span>
+						<span class="ml-auto w-9 min-w-max rounded-full bg-white/25 px-2.5 py-0.5 text-center text-xs/5 font-medium ring-1 ring-gray-600 ring-inset">0 / 12</span>
+					</p>
+				</a>
+
+				<a href="" class="snap-start block rounded-md py-2 px-3 space-y-1 text-balance text-sm text-dark hover:bg-dark-lighter/10 ">
+					<p class="font-semibold">Reference avec trop beaucoup de texte</p>
+					<p>Color Variant avec vraiment trop beaucoup de texte</p>
+					<p class="text-xs/6 flex whitespace-nowrap gap-2">
+						<span class="text-dark-light">#ref-base</span>
+						<span class="ml-auto w-9 min-w-max rounded-full bg-white/25 px-2.5 py-0.5 text-center text-xs/5 font-medium ring-1 ring-gray-600 ring-inset">0 / 12</span>
+					</p>
+				</a>
+
+
+				<a href="" class="snap-start block rounded-md py-2 px-3 space-y-1 text-balance text-sm text-dark bg-(--color-success,var(--color-green-600))/5 hover:bg-(--color-success,var(--color-green-600))/10">
+					<p class="font-semibold text-(--color-success,var(--color-green-600))">Reference complete</p>
+					<p>Color Variant</p>
+					<p class="text-xs/6 flex whitespace-nowrap gap-2">
+						<span class="text-dark-light">#ref-complete</span>
+						<span class="ml-auto w-9 min-w-max rounded-full bg-white/50 px-2.5 py-0.5 text-center text-xs/5 font-medium ring-1 ring-(--color-success,var(--color-green-600)) ring-inset text-(--color-success,var(--color-green-600))">12 / 12
+						</span>
+					</p>
+				</a>
+
+				{% for i in 1..15 %}
+					<a href="" class="snap-start block rounded-md py-2 px-3 space-y-1 text-balance text-sm text-dark hover:bg-dark-lighter/10">
+						<p class="font-semibold">Reference
+							{{i}}</p>
+						<p>Color Variant</p>
+						<p class="text-xs/6 flex whitespace-nowrap gap-2">
+							<span class="text-dark-light">#ref-{{i}}</span>
+							<span class="ml-auto w-9 min-w-max rounded-full bg-white/25 px-2.5 py-0.5 text-center text-xs/5 font-medium ring-1 ring-gray-600 ring-inset">3 / 12</span>
+						</p>
+					</a>
+				{% endfor %}
+
+			</div>
+
+			<div class="border-r border-(--layout-border)/10 p-2 pb-6 space-y-1 max-h-screen overflow-y-auto overflow-x-clip snap-y snap-mandatory scroll-py-2">
+				<div class="snap-start block relative bg-dark-lighter/10 rounded-md">
+					<a space-y-1 class="block text-sm py-2 px-3 text-balance text-selected" href="">Vue selected</a>
+				</div>
+
+				<div class="snap-start block relative has-hover:bg-dark-lighter/10 rounded-md">
+					<a space-y-1 class="block text-sm py-2 px-3 text-balance text-dark" href="">Vue avec trop beaucoup de texte</a>
+				</div>
+
+				{% for i in 1..4 %}
+					<div class="snap-start block relative has-hover:bg-dark-lighter/10 rounded-md">
+						<a space-y-1 class="block text-sm py-2 px-3 text-balance text-dark" href="">Vue
+							{{i}}</a>
+					</div>
+				{% endfor %}
+
+				<div class="snap-start block relative has-hover:bg-dark-lighter/10 rounded-md">
+					<a space-y-1 class="block text-sm py-2 px-3 pe-10 text-balance text-dark" href="">Vue deletable</a>
+					<button type="button" class="absolute end-2 inset-y-0 my-auto inline-block size-7 text-xs cursor-pointer hover:bg-white hover:ring-dark-lighter ring-1 ring-transparent ring-inset p-0.5 rounded-md">
+						<span class="sr-only">Delete</span>
+						<!-- PUT icon HERE to show trashbin / delete -->
+						<x-placeholder class="contents" message="icon delete">🗑️</x-placeholder>
+					</button>
+				</div>
+
+				<hr role="presentation" class="w-full border-t border-(--divider-border)/10 my-2"/>
+
+				<div class="block">
+					<a href="" class="inline-block text-sm py-2 px-3 whitespace-nowrap">
+						+&nbsp;
+						<span class="underline text-indigo-500">Add new vue</span>
+					</a>
+				</div>
+
+			</div>
+
+			<div class="p-3">
+				<x-placeholder class="contents" message="render view">
+					<div class="relative h-full overflow-hidden rounded-xl border border-dashed border-gray-400 opacity-75">
+						<svg class="absolute inset-0 size-full stroke-dark/10" fill="none">
+							<defs>
+								<pattern id="pattern-1526ac66-f54a-4681-8fb8-0859d412f251" x="0" y="0" width="10" height="10" patternunits="userSpaceOnUse">
+									<path d="M-3 13 15-5M-5 5l18-18M-1 21 17 3"></path>
+								</pattern>
+							</defs>
+							<rect stroke="none" fill="url(#pattern-1526ac66-f54a-4681-8fb8-0859d412f251)" width="100%" height="100%"></rect>
+						</svg>
+					</div>
+				</x-placeholder>
+			</div>
+		</div>
+
+		<div class="container mx-auto">
+			<hr role="presentation" class="w-full border-t border-(--divider-border)/10 my-10"/>
+		</div>
+
+		<div class="grid grid-cols-[minmax(var(--layout-col-max-width),_var(--layout-col-min-width))_1fr] min-h-screen max-h-screen">
+			<div class="border-r border-(--layout-border)/10 p-2 pb-6 space-y-1 max-h-screen overflow-y-auto overflow-x-clip snap-y snap-mandatory scroll-py-2">
+				<div class="snap-start block relative bg-dark-lighter/10 rounded-md">
+					<a space-y-1 class="block text-sm py-2 px-3 text-balance text-selected" href="">Vue selected</a>
+				</div>
+
+				<div class="snap-start block relative has-hover:bg-dark-lighter/10 rounded-md">
+					<a space-y-1 class="block text-sm py-2 px-3 text-balance text-dark" href="">Vue avec trop beaucoup de texte</a>
+				</div>
+
+				{% for i in 1..4 %}
+					<div class="snap-start block relative has-hover:bg-dark-lighter/10 rounded-md">
+						<a space-y-1 class="block text-sm py-2 px-3 text-balance text-dark" href="">Vue
+							{{i}}</a>
+					</div>
+				{% endfor %}
+
+				<div class="snap-start block relative has-hover:bg-dark-lighter/10 rounded-md">
+					<a space-y-1 class="block text-sm py-2 px-3 pe-10 text-balance text-dark" href="">Vue deletable</a>
+					<button type="button" class="absolute end-2 inset-y-0 my-auto inline-block size-7 text-xs cursor-pointer hover:bg-white hover:ring-dark-lighter ring-1 ring-transparent ring-inset p-0.5 rounded-md">
+						<span class="sr-only">Delete</span>
+						<!-- PUT icon HERE to show trashbin / delete -->
+						<x-placeholder class="contents" message="icon delete">🗑️</x-placeholder>
+					</button>
+				</div>
+
+				<hr role="presentation" class="w-full border-t border-(--divider-border)/10 my-2"/>
+
+				<div class="block">
+					<a href="" class="inline-block text-sm py-2 px-3 whitespace-nowrap">
+						+&nbsp;
+						<span class="underline text-indigo-500">Add new vue</span>
+					</a>
+				</div>
+
+			</div>
+
+			<div class="p-3">
+				<x-placeholder class="contents" message="render view">
+					<div class="relative h-full overflow-hidden rounded-xl border border-dashed border-gray-400 opacity-75">
+						<svg class="absolute inset-0 size-full stroke-dark/10" fill="none">
+							<defs>
+								<pattern id="pattern-1526ac66-f54a-4681-8fb8-0859d412f251" x="0" y="0" width="10" height="10" patternunits="userSpaceOnUse">
+									<path d="M-3 13 15-5M-5 5l18-18M-1 21 17 3"></path>
+								</pattern>
+							</defs>
+							<rect stroke="none" fill="url(#pattern-1526ac66-f54a-4681-8fb8-0859d412f251)" width="100%" height="100%"></rect>
+						</svg>
+					</div>
+				</x-placeholder>
+			</div>
+		</div>
+
+		<div class="container mx-auto">
+			<hr role="presentation" class="w-full border-t border-(--divider-border)/10 my-10"/>
+			<h2 class="text-2xl font-bold mb-5">Grid</h2>
+		</div>
+
+		<div class="bg-gray-200">
+			<div class="max-w-full min-w-96 mx-auto resize-x overflow-auto py-20 px-10">
+				<div class="@container/grid">
+					<div class="rounded-lg grid grid-cols-1 @md/grid:grid-cols-2 @3xl/grid:grid-cols-3 gap-px overflow-clip">
+						<div class="bg-white h-64 first:rounded-tl-lg last:rounded-br-lg"></div>
+						<div class="bg-white h-64 first:rounded-tl-lg last:rounded-br-lg"></div>
+						<div class="bg-white h-64 first:rounded-tl-lg last:rounded-br-lg"></div>
+						<div class="bg-white h-64 first:rounded-tl-lg last:rounded-br-lg"></div>
+						<div class="bg-white h-64 first:rounded-tl-lg last:rounded-br-lg"></div>
+						<div class="bg-white h-64 first:rounded-tl-lg last:rounded-br-lg"></div>
+						<div class="bg-white h-64 first:rounded-tl-lg last:rounded-br-lg"></div>
+						<div class="bg-white h-64 first:rounded-tl-lg last:rounded-br-lg"></div>
+						<div class="bg-white h-64 first:rounded-tl-lg last:rounded-br-lg"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+	</main>
+{% endblock %}

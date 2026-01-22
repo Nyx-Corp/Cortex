@@ -1,0 +1,17 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    # Makers
+    Cortex\Bridge\Symfony\Bundle\Maker\:
+        resource: '../../Maker/'
+        exclude:
+            - '../../Maker/Manipulator/'
+            - '../../Maker/Helper/'
+        public: true
+        arguments:
+            $templateFolder: '@@CortexBridgeBundle/Resources/maker'
+            $fileLocator: '@file_locator'
+
+        tags: ['maker.command']

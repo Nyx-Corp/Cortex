@@ -1,0 +1,89 @@
+<?php
+
+namespace Application\{Module}\Controller\Action;
+
+use Cortex\Bridge\Symfony\Controller\ControllerInterface;
+use Application\{Module}\Form\{Model}{Action}Type;
+use Domain\{Domain}\Model\{Model};
+use Domain\{Domain}\Action\{Model}{Action};
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGenerator;
+
+/**
+ * Handles "{Action}" action for module {module}
+ * 
+ * @see Domain\{Domain}\Action\{Action}\Handler
+ */
+class {Model}{Action}FormAction implements ControllerInterface
+{
+    public function __construct(
+        private FormFactoryInterface $formFactory,
+        private SessionInterface $session,
+        private UrlGeneratorInterface $urlGenerator,
+        private readonly bool $debug,
+    ) {}
+ 
+    #[Route(
+        path: '/{model}/{action}/{uuid}',
+        name: '{model}/{action}',
+        methods: ['GET', 'POST'],
+    )]
+    public function __invoke(Request $request, {Model} ${model}): Response|array
+    {
+        $form = $this->formFactory->createNamed(
+            name: '{_action}',
+            type: {Model}{Action}Type::class,
+            data: [ 
+                // 'label' => ${model}->label,
+            ],
+            options: [
+                'data_class' => {Action}\Command::class,
+                'action' => $this->urlGenerator->generate(
+                    route: '{module}/{model}/{action}',
+                    parameters: ['uuid' => ${model}->uuid]
+                ),
+                'method' => 'POST',
+            ]
+        );
+
+        try {    
+            $form->handleRequest($request);
+            
+            if ($form->isSubmitted())
+                if (!$form->isValid()) {
+                    $this->session->getFlashBag()->add('error', '{action}.error.validation_failed');
+                }
+                else {
+                    $this->session->getFlashBag()->add('success', '{action}.success.message');
+
+                    /** @var Domain\{Domain}\Action\{Action}\Response */
+                    $response = $form->getData();
+                    
+                    // do stuff here
+
+                    // return new RedirectResponse($this->urlGenerator->generate(
+                    //     route: '{module}/{model}/....',
+                    //     parameters: ['uuid' => $response->{model}->uuid]
+                    // ));                 
+                }
+            }
+        }
+        catch ({Action}\Exception $th) {
+            $this->session->getFlashBag()->add('error', '{action}.error.'.$th->getMessage());
+
+            if ($this->debug) {
+                throw $th;
+            }
+        }
+
+        return [
+            '{model}' => $model,
+            'form' => $form->createView(),
+        ];
+    }
+}

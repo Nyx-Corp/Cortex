@@ -1,0 +1,32 @@
+nav:
+    list:
+        title: Liste
+    create:
+        title: Nouveau
+    edit:
+        title: Modifier
+
+action:
+    reset: Réinitialiser
+    create: Nouveau
+    edit: Éditer
+    back: Retour
+    submit: Enregistrer
+    archive:
+        label: Archiver
+        confirmation: Êtes-vous sûr de vouloir archiver cet élément ?
+
+list:
+    filters:
+        title: Filtres
+        counter: '{first}-{last} sur {total}'
+        submit: Filtrer
+        clear: Effacer
+    pager:
+        display: Afficher
+        results: résultats
+    sorting:
+        asc: Tri par {field} ascendant
+        desc: Tri par {field} descendant
+    fields:
+        uuid: Uuid

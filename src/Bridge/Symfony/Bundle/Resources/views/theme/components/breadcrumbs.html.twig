@@ -1,0 +1,16 @@
+{% macro item(text, icon = null, link = null, active = false) %}
+    <li data-active="{{ active ? 'true' : 'false' }}" class="data-[active=true]:font-semibold data-[active=true]:text-dark">
+        <a {% if link %}href="{{ link }}"{% endif %} 
+            aria-current="{{ active ? 'page' : 'false' }}" 
+            class="flex items-center gap-3 hover:text-dark data-[active=false]:text-dark-lighter data-[active=false]:cursor-default"
+        >
+            {% if icon %}<i data-lucide="{{ icon }}" class="size-4 inline align-text-bottom"></i>{% endif %}
+            {% if text is not empty %}<span>{{ text }}</span>{% endif %}
+        </a>
+    </li>
+    {% if not active %}
+        <li>
+            <i data-lucide="chevron-right" class="size-5 shrink-0 text-menu-hover"></i>
+        </li>
+    {% endif %}
+{% endmacro %}

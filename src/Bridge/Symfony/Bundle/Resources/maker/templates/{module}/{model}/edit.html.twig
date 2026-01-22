@@ -1,0 +1,15 @@
+{# template route : {module}/{model}/{action} #}
+
+{% trans_default_domain '{module}' %}
+
+{% set title = '{model}.edit.title'|trans({ '%model%': {model} }) %}
+
+{% extends "{module}/{model}/_form.html.twig" %}
+
+{% import '_theme/components/breadcrumbs.html.twig' as breadcrumbs %}
+{% block breadcrumb %}
+    {{ parent() }}
+    {{ breadcrumbs.item({model}, null, null, true) }}
+{% endblock %}
+
+{% block title title %}

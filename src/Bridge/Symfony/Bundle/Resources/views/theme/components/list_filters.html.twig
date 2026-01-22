@@ -1,0 +1,39 @@
+{% use "form_div_layout.html.twig" %}
+
+{% block text_widget %}
+    {% set attr = attr|merge({ 
+        'class': 'block px-2.5 py-2.5 w-full text-sm text-dark bg-transparent rounded-s-lg border border-light-darker border-e-0 appearance-none focus:outline-none focus:ring-0 focus:border-form-border-focus peer transition-all',
+        'placeholder': ' '
+    }) %}
+    {{ block('form_widget_simple') }}
+{% endblock %}
+
+{% block choice_widget %}
+    {% set attr = attr|merge({ 
+        'class': 'block px-2.5 py-2.5 pr-8 w-full text-sm text-dark bg-transparent rounded-s-lg border border-light-darker border-e-0 appearance-none focus:outline-none focus:ring-0 focus:border-form-border-focus peer cursor-pointer transition-all',
+        'data-autosubmit': true
+    }) %}
+    <div class="relative w-full">
+        <select {{ block('widget_attributes') }} {{ multiple ? 'multiple="multiple"' : '' }}>
+            {% if placeholder is defined and placeholder %}
+                <option value="">{{ placeholder }}</option>
+            {% else %}
+                <option value="" style="display:none;"></option>
+            {% endif %}
+            {% for group_label, choice in choices %}
+                {%- if choice is iterable -%}
+                    <optgroup label="{{ choice_translation_domain is same as(false) ? group_label : group_label|trans({}, choice_translation_domain) }}">
+                        {% for nested_choice in choice %}
+                            <option value="{{ nested_choice.value }}"{% if nested_choice.attr %} {% set attr = nested_choice.attr %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% endif %}{% if nested_choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? nested_choice.label : nested_choice.label|trans({}, choice_translation_domain) }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {%- else -%}
+                    <option value="{{ choice.value }}"{% if choice.attr %} {% set attr = choice.attr %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% endif %}{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}</option>
+                {%- endif -%}
+            {% endfor %}
+        </select>
+        <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+            <i data-lucide="chevron-down" class="size-3 text-dark-lighter"></i>
+        </div>
+    </div>
+{% endblock %}

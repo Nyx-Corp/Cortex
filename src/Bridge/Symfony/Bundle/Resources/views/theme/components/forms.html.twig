@@ -1,0 +1,89 @@
+{% use "form_div_layout.html.twig" %}
+
+{%- block form_row -%}
+    {% if compound %}
+        {{- form_rest(form) -}}
+    {% else %}
+        {%- set widget_attr = {} -%}
+        {%- if help is not empty -%}
+            {%- set widget_attr = { attr:{'aria-describedby': id ~"_help" }} -%}
+        {%- endif -%}
+        {% set row_attr = { class: 'sm:col-span-4'}|merge(row_attr|default({})) %}
+        {% set label_container_attr = { class: 'flex items-center gap-3'}|merge(label_container_attr|default({})) %}
+        {% set widget_container_attr = { class: 'mt-2'}|merge(widget_container_attr|default({})) %}
+        <div{% with { attr: row_attr } %}{{ block('attributes') }}{% endwith %}>
+            <div {% with { attr: label_container_attr } %}{{ block('attributes') }}{% endwith %}>
+                {{- form_label(form) -}}
+                {{- form_help(form) -}}
+            </div>
+            <div {% with { attr: widget_container_attr } %}{{ block('attributes') }}{% endwith %}>
+                {{- form_widget(form, widget_attr) -}}
+            </div>
+            {{- form_errors(form) -}}
+        </div>
+    {% endif %}
+{%- endblock form_row -%}
+
+{% block form_label %}
+    {% set label_attr = {'class': 'text-sm/6 font-medium text-form-label'} | merge(label_attr|default({})) %}
+    {{ parent() }}
+{% endblock %}
+
+{% block form_widget_simple %}
+    {% set attr = {
+        class: 'block appearance-none w-full rounded-md bg-form-bg px-3 py-1.5 text-base text-form outline-1 -outline-offset-1 outline-form-border placeholder:text-form-placeholder placeholder:italic focus:outline-2 focus:-outline-offset-2 focus:outline-form-border-focus sm:text-sm/6',
+        placeholder: placeholder|default(false)
+    } | merge(attr|default({})) %}
+    {{ parent() }}
+{% endblock %}
+
+{%- block textarea_widget -%}
+    {% set attr = {
+        class: 'block appearance-none w-full rounded-md bg-form-bg px-3 py-1.5 text-base text-form outline-1 -outline-offset-1 outline-form-border placeholder:text-form-placeholder placeholder:italic focus:outline-2 focus:-outline-offset-2 focus:outline-form-border-focus sm:text-sm/6 min-h-[6rem] resize-none',
+        placeholder: placeholder|default(false)
+    } | merge(attr|default({})) %}
+    {{ parent() }}
+{%- endblock textarea_widget -%}
+
+{%- block choice_widget_expanded -%}
+
+    {% set label_attr = {'class': 'ml-2 mr-8 block text-sm/6 font-medium text-form-label'} | merge(label_attr|default({})) %}
+    
+    <div class="flex items-center flex-wrap mt-3 gap-2 sm:flex-nowrap">
+    {%- for child in form %}
+        {{- form_widget(child, {
+            attr: {
+                class: 'relative size-4 appearance-none rounded-full
+                border border-form-border bg-form-bg before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-dark-light checked:bg-dark-lighter focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-medium disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden'
+            }
+        }) -}}
+        {{- form_label(child, null, {
+            translation_domain: choice_translation_domain,
+            label_attr: label_attr
+        }) -}}
+    {% endfor -%}
+    </div>
+{%- endblock choice_widget_expanded -%}
+{% block choice_widget_collapsed %}
+    <div class="mt-2 relative">
+        {% set attr = {
+            'class': 'block w-full appearance-none rounded-md bg-form-bg pr-10 px-3 py-1.5 text-base text-form outline-1 -outline-offset-1 outline-form-border placeholder:text-form-placeholder placeholder:italic focus:outline-2 focus:-outline-offset-2 focus:outline-form-border-focus sm:text-sm/6'
+        } | merge(attr|default({})) %}
+
+        {{ parent() }}
+
+        <i data-lucide="chevrons-up-down" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-form opacity-70"></i>
+    </div>
+{% endblock %}
+
+{% block form_help %}
+    {% set helpContent = block('form_help_content') %}
+    {% if helpContent is not empty and helpContent != help%}
+        <div class="relative group shrink-0">
+            <i data-lucide="info" class="size-3 text-form-placeholder mt-0.5 mr-1 align-bottom"></i>
+            <div class="absolute left-full top-1 ml-2 z-10 hidden group-hover:block min-w-50 max-w-xs text-xs text-dark-lighter bg-form-bg border border-form-border rounded-md shadow p-2">
+                {{ helpContent }}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

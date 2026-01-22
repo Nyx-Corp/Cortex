@@ -1,0 +1,181 @@
+{% use "form_div_layout.html.twig" %}
+
+{# Text input with keyboard shortcut #}
+{% block text_row %}
+    {% set shortcut = attr['data-shortcut-key']|default('F1') %}
+    <div class="mt-2">
+        <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs text-form-label italic">{{ (form.vars.label ?: form.vars.name|humanize)|trans }}</label>
+        </div>
+        <div class="mt-1 field-with-shortcut">
+            {% set attr = attr|merge({
+                'placeholder': (form.vars.label ?: form.vars.name|humanize)|trans,
+                'data-shortcut': shortcut|lower,
+                'class': 'w-full rounded border border-form-border px-2 py-1 text-sm placeholder:italic'
+            })|merge(attr|filter((v, k) => k != 'data-shortcut-key')) %}
+            {{ form_widget(form, { attr: attr }) }}
+            <kbd class="field-shortcut field-shortcut-text text-xs bg-transparent px-0.5 rounded border-light-darker border font-mono opacity-60">{{ shortcut }}</kbd>
+        </div>
+    </div>
+{% endblock %}
+
+
+{# Choice field with keyboard shortcut - handles both select and radio #}
+{% block choice_row %}
+    {% set shortcut = attr['data-shortcut-key']|default('F1') %}
+    <div class="mt-2">
+        <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs text-form-label italic">{{ (form.vars.label ?: form.vars.name|humanize)|trans }}</label>
+            <kbd class="text-xs bg-transparent px-1 border border-light-darker font-mono opacity-60">{{ shortcut }}</kbd>
+        </div>
+        <div class="mt-1">
+            {% if expanded %}
+                {# Radio buttons as segmented controls #}
+                <div class="w-full inline-flex rounded overflow-hidden border border-form-border">
+                    {% for child in form %}
+                        {% if child.vars.value == '' %}
+                            {# Transform the empty choice into "Tout" #}
+                            <label class="cursor-pointer flex-1 {% if not loop.first %}border-l border-form-border{% endif %}">
+                                {% set child_attr = child.vars.attr|merge({
+                                    'class': 'sr-only peer',
+                                    'data-shortcut': shortcut|lower,
+                                    'data-autosubmit': true
+                                }) %}
+                                {{ form_widget(child, { attr: child_attr }) }}
+                                <div class="px-2 py-1.5 text-xs font-medium text-dark-lighter italic bg-light-darker hover:bg-light-dark hover:text-dark peer-checked:bg-light peer-checked:text-dark peer-checked:not-italic focus:z-10 focus:ring-2 focus:ring-form-btn focus:text-dark text-center">
+                                    Tout
+                                </div>
+                            </label>
+                        {% else %}
+                            {# Regular choices #}
+                            <label class="cursor-pointer flex-1 {% if not loop.first %}border-l border-form-border{% endif %}">
+                                {% set child_attr = child.vars.attr|merge({
+                                    'class': 'sr-only peer',
+                                    'data-shortcut': shortcut|lower,
+                                    'data-autosubmit': true
+                                }) %}
+                                {{ form_widget(child, { attr: child_attr }) }}
+                                <div class="px-2 py-1.5 text-xs font-medium text-dark-lighter italic bg-light-darker hover:bg-light-dark hover:text-dark peer-checked:bg-light peer-checked:text-dark peer-checked:not-italic focus:z-10 focus:ring-2 focus:ring-form-btn focus:text-dark text-center">
+                                    {{ child.vars.label|trans }}
+                                </div>
+                            </label>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                {# Select dropdown for non-expanded choices #}
+                <div class="field-with-shortcut">
+                    <div class="relative w-full">
+                        {% set attr = attr|merge({
+                            'data-shortcut': shortcut|lower,
+                            'data-autosubmit': true,
+                            'class': 'w-full appearance-none rounded border border-form-border pl-2 pr-6 py-1 text-sm focus:border-form-border-focus focus:outline-none cursor-pointer transition-colors'
+                        })|merge(attr|filter((v, k) => k != 'data-shortcut-key')) %}
+                        <select {{ block('widget_attributes') }} {{ multiple ? 'multiple="multiple"' : '' }}>
+                            {% if required is not true %}
+                                <option value="">{{ placeholder is defined ? placeholder|trans : 'form.select.empty_value'|trans({}, 'admin') }}</option>
+                            {% endif %}
+                            {% for group_label, choice in choices %}
+                                {%- if choice is iterable -%}
+                                    <optgroup label="{{ choice_translation_domain is same as(false) ? group_label : group_label|trans({}, choice_translation_domain) }}">
+                                        {% for nested_choice in choice %}
+                                            <option value="{{ nested_choice.value }}"{% if nested_choice.attr %} {% set attr = nested_choice.attr %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% endif %}{% if nested_choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? nested_choice.label : nested_choice.label|trans({}, choice_translation_domain) }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                {%- else -%}
+                                    <option value="{{ choice.value }}"{% if choice.attr %} {% set attr = choice.attr %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% endif %}{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}</option>
+                                {%- endif -%}
+                            {% endfor %}
+                        </select>
+                        <kbd class="field-shortcut field-shortcut-select">{{ shortcut }}</kbd>
+                        <i data-lucide="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 size-3 text-form pointer-events-none"></i>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{# Radio buttons with horizontal layout #}
+{% block radio_row %}
+    {% set shortcut = attr['data-shortcut-key']|default('F1') %}
+    <div class="space-y-2 mt-3 xl:mt-0">
+        <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs text-form-label italic">{{ (form.vars.label ?: form.vars.name|humanize)|trans }}</label>
+            <kbd class="text-xs bg-transparent px-1 border border-light-darker font-mono opacity-60">{{ shortcut }}</kbd>
+        </div>
+        <div class="flex items-center gap-4">
+            {% for choice in choices %}
+                <label class="flex items-center gap-2 cursor-pointer">
+                    {% set radio_attr = {
+                        'class': 'text-form-btn focus:ring-form-btn',
+                        'data-shortcut': shortcut|lower,
+                        'data-autosubmit': true
+                    } %}
+                    <input type="radio" 
+                           name="{{ full_name }}" 
+                           value="{{ choice.value }}"
+                           {% if choice is selectedchoice(value) %}checked{% endif %}
+                           {{ block('widget_attributes') }}
+                           {% for attrname, attrvalue in radio_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+                    <span class="text-sm">{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}</span>
+                </label>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{# Checkbox as switch toggle #}
+{% block checkbox_row %}
+    {% set shortcut = attr['data-shortcut-key']|default('F1') %}
+    <div class="mt-2">
+        <div class="flex items-center justify-between">
+            <label class="text-xs text-form-label italic">{{ (form.vars.label ?: form.vars.name|humanize)|trans }}</label>
+            <label class="relative inline-flex items-center cursor-pointer">
+                {% set attr = attr|merge({
+                    'class': 'sr-only peer',
+                    'data-shortcut': shortcut|lower,
+                    'data-autosubmit': true
+                })|merge(attr|filter((v, k) => k != 'data-shortcut-key')) %}
+                {{ form_widget(form, { attr: attr }) }}
+                <div class="relative w-11 h-6 bg-light-darker peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-form-btn rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-form-btn"></div>
+            </label>
+        </div>
+    </div>
+{% endblock %}
+
+{# Radio widget with conditional sort styling #}
+{% block radio_widget %}
+    {% if attr['data-sort-direction'] is defined %}
+        {# Widget spécial pour les radios de tri #}
+        {% set direction = attr['data-sort-direction'] %}
+        {% set icon = direction == 'asc' ? 'chevron-up' : 'chevron-down' %}
+        <label class="cursor-pointer text-dark-lighter hover:text-dark transition-colors has-[:checked]:text-dark">
+            {% set attr = attr|merge({'class': 'sr-only peer'}) %}
+            <input type="radio" {{ block('widget_attributes') }}>
+            <i data-lucide="{{ icon }}" class="size-3"></i>
+        </label>
+    {% else %}
+        {# Radio normal pour les filtres #}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+
+{# Override default form_row to prevent wrapper divs #}
+{% block form_row %}
+    {% if form.vars.block_prefixes[1] is defined %}
+        {% set widget_type = form.vars.block_prefixes[1] %}
+        {% if widget_type == 'text' %}
+            {{ block('text_row') }}
+        {% elseif widget_type == 'choice' or widget_type == 'enum' or 'choice' in form.vars.block_prefixes %}
+            {{ block('choice_row') }}
+        {% elseif widget_type == 'checkbox' %}
+            {{ block('checkbox_row') }}
+        {% else %}
+            {{ form_widget(form) }}
+        {% endif %}
+    {% else %}
+        {{ form_widget(form) }}
+    {% endif %}
+{% endblock %}

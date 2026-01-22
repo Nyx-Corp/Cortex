@@ -1,0 +1,155 @@
+{% trans_default_domain trans_default_domain ?? 'admin' %}
+
+{% form_theme form '@_theme/components/filters.html.twig' %}
+
+{{ form_start(form, { 
+    'action': path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params', {})),
+    'attr': { 
+        'id': '_collectionDecoratorForm', 
+        'class': 'flex flex-col w-full h-full',
+    } 
+}) }}
+    <div class="flex flex-1 overflow-hidden">        
+        <div class="flex-1 relative overflow-auto h-full">
+        {% block table %}
+            <table class="min-w-full text-sm text-left text-dark border-l border-b border-light-darker border-collapse">
+                <thead class="h-12 bg-light text-dark sticky top-0 z-10 shadow-[inset_0_-1px_0_var(--color-light-darker)]">
+                    <tr>
+                        <th scope="col" class="pl-4 w-2">
+                            <input type="checkbox" id="select-all"
+                                class="border-light-darker text-form-btn focus:ring-form-border-focus focus:ring-2">
+                        </th>
+                    {% for field in form.vars.fields %}
+                        {% if block(field ~ '_th') ?? null %}
+                        <th scope="col" class="px-6 text-base font-semibold text-dark whitespace-nowrap transition-colors">
+                            <div class="flex items-center gap-3 h-full">
+                                <span>{{ block(field ~ '_th') }}</span>
+                            {% if form.vars.sorts[field] is defined %}
+                                <div class="sort flex flex-col items-center space-y-0">
+                                    {{ form_widget(form.vars.sorts[field]['asc']) }}
+                                    {{ form_widget(form.vars.sorts[field]['desc']) }}
+                                </div>
+                            {% endif %}
+                            </div>
+                        </th>
+                        {% endif %}
+                    {% endfor %}
+                        <th scope="col" class="px-6 text-right w-20 transition-colors font-normal">
+                            {% if hide_filters|default(false) %}
+                            <a href="{% block create_link '#' %}" data-shortcut="n"
+                                    class="inline-flex items-center gap-2 pl-2 pr-1 py-1 text-xs bg-white hover:bg-light hover:border-dark-lighter hover:text-dark text-dark-light rounded border border-light-darker transition-all cursor-pointer">
+                                <i data-lucide="plus" class="size-3"></i>
+                                <span>Nouveau</span>
+                                <kbd class="text-xs bg-transparent px-1 rounded border-light-darker border font-mono opacity-60">N</kbd>
+                            </a>
+                            {% endif %}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-light-darker">
+                    {% if collection is empty %}
+                        <tr>
+                            <td colspan="100%" class="px-6 py-12 text-center text-sm text-dark-lighter">
+                                <div class="flex flex-col items-center gap-3">
+                                    <i data-lucide="inbox" class="size-12 text-dark-lighter opacity-50"></i>
+                                    {% block empty_text 'admin.list.empty_text'|trans({}, 'admin') %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        {% for item in collection %}
+                            <tr class="h-12 hover:bg-light-dark transition-colors group cursor-pointer even:bg-light-dark">
+                                <td class="pl-4 w-2">
+                                    <input type="checkbox" name="selected_items[]" value="{{ item.uuid }}" 
+                                        class="row-checkbox border-light-darker text-form-btn focus:ring-form-border-focus focus:ring-2">
+                                </td>
+                            {% for field in form.vars.fields %}
+                                {# Check _th existence to ensure column alignment even when _td content is empty #}
+                                {% if block(field ~ '_th') ?? null %}
+                                <td class="px-6 whitespace-nowrap text-sm text-dark font-medium">
+                                    {{ block(field ~ '_td') ?? '' }}
+                                </td>
+                                {% endif %}
+                            {% endfor %}
+                                <td class="pr-4 pl-6 text-right">
+                                {% block row_actions %}
+                                    <div class="inline-flex items-center">
+                                        <a href="{{ app.request.pathInfo|trim('s') ~ '/' ~ item.uuid ~ '/edit' }}" 
+                                        class="inline-flex items-center justify-center w-8 h-8 hover:bg-light-dark transition-colors"
+                                        title="{{ 'admin.action.edit'|trans({}, 'admin') }}"
+                                        >
+                                            <i data-lucide="edit" class="size-4 text-dark-lighter hover:text-dark"></i>
+                                        </a>
+                                        <a href="{{ app.request.pathInfo|trim('s') ~ '/' ~ item.uuid ~ '/archive' }}" 
+                                        class="inline-flex items-center justify-center w-8 h-8 hover:bg-light-dark transition-colors"
+                                        title="{{ 'admin.action.archive.label'|trans({}, 'admin') }}"
+                                        onclick="return confirm('{{ 'admin.action.archive.confirmation'|trans({}, 'admin') }}')"
+                                        >
+                                            <i data-lucide="archive" class="size-4 text-dark-lighter hover:text-danger"></i>
+                                        </a>
+                                    </div>
+                                {% endblock %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        {% endblock %}
+        </div>
+        
+        {% if not hide_filters|default(false) %}
+        <aside class="filters-sidebar w-64 overflow-y-auto h-full flex flex-col">
+            <div class="border-b border-layout-border h-12 z-10 px-4 flex items-center justify-end gap-2">
+                <a href="{{ block('create_link') }}" data-shortcut="n"
+                        class="flex items-center gap-2 pl-2 pr-1 py-1 text-xs bg-white hover:bg-light hover:border-dark-lighter hover:text-dark text-dark-light rounded border border-light-darker transition-all cursor-pointer">
+                    <i data-lucide="plus" class="size-3"></i>
+                    <span>Nouveau</span>
+                    <kbd class="text-xs bg-transparent px-1 rounded border-light-darker border font-mono opacity-60">N</kbd>
+                </a>
+
+                {% if form.vars.filters|length %}
+                <button type="button" data-shortcut="f" data-active="true"
+                        class="flex items-center gap-2 pl-2 pr-1 py-1 text-xs bg-white hover:bg-light hover:border-dark-lighter hover:text-dark text-dark-light rounded border border-light-darker transition-all cursor-pointer has-[:checked]:border-form-border-focus has-[:checked]:text-dark">
+                    <input type="checkbox" class="sr-only" checked>
+                    <i data-lucide="filter" class="size-3"></i>
+                    <kbd class="text-xs bg-transparent px-1 rounded border-light-darker border font-mono opacity-60">F</kbd>
+                </button>
+                {% endif %}
+            </div>
+            <div class="flex-1 p-4 border-l border-light-darker">
+            {% if form.vars.filters|length %}
+                <div class="flex items-center justify-between gap-2 pb-2 border-b border-layout-border-light">
+                    <h3 class="text-sm font-semibold flex items-center gap-2 text-dark">
+                        <i data-lucide="filter" class="size-4 text-form-label"></i>
+                        <span>Filtres</span>
+                    </h3>
+                    <span class="text-xs font-normal bg-light-darker rounded-full px-2 py-0.5">
+                        {{ collection|length }} / YYYY
+                    </span>
+                </div>
+
+                <div class="flex flex-col gap-4 mt-4">
+                    {% for filterForm in form.vars.filters %}
+                        {{ form_row(filterForm, {
+                            'attr': { 'data-shortcut-key': loop.index }
+                        }) }}
+                    {% endfor %}
+                    <div class="flex items-center gap-2 mt-4">
+                        <a href="{{ app.request.pathInfo }}" data-shortcut="x"
+                        class="flex items-center gap-2 pl-2 pr-1 py-1 text-xs bg-white hover:bg-light hover:border-dark-lighter hover:text-dark text-dark-light rounded border border-light-darker transition-all cursor-pointer">
+                            <i data-lucide="x" class="size-3"></i>
+                            <span>Réinitialiser</span>
+                            <kbd class="text-xs bg-transparent px-1 rounded border-light-darker border font-mono opacity-60">X</kbd>
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+            </div>
+        </aside>
+        {% endif %}
+    </div>
+    <div class="hidden">
+        {{ form_rest(form) }}
+    </div>
+{{ form_end(form) }}

@@ -1,0 +1,487 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+	<script type="module" src="{{ asset('components.js') }}"></script>
+{% endblock %}
+
+{% block main %}
+	<main class="container mx-auto py-20">
+		<h1 class="text-3xl font-bold mb-6">Design System</h1>
+
+		<hr role="presentation" class="w-full border-t border-(--divider-border)/15 mx-auto my-10"/>
+
+		<h2 class="text-2xl font-bold mb-5">Tables</h2>
+
+		<h3 class="font-bold mb-2">Base</h3>
+
+		<div class="flow-root">
+			<div class="overflow-x-auto whitespace-nowrap">
+				<div class="inline-block min-w-full align-middle">
+					<table class="table-fixed min-w-full text-start text-sm/6 text-dark divide-y divide-(--table-border)/10">
+						<thead>
+							<tr>
+								{% for i in 1..5 %}
+									<th scope="col" class="min-w-max p-4 first:ps-1 last:pe-1 text-start font-semibold">
+										thead
+										{{ i }}
+									</th>
+								{% endfor %}
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-(--table-border)/5">
+							{% for j in 1..5 %}
+								<tr>
+									{% for i in 1..5 %}
+										<td class="p-4 first:ps-1 last:pe-1">
+											cell
+											{{ i }}
+										</td>
+									{% endfor %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+		<h3 class="font-bold mb-3 mt-6">Grided</h3>
+
+		<div class="flow-root">
+			<div class="overflow-x-auto whitespace-nowrap">
+				<div class="inline-block min-w-full align-middle">
+					<table class="table-fixed min-w-full text-start text-sm/6 text-dark divide-y divide-(--table-border)/10">
+						<thead>
+							<tr class="divide-x divide-(--table-border)/5">
+								{% for i in 1..5 %}
+									<th scope="col" class="min-w-max p-4 first:ps-1 last:pe-1 text-start font-semibold">
+										thead
+										{{ i }}
+									</th>
+								{% endfor %}
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-(--table-border)/5">
+							{% for j in 1..5 %}
+								<tr class="divide-x divide-(--table-border)/5">
+									{% for i in 1..5 %}
+										<td class="p-4 first:ps-1 last:pe-1">
+											cell
+											{{ i }}
+										</td>
+									{% endfor %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+		<h3 class="font-bold mb-3 mt-6">Stripped</h3>
+
+		<div class="flow-root">
+			<div class="overflow-x-auto whitespace-nowrap">
+				<div class="inline-block min-w-full align-middle">
+					<table class="table-fixed min-w-full text-start text-sm/6 text-dark divide-y divide-(--table-border)/10">
+						<thead>
+							<tr>
+								{% for i in 1..5 %}
+									<th scope="col" class="min-w-max p-4 first:ps-1 last:pe-1 text-start font-semibold">
+										thead
+										{{ i }}
+									</th>
+								{% endfor %}
+							</tr>
+						</thead>
+						<tbody>
+							{% for j in 1..5 %}
+								<tr class="even:bg-(--table-bg)/2.5">
+									{% for i in 1..5 %}
+										<td class="p-4 first:ps-1 last:pe-1">
+											cell
+											{{ i }}
+										</td>
+									{% endfor %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+		<h3 class="font-bold mb-3 mt-6">Grid Stripped</h3>
+
+		<div class="flow-root">
+			<div class="overflow-x-auto whitespace-nowrap">
+				<div class="inline-block min-w-full align-middle">
+					<table class="table-fixed min-w-full text-start text-sm/6 text-dark divide-y divide-(--table-border)/10">
+						<thead>
+							<tr class="divide-x divide-(--table-border)/5">
+								{% for i in 1..5 %}
+									<th scope="col" class="min-w-max p-4 first:ps-1 last:pe-1 text-start font-semibold">
+										thead
+										{{ i }}
+									</th>
+								{% endfor %}
+							</tr>
+						</thead>
+						<tbody>
+							{% for j in 1..5 %}
+								<tr class="even:bg-(--table-bg)/2.5 divide-x divide-(--table-border)/5">
+									{% for i in 1..5 %}
+										<td class="p-4 first:ps-1 last:pe-1">
+											cell
+											{{ i }}
+										</td>
+									{% endfor %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+		<h3 class="font-bold mb-3 mt-6">With Checkboxes</h3>
+
+		<div class="flow-root">
+			<div class="overflow-x-auto whitespace-nowrap">
+				<div class="inline-block min-w-full align-middle">
+					<table class="table-fixed min-w-full text-start text-sm/6 text-dark divide-y divide-(--table-border)/10">
+						<thead>
+							<tr>
+								<th class="w-4 p-4 first:ps-1 last:pe-1 align-middle">
+									<span class="align-middle group/checkbox inline-grid size-4 grid-cols-1">
+										<input id="check-all" name="check-all" type="checkbox" class="col-start-1 row-start-1 appearance-none rounded-sm border border-dark-lighter bg-white checked:border-active checked:bg-active indeterminate:border-undeterminate indeterminate:bg-undeterminate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-active disabled:border-disabled/40 disabled:bg-disabled/10 disabled:checked:bg-disabled/10 forced-colors:appearance-auto">
+										<svg class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled/checkbox:stroke-disabled/80" viewbox="0 0 14 14" fill="none">
+											<path class="opacity-0 group-has-checked/checkbox:opacity-100" d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+											<path class="opacity-0 group-has-indeterminate/checkbox:opacity-100" d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+										</svg>
+									</span>
+									<label class="sr-only" for="check-all">Select ligne</label>
+								</th>
+								{% for i in 1..5 %}
+									<th scope="col" class="min-w-max p-4 first:ps-1 text-start font-semibold">
+										<div class="flex items-center justify-between w-full">
+											thead
+											{{ i }}
+											<button type="button" class="inline-flex size-6 text-dark-light cursor-pointer hover:bg-dark-light/10 rounded-md">
+												<span class="sr-only">sort</span>
+												<!-- PUT icon HERE to show filter -->
+												<x-placeholder message="icon sort" class="contents">
+													<svg class="size-4 m-auto" viewbox="0 0 16 16" fill="currentColor" aria-hidden="true" data-slot="icon">
+														<path fill-rule="evenodd" d="M2 2.75A.75.75 0 0 1 2.75 2h9.5a.75.75 0 0 1 0 1.5h-9.5A.75.75 0 0 1 2 2.75ZM2 6.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5A.75.75 0 0 1 2 6.25Zm0 3.5A.75.75 0 0 1 2.75 9h3.5a.75.75 0 0 1 0 1.5h-3.5A.75.75 0 0 1 2 9.75ZM9.22 9.53a.75.75 0 0 1 0-1.06l2.25-2.25a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1-1.06 1.06l-.97-.97v5.69a.75.75 0 0 1-1.5 0V8.56l-.97.97a.75.75 0 0 1-1.06 0Z" clip-rule="evenodd"/>
+													</svg>
+												</x-placehoder>
+											</button>
+										</div>
+									</th>
+								{% endfor %}
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-(--table-border)/5">
+							{% for j in 1..5 %}
+								<tr>
+									<td class="p-4 first:ps-1 last:pe-1">
+										<span class="align-middle group/checkbox inline-grid size-4 grid-cols-1">
+											<input id="checkbox-{{j}}" name="checkbox-{{j}}" type="checkbox" class="col-start-1 row-start-1 appearance-none rounded-sm border border-dark-lighter bg-white checked:border-active checked:bg-active indeterminate:border-undeterminate indeterminate:bg-undeterminate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-active disabled:border-disabled/40 disabled:bg-disabled/10 disabled:checked:bg-disabled/10 forced-colors:appearance-auto">
+											<svg class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled/checkbox:stroke-disabled/80" viewbox="0 0 14 14" fill="none">
+												<path class="opacity-0 group-has-checked/checkbox:opacity-100" d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+												<path class="opacity-0 group-has-indeterminate/checkbox:opacity-100" d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+											</svg>
+										</span>
+										<label class="sr-only" for="checkbox-{{j}}">Select ligne</label>
+									</td>
+									{% for i in 1..5 %}
+										<td class="p-4 first:ps-1 last:pe-1">
+											cell
+											{{ i }}
+										</td>
+									{% endfor %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<hr role="presentation" class="w-full border-t border-(--divider-border)/15 mx-auto my-10"/>
+
+		<h2 class="text-2xl font-bold mb-3">Fields</h2>
+
+		<h3 class="font-bold mb-3 mt-6">Checkboxe</h3>
+
+		<fieldset>
+			<legend class="sr-only">Checkboxes</legend>
+			<div class="space-y-5">
+
+				<div class="flex gap-3">
+					<div class="flex h-6 shrink-0 items-center">
+						<span class="group/checkbox inline-grid size-4 grid-cols-1">
+							<input id="base-checkbox" aria-describedby="base-checkbox-description" name="base-checkbox" type="checkbox" class="col-start-1 row-start-1 appearance-none rounded-sm border border-dark-lighter bg-white checked:border-active checked:bg-active indeterminate:border-undeterminate indeterminate:bg-undeterminate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-active disabled:border-disabled/40 disabled:bg-disabled/10 disabled:checked:bg-disabled/10 forced-colors:appearance-auto transition-colors duration-200 ease-in-out">
+							<svg class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled/checkbox:stroke-disabled/80" viewbox="0 0 14 14" fill="none">
+								<path class="opacity-0 group-has-checked/checkbox:opacity-100 transition-opacity duration-150 ease-in-out" d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								<path class="opacity-0 group-has-indeterminate/checkbox:opacity-100 transition-opacity duration-150 ease-in-out" d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</span>
+					</div>
+					<div class="text-sm/6">
+						<label for="base-checkbox" class="font-medium text-dark">Base</label>
+						<p id="base-checkbox-description" class="text-dark-light">Description to explain use of the checkbox.</p>
+					</div>
+				</div>
+
+				<div class="flex gap-3">
+					<div class="flex h-6 shrink-0 items-center">
+						<span class="group/checkbox inline-grid size-4 grid-cols-1">
+							<input id="checked-checkbox" aria-describedby="checked-checkbox-description" name="checked-checkbox" type="checkbox" checked class="col-start-1 row-start-1 appearance-none rounded-sm border border-dark-lighter bg-white checked:border-active checked:bg-active indeterminate:border-undeterminate indeterminate:bg-undeterminate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-active disabled:border-disabled/40 disabled:bg-disabled/10 disabled:checked:bg-disabled/10 forced-colors:appearance-auto transition-colors duration-200 ease-in-out">
+							<svg class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled/checkbox:stroke-disabled/80" viewbox="0 0 14 14" fill="none">
+								<path class="opacity-0 group-has-checked/checkbox:opacity-100 transition-opacity duration-150 ease-in-out" d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								<path class="opacity-0 group-has-indeterminate/checkbox:opacity-100 transition-opacity duration-150 ease-in-out" d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</span>
+					</div>
+					<div class="text-sm/6">
+						<label for="checked-checkbox" class="font-medium text-dark">Checked</label>
+						<p id="checked-checkbox-description" class="text-dark-light">Description to explain use of the checkbox.</p>
+					</div>
+				</div>
+
+				<div class="flex gap-3">
+					<div class="flex h-6 shrink-0 items-center">
+						<span class="group/checkbox inline-grid size-4 grid-cols-1">
+							<input id="disabled-checkbox" aria-describedby="disabled-checkbox-description" name="disabled-checkbox" type="checkbox" disabled class="col-start-1 row-start-1 appearance-none rounded-sm border border-dark-lighter bg-white checked:border-active checked:bg-active indeterminate:border-undeterminate indeterminate:bg-undeterminate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-active disabled:border-disabled/40 disabled:bg-disabled/10 disabled:checked:bg-disabled/10 forced-colors:appearance-auto transition-colors duration-200 ease-in-out">
+							<svg class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled/checkbox:stroke-disabled/80" viewbox="0 0 14 14" fill="none">
+								<path class="opacity-0 group-has-checked/checkbox:opacity-100 transition-opacity duration-150 ease-in-out" d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								<path class="opacity-0 group-has-indeterminate/checkbox:opacity-100 transition-opacity duration-150 ease-in-out" d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</span>
+					</div>
+					<div class="text-sm/6">
+						<label for="disabled-checkbox" class="font-medium text-dark">Disabled</label>
+						<p id="disabled-checkbox-description" class="text-dark-light">Description to explain use of the checkbox.</p>
+					</div>
+				</div>
+
+				<div class="flex gap-3">
+					<div class="flex h-6 shrink-0 items-center">
+						<span class="group/checkbox inline-grid size-4 grid-cols-1">
+							<input id="disabled-checked-checkbox" aria-describedby="disabled-checked-checkbox-description" name="disabled-checked-checkbox" type="checkbox" checked disabled class="col-start-1 row-start-1 appearance-none rounded-sm border border-dark-lighter bg-white checked:border-active checked:bg-active indeterminate:border-undeterminate indeterminate:bg-undeterminate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-active disabled:border-disabled/40 disabled:bg-disabled/10 disabled:checked:bg-disabled/10 forced-colors:appearance-auto transition-colors duration-200 ease-in-out">
+							<svg class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled/checkbox:stroke-disabled/80" viewbox="0 0 14 14" fill="none">
+								<path class="opacity-0 group-has-checked/checkbox:opacity-100 transition-opacity duration-150 ease-in-out" d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								<path class="opacity-0 group-has-indeterminate/checkbox:opacity-100 transition-opacity duration-150 ease-in-out" d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</span>
+					</div>
+					<div class="text-sm/6">
+						<label for="disabled-checked-checkbox" class="font-medium text-dark">Disabled and Checked</label>
+						<p id="disabled-checked-checkbox-description" class="text-dark-light">Description to explain use of the checkbox.</p>
+					</div>
+				</div>
+
+			</div>
+		</fieldset>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+		<h3 class="font-bold mb-3 mt-6">Switch</h3>
+
+		<fieldset>
+			<legend class="sr-only">Switches</legend>
+
+			<div class="space-y-5">
+
+				<div class="flex gap-3">
+					<div class="flex shrink-0 items-center">
+						<span class="group/switch relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent bg-dark-lighter has-checked:bg-active has-disabled:bg-disabled/70 has-focus:ring-2 has-focus:ring-active has-focus:ring-offset-2 focus:outline-hidden transition-colors duration-200 ease-in-out">
+							<input id="base-switch" name="base-switch" aria-describedby="base-switch-description" type="checkbox" class="opacity-0 absolute -inset-[2px] cursor-pointer disabled:cursor-auto">
+							<span aria-hidden="true" class="pointer-events-none inline-block size-5 translate-x-0 group-has-checked/switch:translate-x-5 transform rounded-full bg-white group-has-disabled/switch:bg-white/30 shadow-sm ring-0 transition duration-200 ease-in-out"></span>
+						</span>
+					</div>
+					<div class="text-sm/6">
+						<label for="base-switch" class="font-medium text-dark">Base</label>
+						<p id="base-switch-description" class="text-dark-light">Description to explain use of the switch.</p>
+					</div>
+				</div>
+
+				<div class="flex gap-3">
+					<div class="flex shrink-0 items-center">
+						<span class="group/switch relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent bg-dark-lighter has-checked:bg-active has-disabled:bg-disabled/70 has-focus:ring-2 has-focus:ring-active has-focus:ring-offset-2 focus:outline-hidden transition-colors duration-200 ease-in-out">
+							<input id="checked-switch" name="checked-switch" aria-describedby="checked-switch-description" type="checkbox" checked class="opacity-0 absolute -inset-[2px] cursor-pointer disabled:cursor-auto">
+							<span aria-hidden="true" class="pointer-events-none inline-block size-5 translate-x-0 group-has-checked/switch:translate-x-5 transform rounded-full bg-white group-has-disabled/switch:bg-white/30 shadow-sm ring-0 transition duration-200 ease-in-out"></span>
+						</span>
+					</div>
+					<div class="text-sm/6">
+						<label for="checked-switch" class="font-medium text-dark">Checked</label>
+						<p id="checked-switch-description" class="text-dark-light">Description to explain use of the switch.</p>
+					</div>
+				</div>
+
+				<div class="flex gap-3">
+					<div class="flex shrink-0 items-center">
+						<span class="group/switch relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent bg-dark-lighter has-checked:bg-active has-disabled:bg-disabled/70 has-focus:ring-2 has-focus:ring-active has-focus:ring-offset-2 focus:outline-hidden transition-colors duration-200 ease-in-out">
+							<input id="disabled-switch" name="disabled-switch" aria-describedby="disabled-switch-description" type="checkbox" disabled class="opacity-0 absolute -inset-[2px] cursor-pointer disabled:cursor-auto">
+							<span aria-hidden="true" class="pointer-events-none inline-block size-5 translate-x-0 group-has-checked/switch:translate-x-5 transform rounded-full bg-white group-has-disabled/switch:bg-white/30 shadow-sm ring-0 transition duration-200 ease-in-out"></span>
+						</span>
+					</div>
+					<div class="text-sm/6">
+						<label for="disabled-switch" class="font-medium text-dark">Disabled</label>
+						<p id="disabled-switch-description" class="text-dark-light">Description to explain use of the switch.</p>
+					</div>
+				</div>
+
+
+				<div class="flex gap-3">
+					<div class="flex shrink-0 items-center">
+						<span class="group/switch relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent bg-dark-lighter has-checked:bg-active has-disabled:bg-disabled/70 has-focus:ring-2 has-focus:ring-active has-focus:ring-offset-2 focus:outline-hidden transition-colors duration-200 ease-in-out">
+							<input id="disabled-checked-switch" name="disabled-checked-switch" aria-describedby="disabled-checked-switch-description" type="checkbox" checked disabled class="opacity-0 absolute -inset-[2px] cursor-pointer disabled:cursor-auto">
+							<span aria-hidden="true" class="pointer-events-none inline-block size-5 translate-x-0 group-has-checked/switch:translate-x-5 transform rounded-full bg-white group-has-disabled/switch:bg-white/30 shadow-sm ring-0 transition duration-200 ease-in-out"></span>
+						</span>
+					</div>
+					<div class="text-sm/6">
+						<label for="disabled-checked-switch" class="font-medium text-dark">Disabled and Checked</label>
+						<p id="disabled-checked-switch-description" class="text-dark-light">Description to explain use of the switch.</p>
+					</div>
+				</div>
+
+			</div>
+		</fieldset>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+		<h3 class="font-bold mb-3 mt-6">Input</h3>
+
+		<div>
+			<label for="input" class="block text-sm/6 font-medium text-dark">Input</label>
+			<div
+				class="mt-2">
+				<!-- replace each input texts from https://tailwindcss.com/plus/ui-blocks/application-ui/forms/input-groups by this one -->
+				<input type="input" name="input" id="text" placeholder="you@example.com" aria-describedby="input-description" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-dark outline-1 -outline-offset-1 outline-dark-lighter placeholder:text-dark-light focus:outline-2 focus:-outline-offset-2 focus:outline-alt sm:text-sm/6">
+			</div>
+			<p class="mt-2 text-sm text-dark-light" id="input-description">Text description for the field.</p>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+		<h3 class="font-bold mb-3 mt-6">Select</h3>
+
+		<div>
+			<label for="select" class="block text-sm/6 font-medium text-dark">List Select</label>
+			<div class="mt-2 grid grid-cols-1">
+				<select id="select" name="select" aria-describedby="select-description" class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-dark outline-1 -outline-offset-1 outline-dark-lighter focus:outline-2 focus:-outline-offset-2 focus:outline-alt sm:text-sm/6">
+					<option>Option 1</option>
+					<option selected>Option 2</option>
+					<option>Option 3</option>
+				</select>
+				<svg class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-dark-light sm:size-4" viewbox="0 0 16 16" fill="currentColor" aria-hidden="true" data-slot="icon">
+					<path fill-rule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/>
+				</svg>
+			</div>
+			<p class="mt-2 text-sm text-dark-light" id="select-description">Text description for the field.</p>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+		<h2 class="text-2xl font-bold mb-5">Buttons</h2>
+
+		<div class="mx-auto flex max-w-3xl flex-col items-center justify-start space-y-4 sm:flex-row sm:items-end sm:justify-around sm:space-y-0">
+			<button type="button" class="rounded-sm bg-primary px-2 py-1 text-xs font-semibold text-light shadow-xs hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Button text</button>
+			<button type="button" class="rounded-sm bg-primary px-2 py-1 text-sm font-semibold text-light shadow-xs hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Button text</button>
+			<button type="button" class="rounded-md bg-primary px-2.5 py-1.5 text-sm font-semibold text-light shadow-xs hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Button text</button>
+			<button type="button" class="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-light shadow-xs hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Button text</button>
+			<button type="button" class="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-light shadow-xs hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Button text</button>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+
+		<div class="mx-auto flex max-w-3xl flex-col items-center justify-start space-y-4 sm:flex-row sm:items-end sm:justify-around sm:space-y-0">
+			<button type="button" class="rounded-sm bg-secondary px-2 py-1 text-xs font-semibold text-light shadow-xs hover:bg-secondary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">Button text</button>
+			<button type="button" class="rounded-sm bg-secondary px-2 py-1 text-sm font-semibold text-light shadow-xs hover:bg-secondary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">Button text</button>
+			<button type="button" class="rounded-md bg-secondary px-2.5 py-1.5 text-sm font-semibold text-light shadow-xs hover:bg-secondary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">Button text</button>
+			<button type="button" class="rounded-md bg-secondary px-3 py-2 text-sm font-semibold text-light shadow-xs hover:bg-secondary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">Button text</button>
+			<button type="button" class="rounded-md bg-secondary px-3.5 py-2.5 text-sm font-semibold text-light shadow-xs hover:bg-secondary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">Button text</button>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+
+		<div class="mx-auto flex max-w-3xl flex-col items-center justify-start space-y-4 sm:flex-row sm:items-end sm:justify-around sm:space-y-0">
+			<button type="button" class="rounded-sm bg-complementary px-2 py-1 text-xs font-semibold text-light shadow-xs hover:bg-complementary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-complementary">Button text</button>
+			<button type="button" class="rounded-sm bg-complementary px-2 py-1 text-sm font-semibold text-light shadow-xs hover:bg-complementary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-complementary">Button text</button>
+			<button type="button" class="rounded-md bg-complementary px-2.5 py-1.5 text-sm font-semibold text-light shadow-xs hover:bg-complementary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-complementary">Button text</button>
+			<button type="button" class="rounded-md bg-complementary px-3 py-2 text-sm font-semibold text-light shadow-xs hover:bg-complementary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-complementary">Button text</button>
+			<button type="button" class="rounded-md bg-complementary px-3.5 py-2.5 text-sm font-semibold text-light shadow-xs hover:bg-complementary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-complementary">Button text</button>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+
+		<div class="mx-auto flex max-w-3xl flex-col items-center justify-start space-y-4 sm:flex-row sm:items-end sm:justify-around sm:space-y-0">
+			<button type="button" class="rounded-sm bg-alt px-2 py-1 text-xs font-semibold text-light shadow-xs hover:bg-alt/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-alt">Button text</button>
+			<button type="button" class="rounded-sm bg-alt px-2 py-1 text-sm font-semibold text-light shadow-xs hover:bg-alt/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-alt">Button text</button>
+			<button type="button" class="rounded-md bg-alt px-2.5 py-1.5 text-sm font-semibold text-light shadow-xs hover:bg-alt/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-alt">Button text</button>
+			<button type="button" class="rounded-md bg-alt px-3 py-2 text-sm font-semibold text-light shadow-xs hover:bg-alt/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-alt">Button text</button>
+			<button type="button" class="rounded-md bg-alt px-3.5 py-2.5 text-sm font-semibold text-light shadow-xs hover:bg-alt/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-alt">Button text</button>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+
+		<div class="mx-auto flex max-w-3xl flex-col items-center justify-start space-y-4 sm:flex-row sm:items-end sm:justify-around sm:space-y-0">
+			<button type="button" class="rounded-sm bg-white px-2 py-1 text-xs font-semibold text-dark shadow-xs ring-1 ring-dark-light ring-inset hover:bg-light-dark">Button text</button>
+			<button type="button" class="rounded-sm bg-white px-2 py-1 text-sm font-semibold text-dark shadow-xs ring-1 ring-dark-light ring-inset hover:bg-light-dark">Button text</button>
+			<button type="button" class="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-dark shadow-xs ring-1 ring-dark-light ring-inset hover:bg-light-dark">Button text</button>
+			<button type="button" class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-dark shadow-xs ring-1 ring-dark-light ring-inset hover:bg-light-dark">Button text</button>
+			<button type="button" class="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-dark shadow-xs ring-1 ring-dark-light ring-inset hover:bg-light-dark">Button text</button>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+
+		<div class="mx-auto flex max-w-3xl flex-col items-center justify-start space-y-4 sm:flex-row sm:items-end sm:justify-around sm:space-y-0">
+			<button type="button" class="rounded-full bg-alt p-1 text-white shadow-xs hover:bg-alt/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-alt">
+				<svg class="size-5" viewbox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+					<path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"/>
+				</svg>
+			</button>
+			<button type="button" class="rounded-full bg-alt p-1.5 text-white shadow-xs hover:bg-alt/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-alt">
+				<svg class="size-5" viewbox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+					<path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"/>
+				</svg>
+			</button>
+			<button type="button" class="rounded-full bg-alt p-2 text-white shadow-xs hover:bg-alt/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-alt">
+				<svg class="size-5" viewbox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+					<path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"/>
+				</svg>
+			</button>
+		</div>
+
+		<hr role="presentation" class="w-[90%] border-t border-(--divider-border)/10 mx-auto my-6"/>
+		<h2 class="text-2xl font-bold mb-5">Pagination</h2>
+
+		<div class="mx-auto w-fit">
+			<nav class="isolate inline-flex -space-x-px rounded-md shadow-xs" aria-label="Pagination">
+				<a href="#" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-dark-lighter ring-1 ring-light-darker ring-inset hover:bg-light-dark focus:z-20 focus:outline-offset-0">
+					<span class="sr-only">Previous</span>
+					<svg class="size-5" viewbox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+						<path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/>
+					</svg>
+				</a>
+				<!-- Current: "z-10 bg-selected text-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-selected", Default: "text-dark ring-1 ring-inset ring-light-darker hover:bg-light-dark focus:outline-offset-0" -->
+				<a href="#" aria-current="page" class="relative z-10 inline-flex items-center bg-selected px-4 py-2 text-sm font-semibold text-light focus:z-20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-selected">1</a>
+				<a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold tex-dark ring-1 ring-light-darker ring-inset hover:bg-light-dark focus:z-20 focus:outline-offset-0">2</a>
+				<a href="#" class="relative hidden items-center px-4 py-2 text-sm font-semibold tex-dark ring-1 ring-light-darker ring-inset hover:bg-light-dark focus:z-20 focus:outline-offset-0 md:inline-flex">3</a>
+				<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-dark-light ring-1 ring-light-darker ring-inset focus:outline-offset-0">...</span>
+				<a href="#" class="relative hidden items-center px-4 py-2 text-sm font-semibold tex-dark ring-1 ring-light-darker ring-inset hover:bg-light-dark focus:z-20 focus:outline-offset-0 md:inline-flex">8</a>
+				<a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold tex-dark ring-1 ring-light-darker ring-inset hover:bg-light-dark focus:z-20 focus:outline-offset-0">9</a>
+				<a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold tex-dark ring-1 ring-light-darker ring-inset hover:bg-light-dark focus:z-20 focus:outline-offset-0">10</a>
+				<a href="#" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-dark-lighter ring-1 ring-light-darker ring-inset hover:bg-light-dark focus:z-20 focus:outline-offset-0">
+					<span class="sr-only">Next</span>
+					<svg class="size-5" viewbox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+						<path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/>
+					</svg>
+				</a>
+			</nav>
+		</div>
+
+	</main>
+{% endblock %}

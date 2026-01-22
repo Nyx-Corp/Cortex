@@ -1,0 +1,25 @@
+{% use '@_theme/components/forms.html.twig' %}
+
+{% form_theme form _self %}
+
+{{ form_start(form, { 'attr': { 'class': 'flex flex-col max-h-[calc(100vh-8rem)] overflow-hidden' } }) }}
+    <h1 class="text-3xl font-bold text-dark">{% block model_form_title '' %}</h1>
+    <div class="space-y-12">
+        <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+            {{ form_rest(form )}}
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+        {% if collectionUrl|default(false) is not empty %}    
+            <a href="{{ collectionUrl }}" type="button" class="inline-flex items-center cursor-pointer text-sm/6 font-semibold text-gray-900 gap-2">
+                <i data-lucide="list-restart" class="size-4"></i>
+                {{ 'admin.action.back'|trans({}, 'admin') }}
+            </a>
+        {% endif %}
+            <button type="submit" class="inline-flex cursor-pointer items-center gap-2 rounded-md bg-form-btn px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-form-btn-hover">
+                <i data-lucide="check" class="size-4"></i>
+                {{ 'admin.action.submit'|trans({}, 'admin') }}
+            </button>
+        </div>
+    </div>
+{{ form_end(form) }}

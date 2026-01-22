@@ -1,0 +1,15 @@
+{% block form_row %}
+	<div>
+		{{ form_label(form, '', { 'attr': { 'class': 'block text-sm/6 font-medium text-form-label' }}) }}
+		<div class="mt-2">
+			{{ form_widget(form, { 'attr': { 'class': 'block w-full rounded-md bg-form-bg px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-form-border placeholder:text-form-placeholder focus:outline-2 focus:-outline-offset-2 focus:outline-form-border sm:text-sm/6' }}) }}
+			{{ form_errors(form) }}
+		</div>
+	</div>
+{% endblock %}
+
+{% block submit_row %}
+	<div>
+		{{ form_widget(form, { 'attr': { 'class': 'flex w-full justify-center rounded-md bg-form-btn px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-btn-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'}}) }}
+	</div>
+{% endblock %}
