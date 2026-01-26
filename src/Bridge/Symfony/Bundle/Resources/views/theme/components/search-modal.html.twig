@@ -1,0 +1,56 @@
+{# Search Modal - Cmd+K style (Linear/Notion) #}
+<div id="search-modal" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true" aria-labelledby="search-modal-title">
+	{# Backdrop #}
+	<div class="fixed inset-0 bg-black/50 backdrop-blur-sm" data-search-backdrop></div>
+
+	{# Modal #}
+	<div class="fixed inset-0 flex items-start justify-center pt-[15vh] px-4">
+		<div class="w-full max-w-xl bg-white rounded-xl shadow-2xl border border-layout-border overflow-hidden" data-search-content>
+			{# Search input #}
+			<div class="flex items-center gap-3 px-4 py-3 border-b border-layout-border">
+				<i data-lucide="search" class="size-5 text-gray-400 shrink-0"></i>
+				<input
+					type="text"
+					id="search-input"
+					class="flex-1 bg-transparent text-dark text-base outline-none placeholder:text-gray-400"
+					placeholder="Rechercher un club, un membre, un tournoi..."
+					autocomplete="off"
+				>
+				<kbd class="text-xs bg-light px-2 py-1 rounded text-gray-500 border border-layout-border">Esc</kbd>
+			</div>
+
+			{# Results area - placeholder for now #}
+			<div class="max-h-80 overflow-y-auto">
+				{# Empty state #}
+				<div id="search-empty" class="py-12 text-center text-gray-500">
+					<i data-lucide="search" class="size-10 mx-auto mb-3 opacity-30"></i>
+					<p class="text-sm">Commencez à taper pour rechercher</p>
+				</div>
+
+				{# Results will be injected here #}
+				<div id="search-results" class="hidden py-2">
+					{# TODO: Implement search results #}
+				</div>
+
+				{# No results state #}
+				<div id="search-no-results" class="hidden py-12 text-center text-gray-500">
+					<i data-lucide="search-x" class="size-10 mx-auto mb-3 opacity-30"></i>
+					<p class="text-sm">Aucun résultat trouvé</p>
+				</div>
+			</div>
+
+			{# Footer hints #}
+			<div class="flex items-center gap-4 px-4 py-2 border-t border-layout-border bg-light/50 text-xs text-gray-500">
+				<span class="flex items-center gap-1">
+					<kbd class="px-1.5 py-0.5 rounded bg-white border border-layout-border">↑</kbd>
+					<kbd class="px-1.5 py-0.5 rounded bg-white border border-layout-border">↓</kbd>
+					naviguer
+				</span>
+				<span class="flex items-center gap-1">
+					<kbd class="px-1.5 py-0.5 rounded bg-white border border-layout-border">↵</kbd>
+					sélectionner
+				</span>
+			</div>
+		</div>
+	</div>
+</div>

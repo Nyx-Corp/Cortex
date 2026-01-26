@@ -166,10 +166,10 @@ class DbalAdapter
         }
 
         if ($query->sorter) {
-            // @fixme hack with now date just to convert key
+            // Convert field name from model (camelCase) to table (snake_case)
             $sortBy = array_key_first(
                 $this->configuration->modelToTableMapper?->map([
-                    $query->sorter->field => new \DateTimeImmutable(),
+                    $query->sorter->field => '', // Use empty string as placeholder
                 ])
             );
         }
@@ -178,7 +178,7 @@ class DbalAdapter
             $this->query(
                 $this->select(
                     $filters,
-                    limit: $limit ?? $query->pager?->limit ?? 0,
+                    limit: $limit ?: $query->pager?->nbPerPage ?? 0,
                     offset: $query->pager?->offset ?? null,
                     sortBy: $sortBy ?? null,
                     sortDirection: $query->sorter?->direction->value ?? 'asc',

@@ -1,0 +1,162 @@
+{#
+    Search & Filters component
+
+    Variables:
+    - form: FormView with filters
+    - query: Current search query string (from ?q=)
+    - filters_config: Array of filter definitions [field => {type, label, choices?}]
+    - active_filters: Array of currently active filters [{field, label, value, display}]
+#}
+
+{% set filters_config = form.vars.filters_config|default({}) %}
+{% set active_filters = form.vars.active_filters|default([]) %}
+
+<div class="search-filters" data-controller="search-filters">
+    {# Search bar #}
+    <div class="relative">
+        <div class="flex items-center gap-2">
+            <i data-lucide="search" class="size-4 text-zinc-400 shrink-0"></i>
+            {{ form_widget(form.q, {
+                value: app.request.query.get('q', ''),
+                attr: {
+                    placeholder: 'Rechercher...',
+                    class: 'flex-1 bg-transparent border-0 outline-none text-sm text-zinc-700 placeholder:text-zinc-400',
+                    'data-search-filters-target': 'input',
+                    autocomplete: 'off'
+                }
+            }) }}
+            {% if filters_config|length > 0 %}
+            <button
+                type="button"
+                class="p-1 hover:bg-zinc-100 rounded transition-colors"
+                data-action="click->search-filters#togglePopover"
+                data-search-filters-target="toggleBtn"
+                title="Filtres avancés"
+            >
+                <i data-lucide="sliders-horizontal" class="size-4 text-zinc-400"></i>
+            </button>
+            {% endif %}
+        </div>
+
+        {# Active filters chips #}
+        {% if active_filters|length > 0 %}
+        <div class="flex flex-wrap gap-2 mt-2" data-search-filters-target="chips">
+            {% for filter in active_filters %}
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-100 text-xs text-zinc-700">
+                <span class="text-zinc-500">{{ filter.label }}:</span>
+                <span class="font-medium">{{ filter.display }}</span>
+                <button
+                    type="button"
+                    class="ml-1 hover:text-primary transition-colors"
+                    data-action="click->search-filters#removeFilter"
+                    data-filter-field="{{ filter.field }}"
+                >
+                    <i data-lucide="x" class="size-3"></i>
+                </button>
+            </span>
+            {% endfor %}
+            {% if active_filters|length > 1 %}
+            <button
+                type="button"
+                class="text-xs text-zinc-500 hover:text-primary transition-colors"
+                data-action="click->search-filters#clearAll"
+            >
+                Tout effacer
+            </button>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {# Filters popover #}
+        {% if filters_config|length > 0 %}
+        <div
+            class="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-200 shadow-lg z-50 hidden"
+            data-search-filters-target="popover"
+        >
+            <div class="p-4">
+                <div class="grid grid-cols-2 gap-4">
+                    {% for field, config in filters_config %}
+                    <div class="{% if config.type == 'boolean' %}col-span-2{% endif %}">
+                        <label class="block text-xs text-zinc-500 mb-1">{{ config.label }}</label>
+                        {% if config.type == 'text' %}
+                        <input
+                            type="text"
+                            name="filter_{{ field }}"
+                            value="{{ form.vars.filters[field].vars.value|default('') }}"
+                            placeholder="{{ config.label }}"
+                            class="w-full px-3 py-1.5 text-sm border border-zinc-200 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all"
+                            data-search-filters-target="field"
+                            data-filter-field="{{ field }}"
+                        >
+                        {% elseif config.type == 'enum' or config.type == 'choice' %}
+                        <select
+                            name="filter_{{ field }}"
+                            class="w-full px-3 py-1.5 text-sm border border-zinc-200 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all appearance-none bg-white"
+                            data-search-filters-target="field"
+                            data-filter-field="{{ field }}"
+                        >
+                            <option value="">Tous</option>
+                            {% for choice in config.choices|default([]) %}
+                            <option value="{{ choice.value|default(choice) }}" {% if form.vars.filters[field].vars.value|default('') == (choice.value|default(choice)) %}selected{% endif %}>
+                                {{ choice.label|default(choice) }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% elseif config.type == 'boolean' %}
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="filter_{{ field }}"
+                                value="1"
+                                {% if form.vars.filters[field].vars.value|default(false) %}checked{% endif %}
+                                class="rounded border-zinc-300 text-primary focus:ring-primary/20"
+                                data-search-filters-target="field"
+                                data-filter-field="{{ field }}"
+                            >
+                            <span class="text-sm text-zinc-700">{{ config.label }}</span>
+                        </label>
+                        {% elseif config.type == 'date' %}
+                        <div class="flex items-center gap-2">
+                            <input
+                                type="date"
+                                name="filter_{{ field }}_from"
+                                value="{{ form.vars.filters[field ~ '_from'].vars.value|default('') }}"
+                                class="flex-1 px-3 py-1.5 text-sm border border-zinc-200 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all"
+                                data-search-filters-target="field"
+                                data-filter-field="{{ field }}_from"
+                            >
+                            <span class="text-zinc-400">→</span>
+                            <input
+                                type="date"
+                                name="filter_{{ field }}_to"
+                                value="{{ form.vars.filters[field ~ '_to'].vars.value|default('') }}"
+                                class="flex-1 px-3 py-1.5 text-sm border border-zinc-200 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all"
+                                data-search-filters-target="field"
+                                data-filter-field="{{ field }}_to"
+                            >
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-4 py-3 border-t border-zinc-100 bg-zinc-50">
+                <button
+                    type="button"
+                    class="px-3 py-1.5 text-sm text-zinc-500 hover:text-zinc-700 transition-colors"
+                    data-action="click->search-filters#reset"
+                >
+                    Reinitialiser
+                </button>
+                <button
+                    type="button"
+                    class="px-4 py-1.5 text-sm bg-primary text-white hover:bg-primary/90 transition-colors"
+                    data-action="click->search-filters#applyFilters"
+                >
+                    Rechercher
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>

@@ -20,6 +20,9 @@ class ModelQueryDecorator extends ModelQuery
     private ?FormBuilderInterface $formBuilder = null;
     private ?FormInterface $form = null;
 
+    private array $filtersConfig = [];
+    private array $activeFilters = [];
+
     public function build(FormFactoryInterface $formFactory, Request $request): self
     {
         $this->formFactory = $formFactory;
@@ -28,19 +31,39 @@ class ModelQueryDecorator extends ModelQuery
         return $this;
     }
 
-    public function decorate(array $sortables, ?\Closure $filters = null): self
+    /**
+     * Configure the query decorator with sortable fields and filters.
+     *
+     * Filters can be:
+     * - A closure (legacy): fn(FormBuilderInterface $fb) => $fb->add(...)
+     * - An array (new): ['field' => ['type' => 'text', 'label' => 'Label'], ...]
+     *
+     * Filter types: text, enum, boolean, date
+     * For enum: add 'choices' => [['value' => 'x', 'label' => 'X'], ...]
+     */
+    public function decorate(array $sortables, \Closure|array|null $filters = null): self
     {
         if (!$this->request) {
             throw new \BadMethodCallException('ModelQuery cannot be decorated without building it first, using build() method.');
+        }
+
+        // Store filters config if array
+        if (is_array($filters)) {
+            $this->filtersConfig = $filters;
         }
 
         $this->formBuilder = $this->formFactory->createNamedBuilder(
             '',
             ModelQueryType::class,
             $this,
-            ['sortable_fields' => $sortables]
+            [
+                'sortable_fields' => $sortables,
+                'filters_config' => is_array($filters) ? $filters : [],
+            ]
         );
-        if ($filters) {
+
+        // Legacy closure support
+        if ($filters instanceof \Closure) {
             $filters($this->formBuilder);
         }
 
@@ -62,6 +85,9 @@ class ModelQueryDecorator extends ModelQuery
 
                 $this->tags->set($key, $value); // tag
             }
+
+            // Parse q parameter (Gmail-style query)
+            $this->parseQueryString($this->request->query->get('q', ''));
         }
 
         // Posted filter form
@@ -77,12 +103,79 @@ class ModelQueryDecorator extends ModelQuery
         return parent::resolve();
     }
 
+    /**
+     * Parse Gmail-style query string: "field:value field2:value2"
+     */
+    private function parseQueryString(string $query): void
+    {
+        if (empty($query)) {
+            return;
+        }
+
+        // Match field:value or field:"value with spaces"
+        $pattern = '/(\w+):(?:"([^"]+)"|(\S+))/';
+        preg_match_all($pattern, $query, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $match) {
+            $field = $match[1];
+            $value = $match[2] ?: $match[3];
+
+            // Check if this is a valid filter field
+            if ($this->filters->hasDeclaredKey($field) || isset($this->filtersConfig[$field])) {
+                $this->filterBy($field, $value);
+
+                // Build active filter for display
+                $label = $this->filtersConfig[$field]['label'] ?? ucfirst($field);
+                $this->activeFilters[] = [
+                    'field' => $field,
+                    'label' => $label,
+                    'value' => $value,
+                    'display' => $this->formatFilterDisplay($field, $value),
+                ];
+            }
+        }
+    }
+
+    /**
+     * Format filter value for display in chips
+     */
+    private function formatFilterDisplay(string $field, string $value): string
+    {
+        $config = $this->filtersConfig[$field] ?? null;
+
+        if (!$config) {
+            return $value;
+        }
+
+        // For enum/choice, find the label
+        if (($config['type'] ?? '') === 'enum' && isset($config['choices'])) {
+            foreach ($config['choices'] as $choice) {
+                if (is_array($choice) && ($choice['value'] ?? '') === $value) {
+                    return $choice['label'] ?? $value;
+                }
+            }
+        }
+
+        // For boolean
+        if (($config['type'] ?? '') === 'boolean') {
+            return $value === 'true' || $value === '1' ? 'Oui' : 'Non';
+        }
+
+        return $value;
+    }
+
     public function getDecorator(): FormView
     {
         if (!$this->form) {
             throw new \BadMethodCallException('No decorator defined, query has to be resolved first.');
         }
 
-        return $this->form->createView();
+        $view = $this->form->createView();
+
+        // Add filters config and active filters to view vars
+        $view->vars['filters_config'] = $this->filtersConfig;
+        $view->vars['active_filters'] = $this->activeFilters;
+
+        return $view;
     }
 }

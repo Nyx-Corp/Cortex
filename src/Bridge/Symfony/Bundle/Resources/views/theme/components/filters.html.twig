@@ -151,8 +151,8 @@
         {% set direction = attr['data-sort-direction'] %}
         {% set icon = direction == 'asc' ? 'chevron-up' : 'chevron-down' %}
         <label class="cursor-pointer text-dark-lighter hover:text-dark transition-colors has-[:checked]:text-dark">
-            {% set attr = attr|merge({'class': 'sr-only peer'}) %}
-            <input type="radio" {{ block('widget_attributes') }}>
+            {% set attr = attr|merge({'class': 'sr-only peer', 'data-autosubmit': 'true'}) %}
+            <input type="radio" {{ block('widget_attributes') }} value="{{ value }}"{% if checked %} checked="checked"{% endif %}>
             <i data-lucide="{{ icon }}" class="size-3"></i>
         </label>
     {% else %}

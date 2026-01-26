@@ -1,17 +1,24 @@
 {% block menu_element %}
     {% set active = element.active|default(false) or element.label == active_menu|default('') %}
-    {% set link = element.link is defined ? element.link : (element.route is defined ? path(element.route) : '#') %}
+    {% set disabled = element.disabled|default(false) %}
+    {% set premium = element.premium|default(false) %}
+    {% set link = disabled ? '#' : (element.link is defined ? element.link : (element.route is defined ? path(element.route) : '#')) %}
     <li>
-        <a href="{{ link }}" class="flex items-center gap-4 rounded-md px-4 py-2 text-sm font-medium hover:bg-menu-hover hover:text-white group-[.closed]/sidebar:px-0 {{ element.extra_class|default('') }} {{ active ? 'text-white bg-menu-active' : '' }}" 
+        <a href="{{ link }}" class="flex items-center gap-4 rounded-md p-2 text-sm font-medium group-[.closed]/sidebar:px-0 {{ element.extra_class|default('') }} {{ active ? 'text-white bg-menu-active' : '' }} {{ disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-menu-hover hover:text-white' }}"
+            {% if disabled %}aria-disabled="true"{% endif %}
         >
         {% if element.icon is defined and element.icon is not empty %}
             <i data-lucide="{{ element.icon }}" class="size-5 group-[.closed]/sidebar:mx-auto"></i>
         {% endif %}
             <span class="group-[.closed]/sidebar:hidden">{{ element.label }}</span>
-        {% if element.pill is defined %}
+        {% if premium %}
+            <span class="ml-auto flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 px-2 py-0.5 text-xs text-amber-900 font-semibold group-[.closed]/sidebar:hidden">
+                <i data-lucide="crown" class="size-3"></i>
+            </span>
+        {% elseif element.pill is defined %}
             <span class="ml-auto rounded-full {{ element.pill.color|default('bg-green-500') }} px-2 text-xs text-white group-[.closed]/sidebar:hidden">
                 {{ element.pill.value }}
-            </span>    
+            </span>
         {% endif %}
         </a>
     </li>
@@ -21,13 +28,13 @@
     <li class="{{ section.class|default('group-[.closed]/sidebar:-mt-5')|raw }}">
     {% if section.label is defined %}
     	<h2 class="text-xs font-semibold uppercase tracking-wide text-gray-500">
-			<span class="block transition-all duration-300 px-4 group-[.closed]/sidebar:hidden">
+			<span class="block transition-all duration-300 pl-5 group-[.closed]/sidebar:hidden">
                 {{ section.label }}
             </span>
 			<span class="hidden group-[.closed]/sidebar:flex h-px w-10 bg-gray-600 mx-auto my-2"></span>
 		</h2>
     {% endif %}
-        <ul role="list" class="flex flex-col mt-3 group-[.closed]/sidebar:mt-4 gap-y-2 group-[.closed]/sidebar:gap-y-3">
+        <ul role="list" class="flex flex-col mt-3 group-[.closed]/sidebar:mt-4 gap-y-2 group-[.closed]/sidebar:gap-y-3 mx-3 px-0">
             {% for element in section.elements|default([]) %}
                 {{ block('menu_element') }}
             {% endfor %}

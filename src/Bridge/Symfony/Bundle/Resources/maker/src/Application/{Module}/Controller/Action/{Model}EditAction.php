@@ -6,16 +6,17 @@ use Cortex\Bridge\Symfony\Controller\ControllerInterface;
 use Application\{Module}\Form\{Model}EditType;
 use Domain\{Domain}\Model\{Model};
 use Domain\{Domain}\Action\{Model}Edit;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Handles {Model} creation/edition form
- * 
+ *
  */
 #[Route(name: '{model}/create', path: '/{model}/create', methods: ['GET', 'POST'])]
 #[Route(name: '{model}/edit', path: '/{model}/{uuid}/edit', methods: ['GET', 'POST'])]
@@ -24,6 +25,7 @@ class {Model}EditAction implements ControllerInterface
     public function __construct(
         private FormFactoryInterface $formFactory,
         private UrlGeneratorInterface $urlGenerator,
+        #[Autowire('%kernel.debug%')]
         private readonly bool $debug,
     ) {}
  

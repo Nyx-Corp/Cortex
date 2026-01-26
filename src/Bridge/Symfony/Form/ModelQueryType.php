@@ -11,6 +11,7 @@ use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
@@ -32,6 +33,7 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
             'csrf_protection' => false,
             'page_sizes' => [10, 20, 50, 100],
             'sortable_fields' => [],
+            'filters_config' => [],
             'default_page_size' => 20,
         ]);
     }
@@ -40,6 +42,12 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
     {
         // Utilise ce FormType comme DataMapper
         $builder->setDataMapper($this);
+
+        // Search query (Gmail-style q parameter)
+        $builder->add('q', TextType::class, [
+            'required' => false,
+            'mapped' => false, // Handled separately via request query
+        ]);
 
         // Pagination
         $builder
@@ -76,6 +84,34 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
             'placeholder' => false,
             'label' => false,
         ]);
+
+        // Add filter fields from filters_config
+        foreach ($options['filters_config'] as $fieldName => $config) {
+            $type = $config['type'] ?? 'text';
+            $label = $config['label'] ?? ucfirst($fieldName);
+
+            $fieldOptions = [
+                'required' => false,
+                'label' => $label,
+                'attr' => [
+                    'data-filter-field' => $fieldName,
+                ],
+            ];
+
+            match ($type) {
+                'text' => $builder->add($fieldName, TextType::class, $fieldOptions),
+                'enum', 'choice' => $builder->add($fieldName, ChoiceType::class, array_merge($fieldOptions, [
+                    'choices' => array_column($config['choices'] ?? [], 'value', 'label'),
+                    'placeholder' => $config['placeholder'] ?? 'Tous',
+                ])),
+                'boolean' => $builder->add($fieldName, ChoiceType::class, array_merge($fieldOptions, [
+                    'choices' => ['Oui' => '1', 'Non' => '0'],
+                    'placeholder' => 'Tous',
+                    'expanded' => true,
+                ])),
+                default => $builder->add($fieldName, TextType::class, $fieldOptions),
+            };
+        }
     }
 
     /**
@@ -91,6 +127,7 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
 
         foreach ($forms as $name => $form) {
             match ($name) {
+                'q' => null, // Handled separately, not mapped
                 'page' => $form->setData($modelQuery->pager?->page ?? 1),
                 'limit' => $form->setData($modelQuery->pager?->nbPerPage ?? 20),
                 'sort' => $modelQuery->sorter ? $form->setData(sprintf(
@@ -116,8 +153,8 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
 
         // Map page et limit vers Pager
         $modelQuery->paginate(new Pager(
-            $forms['page']->getData(),
-            $forms['limit']->getData()
+            $forms['page']->getData() ?? 1,
+            $forms['limit']->getData() ?? 20
         ));
 
         // Map sort vers Sorter
@@ -135,7 +172,7 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
         // Filter map
         $filterForms = array_diff_key(
             $forms,
-            ['page' => true, 'limit' => true, 'sort' => true]
+            ['q' => true, 'page' => true, 'limit' => true, 'sort' => true]
         );
         foreach ($filterForms as $name => $form) {
             $formData = $form->getData();
@@ -155,7 +192,7 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
         $view->vars['fields'] = array_unique(array_merge($filterKeys, $sortableFields));
         $view->vars['filters'] = array_diff_key(
             $view->children,
-            ['page' => true, 'limit' => true, 'sort' => true]
+            ['q' => true, 'page' => true, 'limit' => true, 'sort' => true]
         );
         $view->vars['sorts'] = [];
         foreach ($options['sortable_fields'] as $sortField) {
@@ -166,5 +203,8 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
                 }
             }
         }
+
+        // Pass filters config for the search-filters component
+        $view->vars['filters_config'] = $options['filters_config'] ?? [];
     }
 }

@@ -22,7 +22,7 @@ class Pager
 
     public function __construct(
         int $page,
-        public readonly int $nbPerPage = 25,
+        public readonly int $nbPerPage = 20,
     ) {
         $this->page = $page;
     }

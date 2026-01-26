@@ -3,6 +3,7 @@
 namespace Cortex\Bridge\Symfony\Bundle;
 
 use Cortex\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ActionHandlerCompilerPass;
+use Cortex\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ControllerTaggingPass;
 use Cortex\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ModelProcessorCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -15,5 +16,6 @@ class CortexBridgeBundle extends Bundle
 
         $container->addCompilerPass(new ModelProcessorCompilerPass());
         $container->addCompilerPass(new ActionHandlerCompilerPass());
+        $container->addCompilerPass(new ControllerTaggingPass());
     }
 }

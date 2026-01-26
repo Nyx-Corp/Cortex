@@ -2,30 +2,177 @@
 
 {% form_theme form '@_theme/components/filters.html.twig' %}
 
-{{ form_start(form, { 
+{{ form_start(form, {
     'action': path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params', {})),
-    'attr': { 
-        'id': '_collectionDecoratorForm', 
-        'class': 'flex flex-col w-full h-full',
-    } 
+    'attr': {
+        'id': '_collectionDecoratorForm',
+        'class': 'flex-1 flex flex-col min-h-0',
+    }
 }) }}
-    <div class="flex flex-1 overflow-hidden">        
-        <div class="flex-1 relative overflow-auto h-full">
+<div class="p-6 flex-1 flex flex-col min-h-0 overflow-hidden">
+    {# Page title #}
+    <div class="flex items-center pb-2 border-b-2 border-primary mb-6">
+        <div class="flex items-center gap-3">
+            {% block title %}
+                <i data-lucide="list" class="size-6 text-primary"></i>
+                <h1 class="text-3xl font-bold font-heading text-zinc-700">{{ 'admin.list.title'|trans({}, 'admin') }}</h1>
+            {% endblock %}
+        </div>
+    </div>
+
+    {# Toolbar: Search + Batch Actions + Create button #}
+    <div class="flex items-center gap-3 mb-4">
+        {# Search box with filters popover #}
+        <div class="search-filters flex-1 max-w-[50%] relative">
+            <div class="flex items-center gap-2">
+                <div class="flex items-center bg-white border border-zinc-200 rounded-lg shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition-all flex-1">
+                    <div class="flex items-center gap-2 px-3 py-2 flex-1">
+                        <i data-lucide="search" class="size-4 text-zinc-400 shrink-0"></i>
+                        {{ form_widget(form.q, {
+                            value: app.request.query.get('q', ''),
+                            attr: {
+                                placeholder: 'Filtrer la liste...',
+                                class: 'flex-1 bg-transparent border-0 outline-none text-sm text-zinc-700 placeholder:text-zinc-400',
+                                'data-search-filters-target': 'input',
+                                autocomplete: 'off'
+                            }
+                        }) }}
+                    </div>
+                    {% if form.vars.filters|default({})|length > 0 %}
+                    <div class="flex items-center border-l border-zinc-200">
+                        <button
+                            type="button"
+                            class="p-2.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 rounded-r-lg transition-colors cursor-pointer"
+                            data-search-filters-target="toggleBtn"
+                            title="Filtres avancés (F)"
+                        >
+                            <i data-lucide="sliders-horizontal" class="size-4"></i>
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                {# Info button - outside, circle style #}
+                <button
+                    type="button"
+                    class="size-9 flex items-center justify-center text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-full transition-colors cursor-pointer group relative shrink-0"
+                    title="Syntaxe de recherche"
+                >
+                    <i data-lucide="info" class="size-4"></i>
+                    {# Tooltip #}
+                    <div class="absolute right-0 top-full mt-2 w-72 p-3 bg-zinc-800 text-white text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                        <div class="font-medium mb-2">Syntaxe de recherche</div>
+                        <div class="space-y-1.5 text-zinc-300">
+                            <div><code class="bg-zinc-700 px-1 rounded">nom:dupont</code> Filtre par champ</div>
+                            <div><code class="bg-zinc-700 px-1 rounded">nom:"jean dupont"</code> Valeur avec espaces</div>
+                            <div><code class="bg-zinc-700 px-1 rounded">email:@gmail.com</code> Recherche partielle</div>
+                        </div>
+                        <div class="absolute -top-1.5 right-4 w-3 h-3 bg-zinc-800 rotate-45"></div>
+                    </div>
+                </button>
+            </div>
+            {# Filters popover #}
+            {% if form.vars.filters|default({})|length > 0 %}
+            <div class="hidden absolute top-full left-0 right-0 mt-2 p-4 bg-white border border-zinc-200 rounded-lg shadow-lg z-50"
+                 data-search-filters-target="popover">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {% for name, filter in form.vars.filters %}
+                        {{ form_row(filter, {
+                            attr: filter.vars.attr|merge({
+                                'data-search-filters-target': 'field',
+                                'data-filter-field': name
+                            })
+                        }) }}
+                    {% endfor %}
+                </div>
+                <div class="flex items-center justify-end gap-2 mt-4 pt-4 border-t border-zinc-100">
+                    <button type="button"
+                            class="px-3 py-1.5 text-sm text-zinc-600 hover:bg-zinc-100 rounded transition-colors"
+                            data-action="click->search-filters#reset">
+                        Réinitialiser
+                    </button>
+                    <button type="button"
+                            class="px-3 py-1.5 text-sm bg-primary text-white hover:bg-primary/90 rounded transition-colors"
+                            data-action="click->search-filters#applyFilters">
+                        Appliquer
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {# Export button #}
+        <button
+            type="button"
+            class="ml-auto inline-flex items-center gap-2 px-3 py-2 text-sm border border-zinc-200 bg-white rounded-lg shadow-sm hover:bg-zinc-50 transition-all cursor-pointer"
+            data-batch-action="export"
+            title="Exporter la liste"
+        >
+            <i data-lucide="download" class="size-4 text-zinc-500"></i>
+            <span class="text-zinc-700">Exporter</span>
+        </button>
+
+        {# Create button #}
+        <a href="{% block create_link '#' %}" data-shortcut="n"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary hover:bg-primary/90 text-white rounded-lg shadow-sm transition-all cursor-pointer shrink-0">
+            <i data-lucide="plus" class="size-4"></i>
+            <span>{{ 'admin.action.new'|trans({}, 'admin') }}</span>
+            <kbd class="text-xs bg-white/20 px-1.5 py-0.5 rounded font-mono">N</kbd>
+        </a>
+    </div>
+
+    {# Active filters display #}
+    {% block active_filters %}
+    {% set active_filters = [] %}
+    {% for name, filter in form.vars.filters %}
+        {% if filter.vars.value is not empty %}
+            {% set active_filters = active_filters|merge([{
+                'name': name,
+                'label': filter.vars.label ?? name,
+                'value': filter.vars.value
+            }]) %}
+        {% endif %}
+    {% endfor %}
+    {% if active_filters|length > 0 %}
+    <div class="flex items-center gap-2 mb-4 flex-wrap">
+        <span class="text-xs text-zinc-500">{{ 'admin.list.filters'|trans({}, 'admin') }} :</span>
+        {% for filter in active_filters %}
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-primary/10 text-primary rounded-full border border-primary/20">
+            <span class="font-medium">{{ filter.label }}</span>
+            <span class="text-primary/70">{{ filter.value }}</span>
+            <a href="?{{ app.request.query.all|filter((v, k) => k != filter.name)|url_encode }}"
+               class="text-primary/50 hover:text-primary ml-0.5 transition-colors">
+                <i data-lucide="x" class="size-3"></i>
+            </a>
+        </span>
+        {% endfor %}
+        <a href="{{ path(app.request.attributes.get('_route')) }}"
+           class="text-xs text-zinc-500 hover:text-primary transition-colors underline underline-offset-2">
+            {{ 'admin.list.reset'|trans({}, 'admin') }}
+        </a>
+    </div>
+    {% endif %}
+    {% endblock %}
+
+    {# Table card #}
+    <div class="border border-zinc-200 bg-white min-h-0 max-h-full flex flex-col overflow-hidden">
+        {# Table content - scrollable #}
+        <div class="overflow-auto">
         {% block table %}
-            <table class="min-w-full text-sm text-left text-dark border-l border-b border-light-darker border-collapse">
-                <thead class="h-12 bg-light text-dark sticky top-0 z-10 shadow-[inset_0_-1px_0_var(--color-light-darker)]">
-                    <tr>
-                        <th scope="col" class="pl-4 w-2">
+            <table class="min-w-full text-sm text-left">
+                <thead class="bg-zinc-50 sticky top-0 z-10 font-heading">
+                    <tr class="border-b border-zinc-200">
+                        <th scope="col" class="pl-4 py-3 w-10">
                             <input type="checkbox" id="select-all"
-                                class="border-light-darker text-form-btn focus:ring-form-border-focus focus:ring-2">
+                                class="size-4 rounded border-zinc-300 text-primary accent-primary focus:ring-primary/20 focus:ring-2 cursor-pointer"
+                                data-action="change->batch#toggleAll">
                         </th>
                     {% for field in form.vars.fields %}
                         {% if block(field ~ '_th') ?? null %}
-                        <th scope="col" class="px-6 text-base font-semibold text-dark whitespace-nowrap transition-colors">
-                            <div class="flex items-center gap-3 h-full">
+                        <th scope="col" class="px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider whitespace-nowrap">
+                            <div class="flex items-center gap-2">
                                 <span>{{ block(field ~ '_th') }}</span>
                             {% if form.vars.sorts[field] is defined %}
-                                <div class="sort flex flex-col items-center space-y-0">
+                                <div class="sort flex items-center gap-0.5">
                                     {{ form_widget(form.vars.sorts[field]['asc']) }}
                                     {{ form_widget(form.vars.sorts[field]['desc']) }}
                                 </div>
@@ -34,58 +181,86 @@
                         </th>
                         {% endif %}
                     {% endfor %}
-                        <th scope="col" class="px-6 text-right w-20 transition-colors font-normal">
-                            {% if hide_filters|default(false) %}
-                            <a href="{% block create_link '#' %}" data-shortcut="n"
-                                    class="inline-flex items-center gap-2 pl-2 pr-1 py-1 text-xs bg-white hover:bg-light hover:border-dark-lighter hover:text-dark text-dark-light rounded border border-light-darker transition-all cursor-pointer">
-                                <i data-lucide="plus" class="size-3"></i>
-                                <span>{{ 'admin.action.new'|trans({}, 'admin') }}</span>
-                                <kbd class="text-xs bg-transparent px-1 rounded border-light-darker border font-mono opacity-60">N</kbd>
-                            </a>
-                            {% endif %}
+                        <th scope="col" class="px-4 py-3 w-32 text-right">
+                            {# Batch actions dropdown - visible when items selected #}
+                            <div class="relative inline-block" data-batch-dropdown>
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-normal border border-transparent bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all opacity-0 pointer-events-none"
+                                                    style="font-family: var(--font-sans);"
+                                    data-batch-actions-trigger
+                                >
+                                    <i data-lucide="check-square" class="size-4"></i>
+                                    <span data-batch-count>0</span>
+                                    <span>sélectionné(s)</span>
+                                    <i data-lucide="chevron-down" class="size-3.5"></i>
+                                </button>
+                                <div
+                                    class="absolute top-full right-0 mt-2 w-48 bg-white border border-zinc-200 rounded-xl shadow-xl z-50 hidden overflow-hidden py-1"
+                                    style="font-family: var(--font-sans); font-weight: 400;"
+                                    data-batch-menu
+                                >
+                                    {% block batch_actions %}
+                                    <button type="button" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors" data-batch-action="export">
+                                        <i data-lucide="download" class="size-4 text-zinc-400"></i>
+                                        Exporter
+                                    </button>
+                                    <button type="button" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors" data-batch-action="email">
+                                        <i data-lucide="mail" class="size-4 text-zinc-400"></i>
+                                        Envoyer un email
+                                    </button>
+                                    <div class="my-1 mx-4 border-t border-zinc-100"></div>
+                                    <button type="button" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors" data-batch-action="archive">
+                                        <i data-lucide="archive" class="size-4"></i>
+                                        Archiver
+                                    </button>
+                                    {% endblock %}
+                                </div>
+                            </div>
                         </th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-light-darker">
+                <tbody class="divide-y divide-zinc-100">
                     {% if collection is empty %}
                         <tr>
-                            <td colspan="100%" class="px-6 py-12 text-center text-sm text-dark-lighter">
+                            <td colspan="100%" class="px-4 py-12 text-center text-sm text-zinc-500">
                                 <div class="flex flex-col items-center gap-3">
-                                    <i data-lucide="inbox" class="size-12 text-dark-lighter opacity-50"></i>
+                                    <i data-lucide="inbox" class="size-12 text-zinc-300"></i>
                                     {% block empty_text 'admin.list.empty_text'|trans({}, 'admin') %}
                                 </div>
                             </td>
                         </tr>
                     {% else %}
                         {% for item in collection %}
-                            <tr class="h-12 hover:bg-light-dark transition-colors group cursor-pointer even:bg-light-dark">
-                                <td class="pl-4 w-2">
-                                    <input type="checkbox" name="selected_items[]" value="{{ item.uuid }}" 
-                                        class="row-checkbox border-light-darker text-form-btn focus:ring-form-border-focus focus:ring-2">
+                            <tr class="hover:bg-zinc-50 transition-colors group">
+                                <td class="pl-4 py-3 w-10">
+                                    <input type="checkbox" name="selected_items[]" value="{{ item.uuid }}"
+                                        class="row-checkbox size-4 rounded border-zinc-300 text-primary accent-primary focus:ring-primary/20 focus:ring-2 cursor-pointer"
+                                        data-action="change->batch#toggle">
                                 </td>
                             {% for field in form.vars.fields %}
                                 {# Check _th existence to ensure column alignment even when _td content is empty #}
                                 {% if block(field ~ '_th') ?? null %}
-                                <td class="px-6 whitespace-nowrap text-sm text-dark font-medium">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-zinc-700">
                                     {{ block(field ~ '_td') ?? '' }}
                                 </td>
                                 {% endif %}
                             {% endfor %}
-                                <td class="pr-4 pl-6 text-right">
+                                <td class="px-4 py-3 text-right">
                                 {% block row_actions %}
-                                    <div class="inline-flex items-center">
-                                        <a href="{{ app.request.pathInfo|trim('s') ~ '/' ~ item.uuid ~ '/edit' }}" 
-                                        class="inline-flex items-center justify-center w-8 h-8 hover:bg-light-dark transition-colors"
+                                    <div class="inline-flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <a href="{{ app.request.pathInfo|trim('s') ~ '/' ~ item.uuid ~ '/edit' }}"
+                                        class="p-1.5 text-zinc-400 hover:text-primary hover:bg-zinc-100 rounded transition-colors"
                                         title="{{ 'admin.action.edit'|trans({}, 'admin') }}"
                                         >
-                                            <i data-lucide="edit" class="size-4 text-dark-lighter hover:text-dark"></i>
+                                            <i data-lucide="pencil" class="size-4"></i>
                                         </a>
-                                        <a href="{{ app.request.pathInfo|trim('s') ~ '/' ~ item.uuid ~ '/archive' }}" 
-                                        class="inline-flex items-center justify-center w-8 h-8 hover:bg-light-dark transition-colors"
+                                        <a href="{{ app.request.pathInfo|trim('s') ~ '/' ~ item.uuid ~ '/archive' }}"
+                                        class="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
                                         title="{{ 'admin.action.archive.label'|trans({}, 'admin') }}"
                                         onclick="return confirm('{{ 'admin.action.archive.confirmation'|trans({}, 'admin') }}')"
                                         >
-                                            <i data-lucide="archive" class="size-4 text-dark-lighter hover:text-danger"></i>
+                                            <i data-lucide="archive" class="size-4"></i>
                                         </a>
                                     </div>
                                 {% endblock %}
@@ -97,59 +272,59 @@
             </table>
         {% endblock %}
         </div>
-        
-        {% if not hide_filters|default(false) %}
-        <aside class="filters-sidebar w-64 overflow-y-auto h-full flex flex-col">
-            <div class="border-b border-layout-border h-12 z-10 px-4 flex items-center justify-end gap-2">
-                <a href="{{ block('create_link') }}" data-shortcut="n"
-                        class="flex items-center gap-2 pl-2 pr-1 py-1 text-xs bg-white hover:bg-light hover:border-dark-lighter hover:text-dark text-dark-light rounded border border-light-darker transition-all cursor-pointer">
-                    <i data-lucide="plus" class="size-3"></i>
-                    <span>{{ 'admin.action.new'|trans({}, 'admin') }}</span>
-                    <kbd class="text-xs bg-transparent px-1 rounded border-light-darker border font-mono opacity-60">N</kbd>
-                </a>
 
-                {% if form.vars.filters|length %}
-                <button type="button" data-shortcut="f" data-active="true"
-                        class="flex items-center gap-2 pl-2 pr-1 py-1 text-xs bg-white hover:bg-light hover:border-dark-lighter hover:text-dark text-dark-light rounded border border-light-darker transition-all cursor-pointer has-[:checked]:border-form-border-focus has-[:checked]:text-dark">
-                    <input type="checkbox" class="sr-only" checked>
-                    <i data-lucide="filter" class="size-3"></i>
-                    <kbd class="text-xs bg-transparent px-1 rounded border-light-darker border font-mono opacity-60">F</kbd>
-                </button>
+        {# Pagination footer - always visible #}
+        <div class="px-4 py-3 border-t border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
+            <div class="text-xs text-zinc-500">
+                {% if pager is defined %}
+                    <span class="font-medium text-zinc-700">{{ collection|length }}</span> / {{ pager.nbRecords }} {{ 'admin.list.results'|trans({}, 'admin') }}
+                {% elseif collection is defined %}
+                    <span class="font-medium text-zinc-700">{{ collection|length }}</span> {{ 'admin.list.results'|trans({}, 'admin') }}
                 {% endif %}
             </div>
-            <div class="flex-1 p-4 border-l border-light-darker">
-            {% if form.vars.filters|length %}
-                <div class="flex items-center justify-between gap-2 pb-2 border-b border-layout-border-light">
-                    <h3 class="text-sm font-semibold flex items-center gap-2 text-dark">
-                        <i data-lucide="filter" class="size-4 text-form-label"></i>
-                        <span>{{ 'admin.list.filters'|trans({}, 'admin') }}</span>
-                    </h3>
-                    <span class="text-xs font-normal bg-light-darker rounded-full px-2 py-0.5">
-                        {{ collection|length }} / YYYY
-                    </span>
-                </div>
+            {% if pager is defined and pager.pages|length > 1 %}
+            <div class="flex items-center gap-1">
+                {# Previous #}
+                {% if pager.page > 1 %}
+                <a href="?page={{ pager.page - 1 }}&limit={{ pager.nbPerPage }}"
+                   class="p-1.5 text-zinc-500 hover:text-zinc-700 hover:bg-zinc-200 rounded transition-colors">
+                    <i data-lucide="chevron-left" class="size-4"></i>
+                </a>
+                {% else %}
+                <span class="p-1.5 text-zinc-300">
+                    <i data-lucide="chevron-left" class="size-4"></i>
+                </span>
+                {% endif %}
 
-                <div class="flex flex-col gap-4 mt-4">
-                    {% for filterForm in form.vars.filters %}
-                        {{ form_row(filterForm, {
-                            'attr': { 'data-shortcut-key': loop.index }
-                        }) }}
-                    {% endfor %}
-                    <div class="flex items-center gap-2 mt-4">
-                        <a href="{{ app.request.pathInfo }}" data-shortcut="x"
-                        class="flex items-center gap-2 pl-2 pr-1 py-1 text-xs bg-white hover:bg-light hover:border-dark-lighter hover:text-dark text-dark-light rounded border border-light-darker transition-all cursor-pointer">
-                            <i data-lucide="x" class="size-3"></i>
-                            <span>{{ 'admin.list.reset'|trans({}, 'admin') }}</span>
-                            <kbd class="text-xs bg-transparent px-1 rounded border-light-darker border font-mono opacity-60">X</kbd>
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
+                {# Page numbers #}
+                {% for p in pager.pages %}
+                    {% if p == pager.page %}
+                    <span class="px-3 py-1 text-sm font-medium text-white bg-primary rounded">{{ p }}</span>
+                    {% elseif p == 1 or p == pager.pages|last or (p >= pager.page - 2 and p <= pager.page + 2) %}
+                    <a href="?page={{ p }}&limit={{ pager.nbPerPage }}"
+                       class="px-3 py-1 text-sm text-zinc-600 hover:bg-zinc-200 rounded transition-colors">{{ p }}</a>
+                    {% elseif p == 2 or p == pager.pages|last - 1 %}
+                    <span class="px-1 text-zinc-400">...</span>
+                    {% endif %}
+                {% endfor %}
+
+                {# Next #}
+                {% if pager.page < pager.pages|length %}
+                <a href="?page={{ pager.page + 1 }}&limit={{ pager.nbPerPage }}"
+                   class="p-1.5 text-zinc-500 hover:text-zinc-700 hover:bg-zinc-200 rounded transition-colors">
+                    <i data-lucide="chevron-right" class="size-4"></i>
+                </a>
+                {% else %}
+                <span class="p-1.5 text-zinc-300">
+                    <i data-lucide="chevron-right" class="size-4"></i>
+                </span>
+                {% endif %}
             </div>
-        </aside>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
-    <div class="hidden">
-        {{ form_rest(form) }}
-    </div>
+</div>
+<div class="hidden">
+    {{ form_rest(form) }}
+</div>
 {{ form_end(form) }}

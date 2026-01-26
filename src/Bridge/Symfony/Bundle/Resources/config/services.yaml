@@ -6,9 +6,7 @@ services:
         bind:
             $dbalConnection: '@doctrine.dbal.default_connection'
 
-    _instanceof:
-        Cortex\Bridge\Symfony\Controller\ControllerInterface:
-            tags: ['controller.service_arguments']
+    # ControllerInterface tagging is handled by ControllerTaggingPass
 
     Cortex\Component\Model\Query\Factory\QueryFactory:
         class: Cortex\Bridge\Symfony\Model\Query\RequestQueryFactory
@@ -27,14 +25,21 @@ services:
         autoconfigure: false
         public: false
 
+    Cortex\Bridge\Symfony\Routing\ControllerRouteLoader:
+        tags:
+            - { name: routing.loader }
+
     Cortex\Bridge\:
         resource: '../../../../../Bridge/'
         exclude:
             - '../../../../../Bridge/Symfony/Bundle'
             - '../../../../../Bridge/Symfony/Translation/'
+            - '../../../../../Bridge/Symfony/Routing/'
 
     Cortex\Component\:
         resource: '../../../../../Component/'
         exclude:
             - '../../../../../Component/Collection/'
             - '../../../../../Component/Json/'
+            - '../../../../../Component/Mapper/Relation.php'
+            - '../../../../../Component/Model/ModelCollection.php'

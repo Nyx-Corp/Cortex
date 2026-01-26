@@ -8,8 +8,14 @@
 		<meta name="description" content="{% block html_meta_description %}{% trans %}meta.description{% endtrans %}{% endblock %}">
 		<meta name="robots" content="index, follow">
 
-		<link rel="canonical" href="{{ url('index') }}"/>
-		<link rel="icon" type="image/x-icon" href="{{ asset('assets/public/images/favicon.ico') }}">
+		{% block canonical %}{% endblock %}
+		{% block favicon %}<link rel="icon" type="image/x-icon" href="{{ asset('assets/public/images/favicon.ico') }}">{% endblock %}
+
+		{% block fonts %}
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+		{% endblock %}
 
 		{% block stylesheets vite_entry_link_tags('main') %}
 		{% block javascripts vite_entry_script_tags('app') %}
@@ -17,7 +23,7 @@
 
 	<body class="h-full min-h-0 bg-layout-bg text-layout-text">
 	{% block body %}
-        <div id="container" class="group/sidebar">
+        <div id="container" class="group/sidebar h-screen max-h-screen overflow-hidden flex">
 			<script>
 				if (localStorage.getItem('sidebar-collapsed') === 'true') {
 					document.querySelector('#container').classList.add('closed');
@@ -28,27 +34,22 @@
 				{% embed '@_theme/layout/sidebar.html.twig' %}{% endembed %}
 			{% endblock %}
 			</aside>
-			<div class="ps-60 group-[.closed]/sidebar:ps-16 transition-[padding] duration-150 ease-in-out min-h-screen">
+			<div class="ps-60 group-[.closed]/sidebar:ps-16 transition-[padding] duration-150 ease-in-out h-full flex-1 overflow-hidden flex flex-col">
 			{% block content %}
-				<header class="sticky top-0 z-40 flex h-14 shrink-0 items-center border-b border-layout-border bg-white shadow-xs gap-x-6 px-4 text-dark flex flex-1 self-stretch gap-x-4">
-            	{% block header %}
-					{% block breadcrumbs %}
-					<nav class="flex grow-1 text-dark-lighter text-sm" aria-label="Breadcrumb">
-						<ol role="list" class="flex items-center space-x-3">
-						{% block breadcrumb '' %}
-						</ol>
-					</nav>
-					{% endblock %}
-					{% block notifications include("@_theme/components/notifications.html.twig") %}
-					{% block search_bar include("@_theme/components/searchbar.html.twig") %}
-				{% endblock %}
-				</header>
-				<main class="flex flex-col flex-1 h-[calc(100vh-57px)] max-h-[calc(100vh-57px)] relative z-30">
+				{# Symboles des cartes en diagonale - fond décoratif #}
+				<div class="fixed top-[-5%] left-[calc(15rem-5%)] text-primary/5 text-[33rem] leading-none select-none pointer-events-none -rotate-[15deg] z-0">♦</div>
+				<div class="fixed top-[17%] left-[calc(15rem+17%)] text-black/5 text-[33rem] leading-none select-none pointer-events-none -rotate-[15deg] z-0">♣</div>
+				<div class="fixed top-[42%] left-[calc(15rem+42%)] text-primary/5 text-[33rem] leading-none select-none pointer-events-none -rotate-[15deg] z-0">♥</div>
+				<div class="fixed top-[62%] left-[calc(15rem+70%)] text-black/5 text-[33rem] leading-none select-none pointer-events-none rotate-[165deg] z-0">♠</div>
+				<main class="flex flex-col h-0 flex-1 overflow-hidden relative">
+					{% block notifications %}{% endblock %}
+					{% block toasts %}{% endblock %}
 					{% block main '' %}
 				</main>
 			{% endblock %}
             </div>
         </div>
+		{% block search_modal %}{% endblock %}
 	{% endblock %}
 	</body>
 </html>

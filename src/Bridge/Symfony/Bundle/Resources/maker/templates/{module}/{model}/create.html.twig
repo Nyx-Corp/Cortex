@@ -4,7 +4,7 @@
 
 {% extends "{module}/{model}/_form.html.twig" %}
 
-{% import '_theme/components/breadcrumbs.html.twig' as breadcrumbs %}
+{% import '@_theme/components/breadcrumbs.html.twig' as breadcrumbs %}
 {% block breadcrumb %}
     {{ parent() }}
     {{ breadcrumbs.item('{model}.create.title'|trans, null, null, true) }}

@@ -6,17 +6,18 @@ use Cortex\Bridge\Symfony\Controller\ControllerInterface;
 use Application\{Module}\Form\{Model}{Action}Type;
 use Domain\{Domain}\Model\{Model};
 use Domain\{Domain}\Action\{Model}{Action};
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Generator\UrlGenerator;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Handles "{Action}" action for module {module}
- * 
+ *
  * @see Domain\{Domain}\Action\{Action}\Handler
  */
 class {Model}{Action}FormAction implements ControllerInterface
@@ -25,6 +26,7 @@ class {Model}{Action}FormAction implements ControllerInterface
         private FormFactoryInterface $formFactory,
         private SessionInterface $session,
         private UrlGeneratorInterface $urlGenerator,
+        #[Autowire('%kernel.debug%')]
         private readonly bool $debug,
     ) {}
  

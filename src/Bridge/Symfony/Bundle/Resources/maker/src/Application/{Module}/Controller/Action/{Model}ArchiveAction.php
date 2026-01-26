@@ -8,7 +8,7 @@ use Domain\{Domain}\Action\{Model}Archive;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
@@ -26,7 +26,6 @@ class {Model}ArchiveAction implements ControllerInterface
     public function __construct(
         private readonly {Model}Archive\Handler $handler,
         private UrlGeneratorInterface $urlGenerator,
-        private readonly bool $debug,
     ) {
     }
 
