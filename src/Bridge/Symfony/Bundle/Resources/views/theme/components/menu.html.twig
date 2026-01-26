@@ -34,7 +34,7 @@
 			<span class="hidden group-[.closed]/sidebar:flex h-px w-10 bg-gray-600 mx-auto my-2"></span>
 		</h2>
     {% endif %}
-        <ul role="list" class="flex flex-col mt-3 group-[.closed]/sidebar:mt-4 gap-y-2 group-[.closed]/sidebar:gap-y-3 mx-3 px-0">
+        <ul role="list" class="flex flex-col mt-3 group-[.closed]/sidebar:mt-4 gap-y-1 group-[.closed]/sidebar:gap-y-2 mx-3 px-0">
             {% for element in section.elements|default([]) %}
                 {{ block('menu_element') }}
             {% endfor %}

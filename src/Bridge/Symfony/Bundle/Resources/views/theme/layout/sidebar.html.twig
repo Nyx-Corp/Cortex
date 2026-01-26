@@ -4,14 +4,12 @@
 </button>
 
 {# Logo #}
-<div class="flex items-center justify-center h-20 group-[.closed]/sidebar:h-14 px-4 pt-4 group-[.closed]/sidebar:p-2">
-	<div class="flex items-center justify-center h-full transition-all duration-300">
-		<img src="{% block logo_url '' %}" alt="Logo" class="w-auto h-full object-contain">
-	</div>
+<div class="flex items-center justify-start px-6 py-5 group-[.closed]/sidebar:p-2">
+	<img src="{% block logo_url '' %}" alt="Logo" class="h-8 group-[.closed]/sidebar:h-6 w-auto object-contain transition-all duration-300">
 </div>
 
 {# Search button - triggers Cmd+K modal #}
-<div class="px-3 pt-4 pb-3">
+<div class="px-3 pt-1 pb-3">
 	<button id="search-trigger" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-400 bg-menu-bg-lighter hover:bg-menu-hover hover:text-white transition-colors group-[.closed]/sidebar:justify-center">
 		<i data-lucide="search" class="size-4 shrink-0"></i>
 		<span class="group-[.closed]/sidebar:hidden flex-1 text-left">Rechercher...</span>
@@ -21,7 +19,7 @@
 
 {# Navigation menu #}
 <nav class="flex flex-1 flex-col overflow-y-auto">
-	<ul class="flex flex-1 flex-col overflow-hidden gap-y-7">
+	<ul class="flex flex-1 flex-col overflow-hidden gap-y-6">
 	{% for section in menu|default([]) %}
 		{{ render_block('menu_section', '@_theme/components/menu.html.twig', {
 			section: section,
@@ -30,7 +28,7 @@
 	{% endfor %}
 	</ul>
 	{% if menu_bottom|default([])|length > 0 %}
-	<ul class="flex flex-col gap-y-7 mt-auto py-4 border-t border-menu-border">
+	<ul class="flex flex-col gap-y-6 mt-auto py-4 border-t border-menu-border">
 	{% for section in menu_bottom %}
 		{{ render_block('menu_section', '@_theme/components/menu.html.twig', {
 			section: section,
@@ -121,3 +119,5 @@
 	</div>
 </div>
 {% endblock %}
+{# test 1769429586 #}
+{# test 1769429625 #}
