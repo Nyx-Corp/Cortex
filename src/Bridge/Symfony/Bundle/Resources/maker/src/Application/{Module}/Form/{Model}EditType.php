@@ -14,6 +14,7 @@ class {Model}EditType extends AbstractType
     {
         $resolver->setDefaults([
             'command_class' => Command::class,
+            'translation_domain' => '{model}',
         ]);
     }
 

@@ -48,6 +48,9 @@ final class CrudMaker extends CortexMaker
             'src/Domain/{Domain}/Action/{Model}Archive/Command.php',
             'src/Domain/{Domain}/Action/{Model}Archive/Handler.php',
             'src/Domain/{Domain}/Action/{Model}Archive/Response.php',
+
+            // Tests
+            'tests/Functional/Application/{Module}/Controller/{Model}ControllerTest.php',
         ];
 
         return $paths;

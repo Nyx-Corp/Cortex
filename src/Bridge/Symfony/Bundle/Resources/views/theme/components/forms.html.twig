@@ -26,7 +26,15 @@
 
 {% block form_label %}
     {% set label_attr = {'class': 'text-sm/6 font-medium text-form-label'} | merge(label_attr|default({})) %}
-    {{ parent() }}
+    {% if label is not same as(false) %}
+        {% if label is empty %}
+            {% set label = name|humanize %}
+        {% endif %}
+        <label{% if id is not empty %} for="{{ id }}"{% endif %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
+            {{- label|trans(label_translation_parameters, translation_domain) -}}
+            {%- if required %}<span class="text-primary ml-0.5">*</span>{% endif -%}
+        </label>
+    {% endif %}
 {% endblock %}
 
 {% block form_widget_simple %}
@@ -35,6 +43,28 @@
         placeholder: placeholder|default(false)
     } | merge(attr|default({})) %}
     {{ parent() }}
+{% endblock %}
+
+{% block email_widget %}
+    <div class="relative">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <i data-lucide="mail" class="size-4 text-zinc-400"></i>
+        </div>
+        {% set type = 'email' %}
+        {% set attr = attr|default({})|merge({class: '!pl-10 ' ~ (attr.class|default(''))}) %}
+        {{ parent() }}
+    </div>
+{% endblock %}
+
+{% block tel_widget %}
+    <div class="relative">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <i data-lucide="phone" class="size-4 text-zinc-400"></i>
+        </div>
+        {% set type = 'tel' %}
+        {% set attr = attr|default({})|merge({class: '!pl-10 ' ~ (attr.class|default(''))}) %}
+        {{ parent() }}
+    </div>
 {% endblock %}
 
 {%- block textarea_widget -%}
@@ -77,12 +107,11 @@
 {% endblock %}
 
 {% block form_help %}
-    {% set helpContent = block('form_help_content') %}
-    {% if helpContent is not empty and helpContent != help%}
+    {% if help is not empty %}
         <div class="relative group shrink-0">
-            <i data-lucide="info" class="size-3 text-form-placeholder mt-0.5 mr-1 align-bottom"></i>
-            <div class="absolute left-full top-1 ml-2 z-10 hidden group-hover:block min-w-50 max-w-xs text-xs text-dark-lighter bg-form-bg border border-form-border rounded-md shadow p-2">
-                {{ helpContent }}
+            <i data-lucide="info" class="size-3 text-form-placeholder cursor-help"></i>
+            <div class="absolute left-full top-0 ml-2 z-10 hidden group-hover:block min-w-50 max-w-xs text-xs text-dark-lighter bg-form-bg border border-form-border rounded-md shadow p-2 whitespace-normal">
+                {{ help|trans(help_translation_parameters, translation_domain) }}
             </div>
         </div>
     {% endif %}

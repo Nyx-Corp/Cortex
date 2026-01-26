@@ -1,3 +1,24 @@
+{#
+    List layout component - to be used inside page_content block.
+
+    The parent template should define:
+    - page_icon: The list icon
+    - page_title: The list title
+    - page_content: Embed this template
+
+    Usage in index.html.twig:
+    {% block page_icon %}<i data-lucide="users" class="size-6 text-primary"></i>{% endblock %}
+    {% block page_title %}Contacts{% endblock %}
+    {% block page_content %}
+        {% embed '@_theme/layout/list.html.twig' %}
+            {% block create_link %}{{ path('admin/contact/create') }}{% endblock %}
+            {% block email_th %}Email{% endblock %}
+            {% block email_td %}{{ item.email }}{% endblock %}
+            ...
+        {% endembed %}
+    {% endblock %}
+#}
+
 {% trans_default_domain trans_default_domain ?? 'admin' %}
 
 {% form_theme form '@_theme/components/filters.html.twig' %}
@@ -9,17 +30,7 @@
         'class': 'flex-1 flex flex-col min-h-0',
     }
 }) }}
-<div class="p-6 flex-1 flex flex-col min-h-0 overflow-hidden">
-    {# Page title #}
-    <div class="flex items-center pb-2 border-b-2 border-primary mb-6">
-        <div class="flex items-center gap-3">
-            {% block title %}
-                <i data-lucide="list" class="size-6 text-primary"></i>
-                <h1 class="text-3xl font-bold font-heading text-zinc-700">{{ 'admin.list.title'|trans({}, 'admin') }}</h1>
-            {% endblock %}
-        </div>
-    </div>
-
+<div class="flex-1 flex flex-col min-h-0 overflow-hidden">
     {# Toolbar: Search + Batch Actions + Create button #}
     <div class="flex items-center gap-3 mb-4">
         {# Search box with filters popover #}
@@ -154,9 +165,9 @@
     {% endblock %}
 
     {# Table card #}
-    <div class="border border-zinc-200 bg-white min-h-0 max-h-full flex flex-col overflow-hidden">
+    <div class="border border-zinc-200 bg-white min-h-0 flex-1 flex flex-col overflow-hidden">
         {# Table content - scrollable #}
-        <div class="overflow-auto">
+        <div class="overflow-auto flex-1">
         {% block table %}
             <table class="min-w-full text-sm text-left">
                 <thead class="bg-zinc-50 sticky top-0 z-10 font-heading">
@@ -209,11 +220,14 @@
                                         <i data-lucide="mail" class="size-4 text-zinc-400"></i>
                                         Envoyer un email
                                     </button>
+                                    {# Batch archive action - only if model is archivable #}
+                                    {% if collection|first.archivedAt is defined %}
                                     <div class="my-1 mx-4 border-t border-zinc-100"></div>
                                     <button type="button" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors" data-batch-action="archive">
                                         <i data-lucide="archive" class="size-4"></i>
                                         Archiver
                                     </button>
+                                    {% endif %}
                                     {% endblock %}
                                 </div>
                             </div>
@@ -255,6 +269,8 @@
                                         >
                                             <i data-lucide="pencil" class="size-4"></i>
                                         </a>
+                                        {# Archive button - only if model is archivable #}
+                                        {% if item.archivedAt is defined %}
                                         <a href="{{ app.request.pathInfo|trim('s') ~ '/' ~ item.uuid ~ '/archive' }}"
                                         class="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
                                         title="{{ 'admin.action.archive.label'|trans({}, 'admin') }}"
@@ -262,6 +278,7 @@
                                         >
                                             <i data-lucide="archive" class="size-4"></i>
                                         </a>
+                                        {% endif %}
                                     </div>
                                 {% endblock %}
                                 </td>

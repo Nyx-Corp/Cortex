@@ -1,0 +1,35 @@
+{#
+    Page header component with clickable icon and breadcrumb-style title.
+
+    The base admin template (admin/base.html.twig) provides these blocks:
+    - page_icon: The icon (will be wrapped in a link if page_backlink is set)
+    - page_backlink: URL for the icon link (makes icon clickable)
+    - page_title: The title content (supports breadcrumb style with chevron)
+
+    Usage in edit templates:
+    ========================
+    {% block page_icon %}<i data-lucide="users" class="size-6"></i>{% endblock %}
+    {% block page_backlink %}{{ path('admin/model/index') }}{% endblock %}
+    {% block page_title %}
+        {{ model }}
+        <i data-lucide="chevron-right" class="size-5 text-zinc-300"></i>
+        <span class="text-zinc-400 font-normal">{{ 'model.action.edit'|trans }}</span>
+    {% endblock %}
+
+    Result: [Icon] Model Name › Modifier
+
+    Usage in create templates:
+    ==========================
+    {% block page_icon %}<i data-lucide="users" class="size-6"></i>{% endblock %}
+    {% block page_backlink %}{{ path('admin/model/index') }}{% endblock %}
+    {% block page_title %}{{ 'model.create.title'|trans }}{% endblock %}
+
+    Result: [Icon] Nouveau model
+
+    Usage in list templates (no backlink):
+    ======================================
+    {% block page_icon %}<i data-lucide="users" class="size-6 text-primary"></i>{% endblock %}
+    {% block page_title %}Contacts{% endblock %}
+
+    Result: [Icon] Contacts
+#}

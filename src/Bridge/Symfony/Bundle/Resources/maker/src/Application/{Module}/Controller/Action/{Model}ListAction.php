@@ -30,7 +30,8 @@ class {Model}ListAction implements ControllerInterface
         /** @var ModelQueryDecorator $query */
         $query = ${model}s->query;
 
-        // Filter non-archived by default (uncomment if model has archivedAt field)
+        // Filter non-archived by default (if model uses Archivable trait)
+        // The Gmail-style query parser allows overriding with ?q=archivedAt:true
         // $query->filter(archivedAt: null);
 
         $query
@@ -40,13 +41,15 @@ class {Model}ListAction implements ControllerInterface
                 filters: fn (FormBuilderInterface $filtersFormBuilder) => $filtersFormBuilder
                     // ->add('firstname', Form\TextType::class)
                     // ->add('lastname', Form\TextType::class)
-                    // ->add('archived', Form\CheckboxType::class, ['required' => false])
+                    // If model uses Archivable trait, add this filter for ?q=archivedAt:true support:
+                    // ->add('archivedAt', Form\CheckboxType::class, ['required' => false, 'label' => 'Archivé'])
             )
         ;
 
         return [
             'collection' => ${model}s->toArray(),
             'form' => $query->getDecorator(),
+            'pager' => $query->pager,
         ];
     }
 }
