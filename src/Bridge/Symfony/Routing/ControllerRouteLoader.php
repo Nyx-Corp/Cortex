@@ -98,19 +98,19 @@ class ControllerRouteLoader extends Loader
     private function addRoute(RouteCollection $collection, \ReflectionClass $reflection, RouteAttribute $routeAttr): void
     {
         $prefix = $this->getNamespacePrefix($reflection);
-        $routeName = $routeAttr->getName()
-            ? $prefix . $routeAttr->getName()
+        $routeName = $routeAttr->name
+            ? $prefix . $routeAttr->name
             : $this->generateRouteName($reflection);
 
-        $defaults = $routeAttr->getDefaults();
+        $defaults = $routeAttr->defaults;
         $defaults['_controller'] = $reflection->getName();
 
         $route = new Route(
-            path: $routeAttr->getPath(),
+            path: $routeAttr->path,
             defaults: $defaults,
-            requirements: $routeAttr->getRequirements(),
-            options: $routeAttr->getOptions(),
-            methods: $routeAttr->getMethods() ?: ['GET'],
+            requirements: $routeAttr->requirements,
+            options: $routeAttr->options,
+            methods: $routeAttr->methods ?: ['GET'],
         );
 
         $collection->add($routeName, $route);
