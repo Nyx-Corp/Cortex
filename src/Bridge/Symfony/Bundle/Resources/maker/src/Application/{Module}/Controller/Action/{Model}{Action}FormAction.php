@@ -3,6 +3,7 @@
 namespace Application\{Module}\Controller\Action;
 
 use Cortex\Bridge\Symfony\Controller\ControllerInterface;
+use Cortex\Component\Exception\DomainException;
 use Application\{Module}\Form\{Model}{Action}Type;
 use Domain\{Domain}\Model\{Model};
 use Domain\{Domain}\Action\{Model}{Action};
@@ -56,27 +57,36 @@ class {Model}{Action}FormAction implements ControllerInterface
         try {    
             $form->handleRequest($request);
             
-            if ($form->isSubmitted())
+            if ($form->isSubmitted()) {
                 if (!$form->isValid()) {
-                    $this->session->getFlashBag()->add('error', '{action}.error.validation_failed');
+                    $this->session->getFlashBag()->add('error', [
+                        'message' => '{action}.error.validation_failed',
+                        'domain' => '{module}',
+                    ]);
                 }
                 else {
-                    $this->session->getFlashBag()->add('success', '{action}.success.message');
+                    $this->session->getFlashBag()->add('success', [
+                        'message' => '{action}.success',
+                        'domain' => '{module}',
+                    ]);
 
                     /** @var Domain\{Domain}\Action\{Action}\Response */
                     $response = $form->getData();
-                    
+
                     // do stuff here
 
                     // return new RedirectResponse($this->urlGenerator->generate(
                     //     route: '{module}/{model}/....',
                     //     parameters: ['uuid' => $response->{model}->uuid]
-                    // ));                 
+                    // ));
                 }
             }
         }
-        catch ({Action}\Exception $th) {
-            $this->session->getFlashBag()->add('error', '{action}.error.'.$th->getMessage());
+        catch (DomainException $th) {
+            $this->session->getFlashBag()->add('error', [
+                'message' => '{action}.error.'.$th->getMessage(),
+                'domain' => $th->getDomain(),
+            ]);
 
             if ($this->debug) {
                 throw $th;

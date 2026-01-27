@@ -7,14 +7,14 @@
         <div class="flex items-center justify-between mb-1">
             <label class="block text-xs text-form-label italic">{{ (form.vars.label ?: form.vars.name|humanize)|trans }}</label>
         </div>
-        <div class="mt-1 field-with-shortcut">
+        <div class="mt-1 input-with-shortcut">
             {% set attr = attr|merge({
                 'placeholder': (form.vars.label ?: form.vars.name|humanize)|trans,
                 'data-shortcut': shortcut|lower,
-                'class': 'w-full rounded border border-form-border px-2 py-1 text-sm placeholder:italic'
+                'class': 'block w-full rounded-md bg-white px-3 py-1.5 text-sm text-zinc-700 outline-1 -outline-offset-1 outline-zinc-300 placeholder:text-zinc-400 placeholder:italic focus:outline-2 focus:-outline-offset-2 focus:outline-primary'
             })|merge(attr|filter((v, k) => k != 'data-shortcut-key')) %}
             {{ form_widget(form, { attr: attr }) }}
-            <kbd class="field-shortcut field-shortcut-text text-xs bg-transparent px-0.5 rounded border-light-darker border font-mono opacity-60">{{ shortcut }}</kbd>
+            <kbd class="input-shortcut">{{ shortcut|upper }}</kbd>
         </div>
     </div>
 {% endblock %}
@@ -26,50 +26,50 @@
     <div class="mt-2">
         <div class="flex items-center justify-between mb-1">
             <label class="block text-xs text-form-label italic">{{ (form.vars.label ?: form.vars.name|humanize)|trans }}</label>
-            <kbd class="text-xs bg-transparent px-1 border border-light-darker font-mono opacity-60">{{ shortcut }}</kbd>
         </div>
         <div class="mt-1">
             {% if expanded %}
                 {# Radio buttons as segmented controls #}
-                <div class="w-full inline-flex rounded overflow-hidden border border-form-border">
+                <div class="w-full inline-flex overflow-hidden border border-zinc-300 rounded-md">
                     {% for child in form %}
                         {% if child.vars.value == '' %}
                             {# Transform the empty choice into "Tout" #}
-                            <label class="cursor-pointer flex-1 {% if not loop.first %}border-l border-form-border{% endif %}">
+                            <label class="cursor-pointer flex-1 {% if not loop.first %}border-l border-zinc-300{% endif %}">
                                 {% set child_attr = child.vars.attr|merge({
                                     'class': 'sr-only peer',
                                     'data-shortcut': shortcut|lower,
                                     'data-autosubmit': true
                                 }) %}
                                 {{ form_widget(child, { attr: child_attr }) }}
-                                <div class="px-2 py-1.5 text-xs font-medium text-dark-lighter italic bg-light-darker hover:bg-light-dark hover:text-dark peer-checked:bg-light peer-checked:text-dark peer-checked:not-italic focus:z-10 focus:ring-2 focus:ring-form-btn focus:text-dark text-center">
+                                <div class="px-2 py-1.5 text-xs font-medium text-zinc-500 italic bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-700 peer-checked:bg-white peer-checked:text-zinc-900 peer-checked:not-italic text-center transition-colors">
                                     Tout
                                 </div>
                             </label>
                         {% else %}
                             {# Regular choices #}
-                            <label class="cursor-pointer flex-1 {% if not loop.first %}border-l border-form-border{% endif %}">
+                            <label class="cursor-pointer flex-1 {% if not loop.first %}border-l border-zinc-300{% endif %}">
                                 {% set child_attr = child.vars.attr|merge({
                                     'class': 'sr-only peer',
                                     'data-shortcut': shortcut|lower,
                                     'data-autosubmit': true
                                 }) %}
                                 {{ form_widget(child, { attr: child_attr }) }}
-                                <div class="px-2 py-1.5 text-xs font-medium text-dark-lighter italic bg-light-darker hover:bg-light-dark hover:text-dark peer-checked:bg-light peer-checked:text-dark peer-checked:not-italic focus:z-10 focus:ring-2 focus:ring-form-btn focus:text-dark text-center">
+                                <div class="px-2 py-1.5 text-xs font-medium text-zinc-500 italic bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-700 peer-checked:bg-white peer-checked:text-zinc-900 peer-checked:not-italic text-center transition-colors">
                                     {{ child.vars.label|trans }}
                                 </div>
                             </label>
                         {% endif %}
                     {% endfor %}
                 </div>
+                <kbd class="mt-1 inline-block text-xs text-zinc-400 font-mono">{{ shortcut }}</kbd>
             {% else %}
                 {# Select dropdown for non-expanded choices #}
-                <div class="field-with-shortcut">
+                <div class="input-with-shortcut">
                     <div class="relative w-full">
                         {% set attr = attr|merge({
                             'data-shortcut': shortcut|lower,
                             'data-autosubmit': true,
-                            'class': 'w-full appearance-none rounded border border-form-border pl-2 pr-6 py-1 text-sm focus:border-form-border-focus focus:outline-none cursor-pointer transition-colors'
+                            'class': 'block w-full appearance-none rounded-md bg-white pl-3 pr-10 py-1.5 text-sm text-zinc-700 outline-1 -outline-offset-1 outline-zinc-300 focus:outline-2 focus:-outline-offset-2 focus:outline-primary cursor-pointer'
                         })|merge(attr|filter((v, k) => k != 'data-shortcut-key')) %}
                         <select {{ block('widget_attributes') }} {{ multiple ? 'multiple="multiple"' : '' }}>
                             {% if required is not true %}
@@ -87,8 +87,8 @@
                                 {%- endif -%}
                             {% endfor %}
                         </select>
-                        <kbd class="field-shortcut field-shortcut-select">{{ shortcut }}</kbd>
-                        <i data-lucide="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 size-3 text-form pointer-events-none"></i>
+                        <kbd class="input-shortcut" style="right: 1.75rem;">{{ shortcut }}</kbd>
+                        <i data-lucide="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 size-3 text-zinc-400 pointer-events-none"></i>
                     </div>
                 </div>
             {% endif %}
@@ -100,25 +100,25 @@
 {% block radio_row %}
     {% set shortcut = attr['data-shortcut-key']|default('F1') %}
     <div class="space-y-2 mt-3 xl:mt-0">
-        <div class="flex items-center justify-between mb-1">
-            <label class="block text-xs text-form-label italic">{{ (form.vars.label ?: form.vars.name|humanize)|trans }}</label>
-            <kbd class="text-xs bg-transparent px-1 border border-light-darker font-mono opacity-60">{{ shortcut }}</kbd>
+        <div class="flex items-center gap-2 mb-1">
+            <label class="block text-xs text-zinc-600 italic">{{ (form.vars.label ?: form.vars.name|humanize)|trans }}</label>
+            <kbd class="text-xs text-zinc-400 font-mono">{{ shortcut }}</kbd>
         </div>
         <div class="flex items-center gap-4">
             {% for choice in choices %}
                 <label class="flex items-center gap-2 cursor-pointer">
                     {% set radio_attr = {
-                        'class': 'text-form-btn focus:ring-form-btn',
+                        'class': 'text-primary focus:ring-primary',
                         'data-shortcut': shortcut|lower,
                         'data-autosubmit': true
                     } %}
-                    <input type="radio" 
-                           name="{{ full_name }}" 
+                    <input type="radio"
+                           name="{{ full_name }}"
                            value="{{ choice.value }}"
                            {% if choice is selectedchoice(value) %}checked{% endif %}
                            {{ block('widget_attributes') }}
                            {% for attrname, attrvalue in radio_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-                    <span class="text-sm">{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}</span>
+                    <span class="text-sm text-zinc-700">{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}</span>
                 </label>
             {% endfor %}
         </div>
@@ -130,7 +130,10 @@
     {% set shortcut = attr['data-shortcut-key']|default('F1') %}
     <div class="mt-2">
         <div class="flex items-center justify-between">
-            <label class="text-xs text-form-label italic">{{ (form.vars.label ?: form.vars.name|humanize)|trans }}</label>
+            <div class="flex items-center gap-2">
+                <label class="text-xs text-zinc-600 italic">{{ (form.vars.label ?: form.vars.name|humanize)|trans }}</label>
+                <kbd class="text-xs text-zinc-400 font-mono">{{ shortcut }}</kbd>
+            </div>
             <label class="relative inline-flex items-center cursor-pointer">
                 {% set attr = attr|merge({
                     'class': 'sr-only peer',
@@ -138,7 +141,7 @@
                     'data-autosubmit': true
                 })|merge(attr|filter((v, k) => k != 'data-shortcut-key')) %}
                 {{ form_widget(form, { attr: attr }) }}
-                <div class="relative w-11 h-6 bg-light-darker peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-form-btn rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-form-btn"></div>
+                <div class="relative w-11 h-6 bg-zinc-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
         </div>
     </div>
@@ -150,10 +153,10 @@
         {# Widget spécial pour les radios de tri #}
         {% set direction = attr['data-sort-direction'] %}
         {% set icon = direction == 'asc' ? 'chevron-up' : 'chevron-down' %}
-        <label class="cursor-pointer text-dark-lighter hover:text-dark transition-colors has-[:checked]:text-dark">
-            {% set attr = attr|merge({'class': 'sr-only peer', 'data-autosubmit': 'true'}) %}
+        <label class="cursor-pointer {{ checked ? 'text-heart' : 'text-dark-lighter' }} hover:text-heart transition-colors">
+            {% set attr = attr|merge({'class': 'sr-only', 'data-autosubmit': 'true'}) %}
             <input type="radio" {{ block('widget_attributes') }} value="{{ value }}"{% if checked %} checked="checked"{% endif %}>
-            <i data-lucide="{{ icon }}" class="size-3"></i>
+            <i data-lucide="{{ icon }}" class="{{ checked ? 'size-5' : 'size-4' }}"></i>
         </label>
     {% else %}
         {# Radio normal pour les filtres #}

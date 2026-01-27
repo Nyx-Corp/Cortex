@@ -42,7 +42,12 @@ class {Model}ArchiveAction implements ControllerInterface
             new {Model}Archive\Command(${model})
         );
 
-        $session?->getFlashBag()->add('success', '{model}.archive.success.message');
+        $session?->getFlashBag()->add('success', [
+            'title' => '{model}.alert.archive.success.title',
+            'message' => '{model}.alert.archive.success.details',
+            'params' => ['model' => (string) ${model}],
+            'domain' => '{domain}',
+        ]);
         
         return new RedirectResponse(
             $request->headers->get(

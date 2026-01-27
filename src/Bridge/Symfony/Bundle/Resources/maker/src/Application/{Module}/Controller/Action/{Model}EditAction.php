@@ -3,9 +3,9 @@
 namespace Application\{Module}\Controller\Action;
 
 use Cortex\Bridge\Symfony\Controller\ControllerInterface;
+use Cortex\Component\Exception\DomainException;
 use Application\{Module}\Form\{Model}EditType;
 use Domain\{Domain}\Model\{Model};
-use Domain\{Domain}\Action\{Model}Edit;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -50,31 +50,43 @@ class {Model}EditAction implements ControllerInterface
             
             if ($form->isSubmitted()) {
                 if (!$form->isValid()) {
-                    $session?->getFlashBag()->add('error', '{model}.error.validation_failed');
+                    $session?->getFlashBag()->add('error', [
+                        'title' => '{model}.alert.edit.error.title',
+                        'message' => '{model}.alert.edit.error.details',
+                        'domain' => '{domain}',
+                    ]);
                 }
                 else {
 
                     if ($isNew) {
-                        $session?->getFlashBag()->add(
-                            'success', 
-                            '{model}.create.success.message'
-                        );
+                        $session?->getFlashBag()->add('success', [
+                            'title' => '{model}.alert.create.success.title',
+                            'message' => '{model}.alert.create.success.details',
+                            'params' => ['model' => (string) $form->getData()->{model}],
+                            'domain' => '{domain}',
+                        ]);
 
                         return new RedirectResponse($this->urlGenerator->generate(
                             name: '{module}/{model}/edit',
                             parameters: ['uuid' => $form->getData()->{model}->uuid]
                         ));
                     }
-                    
-                    $session?->getFlashBag()->add(
-                        'success', 
-                        '{model}.edit.success.message'
-                    );
+
+                    $session?->getFlashBag()->add('success', [
+                        'title' => '{model}.alert.edit.success.title',
+                        'message' => '{model}.alert.edit.success.details',
+                        'params' => ['model' => (string) $model],
+                        'domain' => '{domain}',
+                    ]);
                 }
             }
         }
-        catch ({Model}Edit\Exception $th) {
-            $session?->getFlashBag()->add('error', '{model}.error.'.$th->getMessage());
+        catch (DomainException $th) {
+            $session?->getFlashBag()->add('error', [
+                'title' => '{model}.alert.error.title',
+                'message' => '{model}.alert.error.'.$th->getMessage(),
+                'domain' => $th->getDomain(),
+            ]);
 
             if ($this->debug) {
                 throw $th;

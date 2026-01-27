@@ -2,6 +2,9 @@
 
 namespace Domain\{Domain}\Error;
 
-class {Model}Exception extends \Exception
+/**
+ * Exception for {Model} model.
+ */
+class {Model}Exception extends {Domain}Exception
 {
 }

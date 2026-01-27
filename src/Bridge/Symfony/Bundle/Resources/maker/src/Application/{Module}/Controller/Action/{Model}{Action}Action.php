@@ -3,6 +3,7 @@
 namespace Application\{Module}\Controller\Action;
 
 use Cortex\Bridge\Symfony\Controller\ControllerInterface;
+use Cortex\Component\Exception\DomainException;
 use Domain\{Domain}\Model\{Model};
 use Domain\{Domain}\Action\{Model}{Action};
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -46,10 +47,19 @@ class {Model}{Action}Action implements ControllerInterface
                 new {Model}{Action}\Command(${model})
             );
 
-            $session?->getFlashBag()->add('success', '{model}.{action}.success.message');
+            $session?->getFlashBag()->add('success', [
+                'title' => '{model}.alert.{action}.success.title',
+                'message' => '{model}.alert.{action}.success.details',
+                'params' => ['model' => (string) ${model}],
+                'domain' => '{domain}',
+            ]);
         }
-        catch ({Model}{Action}\Exception $e) {
-            $session?->getFlashBag()->add('error', '{model}.{action}.error.'.$e->getMessage());
+        catch (DomainException $e) {
+            $session?->getFlashBag()->add('error', [
+                'title' => '{model}.alert.{action}.error.title',
+                'message' => '{model}.alert.{action}.error.'.$e->getMessage(),
+                'domain' => $e->getDomain(),
+            ]);
 
             if ($this->debug) {
                 throw $e;

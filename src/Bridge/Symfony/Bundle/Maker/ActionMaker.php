@@ -35,6 +35,11 @@ final class ActionMaker extends CortexMaker
             'src/Domain/{Domain}/Action/{Model}{Action}/Response.php',
         ];
 
+        // MCP Tool
+        if ($options['mcp-tool'] ?? false) {
+            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}{Action}Tool.php';
+        }
+
         return array_merge($paths, match ($options['controller']) {
             'form' => [
                 'src/Application/{Module}/Form/{Model}{Action}Type.php',
@@ -58,6 +63,7 @@ final class ActionMaker extends CortexMaker
             ->addArgument('model', InputArgument::REQUIRED, 'Action related model')
             ->addArgument('action', InputArgument::REQUIRED, 'Action to generate')
             ->addOption('controller', 'null', InputOption::VALUE_REQUIRED, 'Controller (model|form|list)', 'model')
+            ->addOption('mcp-tool', null, InputOption::VALUE_NONE, 'Generate MCP Tool wrapper')
         ;
     }
 
@@ -87,6 +93,11 @@ final class ActionMaker extends CortexMaker
                     '{action}' => $actionUnicode->snake()->toString(),
                     '{Action}' => $Action = $actionUnicode->camel()->title()->toString(),
                     '{ActionForm}' => $Action,
+                    '{tool_name}' => sprintf('%s-%s-%s',
+                        $domainUnicode->snake()->replace('_', '-')->toString(),
+                        $modelUnicode->snake()->replace('_', '-')->toString(),
+                        $actionUnicode->snake()->replace('_', '-')->toString()
+                    ),
                 ],
             )
             ->generate(fn (string $generatedFilepath) => $io->text(sprintf(

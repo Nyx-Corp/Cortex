@@ -30,6 +30,7 @@ final class ModelMaker extends CortexMaker
         $paths = [
             'src/Domain/{Domain}/Model/{Model}.php',
             'src/Domain/{Domain}/Model/{Model}Collection.php',
+            'src/Domain/{Domain}/Error/{Domain}Exception.php',
             'src/Domain/{Domain}/Error/{Model}Exception.php',
             'src/Domain/{Domain}/Factory/{Model}Factory.php',
             'src/Domain/{Domain}/Persistence/{Model}Store.php',

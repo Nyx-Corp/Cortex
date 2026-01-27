@@ -53,6 +53,14 @@ final class CrudMaker extends CortexMaker
             'tests/Functional/Application/{Module}/Controller/{Model}ControllerTest.php',
         ];
 
+        // MCP Tools
+        if ($options['mcp-tool'] ?? false) {
+            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}ListTool.php';
+            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}CreateTool.php';
+            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}EditTool.php';
+            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}ArchiveTool.php';
+        }
+
         return $paths;
     }
 
@@ -62,7 +70,7 @@ final class CrudMaker extends CortexMaker
             ->addArgument('module', InputArgument::REQUIRED, 'CRUD related module')
             ->addArgument('domain', InputArgument::REQUIRED, 'CRUD related domain')
             ->addArgument('model', InputArgument::REQUIRED, 'CRUD related model')
-            // ->addOption('controller', 'null', InputOption::VALUE_REQUIRED, 'Controller (model|form|list)', 'model')
+            ->addOption('mcp-tool', null, InputOption::VALUE_NONE, 'Generate MCP Tools (List, Create, Edit, Archive)')
         ;
     }
 
@@ -88,6 +96,22 @@ final class CrudMaker extends CortexMaker
                     '{Module}' => $Module = $moduleUnicode->camel()->title()->toString(),
                     '{domain}' => $domainUnicode->snake()->toString(),
                     '{Domain}' => $Domain = $domainUnicode->camel()->title()->toString(),
+                    '{tool_name_list}' => sprintf('%s-%s-list',
+                        $domainUnicode->snake()->replace('_', '-')->toString(),
+                        $modelUnicode->snake()->replace('_', '-')->toString()
+                    ),
+                    '{tool_name_create}' => sprintf('%s-%s-create',
+                        $domainUnicode->snake()->replace('_', '-')->toString(),
+                        $modelUnicode->snake()->replace('_', '-')->toString()
+                    ),
+                    '{tool_name_edit}' => sprintf('%s-%s-edit',
+                        $domainUnicode->snake()->replace('_', '-')->toString(),
+                        $modelUnicode->snake()->replace('_', '-')->toString()
+                    ),
+                    '{tool_name_archive}' => sprintf('%s-%s-archive',
+                        $domainUnicode->snake()->replace('_', '-')->toString(),
+                        $modelUnicode->snake()->replace('_', '-')->toString()
+                    ),
                 ],
             )
             ->generate(fn (string $generatedFilepath) => $io->text(sprintf(
