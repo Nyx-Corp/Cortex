@@ -78,10 +78,12 @@ Crée une action DDD (Command/Handler/Response) avec son controller optionnel.
 ```
 src/Domain/{Domain}/
 ├── Error/{Model}Exception.php
+├── Event/{Model}Event.php           # Événement de base du modèle
 └── Action/{Model}{Action}/
     ├── Command.php
+    ├── Event.php                    # Événement de l'action
     ├── Exception.php
-    ├── Handler.php
+    ├── Handler.php                  # Avec émission d'événement
     └── Response.php
 ```
 
@@ -136,16 +138,21 @@ Crée un CRUD complet (List, Edit, Archive) avec templates et tests.
 **Domain :**
 
 ```
-src/Domain/{Domain}/Action/
-├── {Model}Edit/
-│   ├── Command.php
-│   ├── Exception.php
-│   ├── Handler.php
-│   └── Response.php
-└── {Model}Archive/
-    ├── Command.php
-    ├── Handler.php
-    └── Response.php
+src/Domain/{Domain}/
+├── Event/
+│   └── {Model}Event.php             # Événement de base du modèle
+└── Action/
+    ├── {Model}Edit/
+    │   ├── Command.php
+    │   ├── Event.php                # Événement de l'action
+    │   ├── Exception.php
+    │   ├── Handler.php              # Avec émission d'événement
+    │   └── Response.php
+    └── {Model}Archive/
+        ├── Command.php
+        ├── Event.php                # Événement de l'action
+        ├── Handler.php              # Avec émission d'événement
+        └── Response.php
 ```
 
 **Application :**

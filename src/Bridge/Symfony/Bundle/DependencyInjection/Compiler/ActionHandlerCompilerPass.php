@@ -4,7 +4,9 @@ namespace Cortex\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use Cortex\Component\Action\ActionHandler;
 use Cortex\Component\Action\ActionHandlerCollection;
+use Cortex\Component\Event\EventDispatcherAwareInterface;
 use Cortex\ValueObject\RegisteredClass;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -32,6 +34,13 @@ class ActionHandlerCompilerPass implements CompilerPassInterface
             );
 
             $handlerCommandMapping[$commandClass->value] = new Reference($id);
+
+            if (is_subclass_of($class, EventDispatcherAwareInterface::class)) {
+                $definition->addMethodCall(
+                    'setEventDispatcher',
+                    [new Reference(EventDispatcherInterface::class)]
+                );
+            }
         }
 
         $actionHandlerCollectionDefinition

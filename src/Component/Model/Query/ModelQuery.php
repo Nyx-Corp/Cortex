@@ -15,6 +15,7 @@ class ModelQuery
     public private(set) ?Pager $pager = null;
     public private(set) StructuredMap $tags;
     public private(set) ?int $limit = null;
+    public private(set) ?string $uniqueField = null;
 
     public function __construct(
         \Closure $resolver,
@@ -75,6 +76,18 @@ class ModelQuery
     public function sort(?Sorter $sorter): self
     {
         $this->sorter = $sorter;
+
+        return $this;
+    }
+
+    /**
+     * Set a unique field for deduplication (translates to GROUP BY).
+     *
+     * @param string|null $field Model field name (e.g., 'contact' for unique contacts)
+     */
+    public function unique(?string $field = null): self
+    {
+        $this->uniqueField = $field;
 
         return $this;
     }

@@ -105,6 +105,9 @@ class DbalMappingConfiguration
     /**
      * Check if a filter key belongs to a join.
      *
+     * Supports both dot notation (relation.field) and underscore notation (relation_field).
+     * Underscore notation is useful for form field names which don't allow dots.
+     *
      * @param string $filterKey The filter key to check
      * @return array{join: JoinDefinition, field: string}|null The join and field if found
      */
@@ -121,6 +124,43 @@ class DbalMappingConfiguration
             }
         }
 
+        // Check for underscore notation: "relation_field" (for form compatibility)
+        foreach ($this->joins as $relationName => $join) {
+            $prefix = $relationName . '_';
+            if (str_starts_with($filterKey, $prefix)) {
+                $field = substr($filterKey, strlen($prefix));
+                return [
+                    'join' => $join,
+                    'field' => $field,
+                ];
+            }
+        }
+
         return null;
+    }
+
+    /**
+     * Resolve a unique field to a qualified SQL column for GROUP BY.
+     *
+     * Maps model field name (e.g., 'contact') to qualified column (e.g., 'contact_role.contact_uuid').
+     *
+     * @param string $field Model field name
+     * @return string Qualified SQL column name
+     */
+    public function resolveUniqueField(string $field): string
+    {
+        // Try to map via modelToTableMapper
+        if ($this->modelToTableMapper) {
+            $mapped = $this->modelToTableMapper->map([$field => '']);
+            $column = array_key_first($mapped);
+
+            if ($column && $column !== $field) {
+                // Qualify with table name
+                return $this->table . '.' . $column;
+            }
+        }
+
+        // Fallback: use field as-is, qualified with table name
+        return $this->table . '.' . $field;
     }
 }

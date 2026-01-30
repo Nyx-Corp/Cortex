@@ -103,6 +103,7 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
                 'enum', 'choice' => $builder->add($fieldName, ChoiceType::class, array_merge($fieldOptions, [
                     'choices' => array_column($config['choices'] ?? [], 'value', 'label'),
                     'placeholder' => $config['placeholder'] ?? 'Tous',
+                    'expanded' => false, // Explicit: use select dropdown, not radio buttons
                 ])),
                 'boolean' => $builder->add($fieldName, ChoiceType::class, array_merge($fieldOptions, [
                     'choices' => ['Oui' => '1', 'Non' => '0'],
@@ -184,24 +185,32 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        // Combine filter keys and sortable fields for the fields list
-        $filterKeys = $form->getData()->filters->declaredKeys();
+        // Use filters_config keys order (user-specified) for columns
+        $filterConfigKeys = array_keys($options['filters_config'] ?? []);
         $sortableFields = $options['sortable_fields'] ?? [];
 
-        // Merge and deduplicate - keep original case to match template blocks and sorts keys
-        $view->vars['fields'] = array_unique(array_merge($filterKeys, $sortableFields));
+        // Merge: filters_config order first, then sortable-only fields
+        $view->vars['fields'] = array_unique(array_merge($filterConfigKeys, $sortableFields));
         $view->vars['filters'] = array_diff_key(
             $view->children,
             ['q' => true, 'page' => true, 'limit' => true, 'sort' => true]
         );
+        // Build sort data for manual rendering in templates (avoid re-rendering form children)
         $view->vars['sorts'] = [];
+        $currentSort = $form->get('sort')->getData();
         foreach ($options['sortable_fields'] as $sortField) {
-            $view->vars['sorts'][$sortField] = [];
-            foreach ($view['sort'] as $choice) {
-                if ($choice->vars['attr']['data-sort-field'] === $sortField) {
-                    $view->vars['sorts'][$sortField][$choice->vars['attr']['data-sort-direction']] = $choice;
-                }
-            }
+            $view->vars['sorts'][$sortField] = [
+                'asc' => [
+                    'name' => $view['sort']->vars['full_name'],
+                    'value' => $sortField . '_asc',
+                    'checked' => $currentSort === $sortField . '_asc',
+                ],
+                'desc' => [
+                    'name' => $view['sort']->vars['full_name'],
+                    'value' => $sortField . '_desc',
+                    'checked' => $currentSort === $sortField . '_desc',
+                ],
+            ];
         }
 
         // Pass filters config for the search-filters component

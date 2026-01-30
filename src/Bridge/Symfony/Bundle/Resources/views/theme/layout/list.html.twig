@@ -182,8 +182,14 @@
                                 <span>{{ block(field ~ '_th') }}</span>
                             {% if form.vars.sorts[field] is defined %}
                                 <div class="sort flex items-center gap-0 ml-2">
-                                    {{ form_widget(form.vars.sorts[field]['asc']) }}
-                                    {{ form_widget(form.vars.sorts[field]['desc']) }}
+                                    {# Manual rendering of sort radio buttons to avoid form re-rendering issues #}
+                                    {% for direction, sortData in form.vars.sorts[field] %}
+                                        {% set icon = direction == 'asc' ? 'chevron-up' : 'chevron-down' %}
+                                        <label class="cursor-pointer {{ sortData.checked ? 'text-heart' : 'text-dark-lighter' }} hover:text-heart transition-colors">
+                                            <input type="radio" class="sr-only" name="{{ sortData.name }}" value="{{ sortData.value }}" data-autosubmit="true" {{ sortData.checked ? 'checked' : '' }}>
+                                            <i data-lucide="{{ icon }}" class="{{ sortData.checked ? 'size-5' : 'size-4' }}"></i>
+                                        </label>
+                                    {% endfor %}
                                 </div>
                             {% endif %}
                             </div>

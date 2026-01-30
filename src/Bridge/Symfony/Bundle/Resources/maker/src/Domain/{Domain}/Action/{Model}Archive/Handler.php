@@ -4,10 +4,14 @@ namespace Domain\{Domain}\Action\{Model}Archive;
 
 use Cortex\Component\Action\ActionHandler;
 use Cortex\Component\Date\DateTimeFactory;
+use Cortex\Component\Event\EmitsActionEvents;
+use Cortex\Component\Event\EventDispatcherAwareInterface;
 use Domain\{Domain}\Persistence\{Model}Store;
 
-class Handler implements ActionHandler
+class Handler implements ActionHandler, EventDispatcherAwareInterface
 {
+    use EmitsActionEvents;
+
     public function __construct(
         private DateTimeFactory $dateTimeFactory,
         private {Model}Store $store,
@@ -27,9 +31,11 @@ class Handler implements ActionHandler
 
         $this->store->sync($model);
 
-        return new Response(
+        $this->emit($event = new Event(new Response(
             $model,
             $model->isArchived() == $command->isArchived
-        );
+        )));
+
+        return $event->getResponse();
     }
 }

@@ -3,10 +3,14 @@
 namespace Domain\{Domain}\Action\{Model}{Action};
 
 use Cortex\Component\Action\ActionHandler;
+use Cortex\Component\Event\EmitsActionEvents;
+use Cortex\Component\Event\EventDispatcherAwareInterface;
 use Domain\{Domain}\Persistence\{Model}Store;
 
-class Handler implements ActionHandler
+class Handler implements ActionHandler, EventDispatcherAwareInterface
 {
+    use EmitsActionEvents;
+
     public function __construct(
         private {Model}Store $store,
     ) {
@@ -21,6 +25,8 @@ class Handler implements ActionHandler
 
         $this->store->sync($model);
 
-        return new Response($model);
+        $this->emit($event = new Event(new Response($model)));
+
+        return $event->getResponse();
     }
 }

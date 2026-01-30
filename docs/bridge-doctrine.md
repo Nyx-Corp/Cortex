@@ -127,7 +127,9 @@ $config->buildJoinSelectFields();
 
 #### resolveJoinFilter()
 
-Résout un filtre "relation.field".
+Résout un filtre vers une relation jointe. Supporte deux notations :
+- **Dot notation** : `relation.field` (ex: `organisation.name`)
+- **Underscore notation** : `relation_field` (ex: `organisation_name`) - utile pour les formulaires Symfony qui n'acceptent pas les points
 
 ```php
 public function resolveJoinFilter(string $filterKey): ?array
@@ -137,9 +139,30 @@ public function resolveJoinFilter(string $filterKey): ?array
 $config->resolveJoinFilter('organisation.name');
 // ['join' => JoinDefinition, 'field' => 'name']
 
+$config->resolveJoinFilter('contact_firstname');  // underscore notation
+// ['join' => JoinDefinition (contact), 'field' => 'firstname']
+
 $config->resolveJoinFilter('name');
 // null (pas un filtre de join)
 ```
+
+#### resolveUniqueField()
+
+Résout un champ de déduplication en colonne SQL qualifiée pour `GROUP BY`.
+
+```php
+public function resolveUniqueField(string $field): string
+```
+
+```php
+$config->resolveUniqueField('contact');
+// 'contact_role.contact_uuid'  (via modelToTableMapper)
+
+$config->resolveUniqueField('uuid');
+// 'contact_role.uuid'  (fallback direct)
+```
+
+Le mapping utilise `modelToTableMapper` pour traduire le nom de propriété (ex: `contact`) en nom de colonne (ex: `contact_uuid`).
 
 ### Exemple complet
 
@@ -462,16 +485,24 @@ public function onModelQuery(Middleware $chain, ModelQuery $query): \Generator
     // 3. Resolve join filters ("organisation.name" → "c1.name")
     $filters = $this->resolveJoinFilters($filters);
 
-    // 4. Handle pagination
+    // 4. Handle unique/GROUP BY
+    $groupBy = null;
+    if ($query->uniqueField) {
+        $groupBy = $this->configuration->resolveUniqueField($query->uniqueField);
+    }
+
+    // 5. Handle pagination (avec COUNT DISTINCT si groupBy)
     if ($query->pager) {
-        $count = COUNT(*) query;
+        $count = $groupBy
+            ? "SELECT COUNT(DISTINCT {$groupBy}) AS count ..."
+            : "SELECT COUNT(*) AS count ...";
         $query->pager->bind($count);
     }
 
-    // 5. Execute SELECT with JOINs
-    $results = $this->query($this->select($filters, ...));
+    // 6. Execute SELECT with JOINs and GROUP BY
+    $results = $this->query($this->select($filters, groupBy: $groupBy, ...));
 
-    // 6. Pour chaque row :
+    // 7. Pour chaque row :
     foreach ($results as $row) {
         // Preload les données jointes
         $this->preloadJoinedData($row);
@@ -483,6 +514,33 @@ public function onModelQuery(Middleware $chain, ModelQuery $query): \Generator
         ];
     }
 }
+```
+
+### Déduplication avec unique()
+
+Quand `ModelQuery->unique('field')` est défini, `DbalAdapter` génère une clause `GROUP BY` :
+
+```php
+// Dans le controller
+$query->unique('contact');
+
+// DbalAdapter résout le champ via DbalMappingConfiguration
+$groupBy = $config->resolveUniqueField('contact');
+// → 'contact_role.contact_uuid'
+
+// SQL généré
+SELECT contact_role.contact_uuid, ...
+FROM contact_role
+WHERE ...
+GROUP BY contact_role.contact_uuid
+```
+
+**Pagination avec unique** : Le count utilise `COUNT(DISTINCT colonne)` au lieu de `COUNT(*)` :
+
+```sql
+SELECT COUNT(DISTINCT contact_role.contact_uuid) AS count
+FROM contact_role
+WHERE organisation_uuid = :orgUuid
 ```
 
 ### onModelSync()

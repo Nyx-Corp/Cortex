@@ -287,6 +287,20 @@ $query->decorate(
 );
 ```
 
+**Filtres sur les relations jointes (underscore notation) :**
+
+Les formulaires Symfony n'acceptent pas les points dans les noms de champs. Pour filtrer sur une relation jointe, utilisez la notation underscore (`relation_field` au lieu de `relation.field`) :
+
+```php
+// ❌ Ne fonctionne pas avec les formulaires Symfony
+'contact.firstname' => ['type' => 'text', 'label' => 'Prénom']
+
+// ✅ Utilisez la notation underscore
+'contact_firstname' => ['type' => 'text', 'label' => 'Prénom']
+```
+
+Le `DbalMappingConfiguration->resolveJoinFilter()` supporte les deux notations et résout automatiquement `contact_firstname` vers le join `contact` et le champ `firstname`.
+
 #### resolve()
 
 Résout le query avec traitement des filtres.
@@ -333,6 +347,84 @@ return [
     'contacts' => $contacts->toArray(),
     'decorator' => $contacts->query->getDecorator(),
 ];
+```
+
+---
+
+## Déduplication avec unique()
+
+La méthode `unique()` permet de dédupliquer les résultats par un champ spécifique. Utile quand on requête une table de jointure (ex: Role) mais qu'on veut des résultats uniques par une relation (ex: Contact).
+
+### Usage
+
+```php
+$query->unique('contact');  // Un résultat par contact
+```
+
+### Exemple complet : Liste de contacts via leurs rôles
+
+```php
+#[Route('/contacts', methods: ['GET'])]
+class ContactListAction implements ControllerInterface
+{
+    public function __construct(
+        private readonly OrganisationContext $organisationContext,
+    ) {}
+
+    public function __invoke(RoleCollection $roles): array
+    {
+        $currentOrg = $this->organisationContext->getCurrent();
+        $query = $roles->query;
+
+        // Filtrer par organisation active
+        $query->filter(organisationUuid: $currentOrg['uuid']);
+        $query->filter(archivedAt: null);
+
+        // Dédupliquer : un seul résultat par contact
+        // (même si un contact a plusieurs rôles dans l'organisation)
+        $query->unique('contact');
+
+        $query->decorate(
+            sortables: ['contact_firstname', 'contact_lastname', 'role'],
+            filters: [
+                'contact_firstname' => ['type' => 'text', 'label' => 'Prénom'],
+                'contact_lastname' => ['type' => 'text', 'label' => 'Nom'],
+                'role' => ['type' => 'enum', 'label' => 'Rôle', 'choices' => [...]],
+            ]
+        );
+
+        return [
+            'collection' => $roles->toArray(),
+            'form' => $query->getDecorator(),
+            'pager' => $query->pager,
+        ];
+    }
+}
+```
+
+### Fonctionnement interne
+
+1. `ModelQuery->unique('contact')` stocke le champ dans `$uniqueField`
+2. `DbalAdapter` traduit en `GROUP BY` sur la colonne correspondante
+3. Le mapper résout le nom du champ en colonne SQL via `DbalMappingConfiguration->resolveUniqueField()`
+4. Le COUNT pour la pagination utilise `COUNT(DISTINCT colonne)`
+
+### SQL généré
+
+```sql
+-- Requête principale
+SELECT contact_role.contact_uuid, ...
+FROM contact_role
+INNER JOIN contact_contact AS c1 ON contact_role.contact_uuid = c1.uuid
+WHERE contact_role.organisation_uuid = :orgUuid
+GROUP BY contact_role.contact_uuid
+ORDER BY c1.lastname ASC
+LIMIT 20 OFFSET 0
+
+-- Requête count pour pagination
+SELECT COUNT(DISTINCT contact_role.contact_uuid) AS count
+FROM contact_role
+WHERE contact_role.organisation_uuid = :orgUuid
 ```
 
 ---
@@ -463,22 +555,45 @@ Ajoute des variables au FormView.
 ```php
 public function finishView(FormView $view, FormInterface $form, array $options): void
 {
-    // Liste des champs disponibles
-    $view->vars['fields'] = array_unique(array_merge($filterKeys, $sortableFields));
+    // Liste des champs : l'ordre est déterminé par filters_config
+    $filterConfigKeys = array_keys($options['filters_config'] ?? []);
+    $sortableFields = $options['sortable_fields'] ?? [];
+    $view->vars['fields'] = array_unique(array_merge($filterConfigKeys, $sortableFields));
 
     // Filtres (sans q, page, limit, sort)
     $view->vars['filters'] = array_diff_key($view->children, [...]);
 
-    // Sorts groupés par field
+    // Sorts : données pour rendu manuel (évite problème de "already rendered")
     $view->vars['sorts'] = [
-        'name' => ['asc' => $choiceView, 'desc' => $choiceView],
-        'createdAt' => ['asc' => $choiceView, 'desc' => $choiceView],
+        'name' => [
+            'asc' => ['name' => 'sort', 'value' => 'name_asc', 'checked' => false],
+            'desc' => ['name' => 'sort', 'value' => 'name_desc', 'checked' => true],
+        ],
     ];
 
     // Config pour JS
     $view->vars['filters_config'] = $options['filters_config'];
 }
 ```
+
+### Ordre des colonnes
+
+**Important** : L'ordre des colonnes dans les templates de liste est déterminé par l'ordre des clés dans le tableau `filters` de `decorate()`, suivi des champs `sortables` qui ne sont pas dans `filters`.
+
+```php
+// Les colonnes apparaîtront dans cet ordre : firstname, lastname, role, email
+$query->decorate(
+    sortables: ['firstname', 'lastname', 'role', 'email'],
+    filters: [
+        'firstname' => ['type' => 'text', 'label' => 'Prénom'],
+        'lastname' => ['type' => 'text', 'label' => 'Nom'],
+        'role' => ['type' => 'enum', 'label' => 'Rôle', 'choices' => [...]],
+        'email' => ['type' => 'text', 'label' => 'Email'],
+    ]
+);
+```
+
+Pour changer l'ordre des colonnes, il suffit de réorganiser les clés dans le tableau `filters`.
 
 ---
 

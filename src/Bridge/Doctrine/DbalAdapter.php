@@ -111,6 +111,7 @@ class DbalAdapter
         ?int $offset = null,
         ?string $sortBy = null,
         string $sortDirection = 'asc',
+        ?string $groupBy = null,
     ): string {
         // Build JOIN clauses from configuration
         $joinClauses = $this->configuration->buildJoinClauses();
@@ -124,6 +125,33 @@ class DbalAdapter
         // Qualify sortBy with table name if it's not already qualified and joins exist
         if ($sortBy && !empty($this->configuration->joins) && !str_contains($sortBy, '.')) {
             $sortBy = $this->configuration->table . '.' . $sortBy;
+        }
+
+        // When groupBy is specified, use subquery to get unique primary keys first
+        // This is compatible with MySQL ONLY_FULL_GROUP_BY mode
+        if ($groupBy) {
+            $subquery = sprintf(
+                'SELECT MIN(%s.%s) FROM %s%s%s GROUP BY %s',
+                $this->configuration->table,
+                $this->configuration->pivotKey,
+                $this->configuration->table,
+                $joinClauses,
+                $this->where($params),
+                $groupBy
+            );
+
+            return trim(sprintf(
+                'SELECT %s FROM %s%s WHERE %s.%s IN (%s)%s%s%s',
+                $fields,
+                $this->configuration->table,
+                $joinClauses,
+                $this->configuration->table,
+                $this->configuration->pivotKey,
+                $subquery,
+                $sortBy ? ' ORDER BY ' . $sortBy . ' ' . strtoupper($sortDirection) : '',
+                $limit > 0 ? ' LIMIT ' . $limit : '',
+                $limit > 0 && $offset !== null ? ' OFFSET ' . $offset : '',
+            ));
         }
 
         return trim(sprintf(
@@ -189,6 +217,32 @@ class DbalAdapter
         );
     }
 
+    /**
+     * Build a COUNT query, handling groupBy for unique counts.
+     */
+    public function count(array $params = [], ?string $groupBy = null): string
+    {
+        $joinClauses = $this->configuration->buildJoinClauses();
+
+        if ($groupBy) {
+            // Count distinct grouped values
+            return trim(sprintf(
+                'SELECT COUNT(DISTINCT %s) AS count FROM %s%s%s',
+                $groupBy,
+                $this->configuration->table,
+                $joinClauses,
+                $this->where($params)
+            ));
+        }
+
+        return trim(sprintf(
+            'SELECT COUNT(*) AS count FROM %s%s%s',
+            $this->configuration->table,
+            $joinClauses,
+            $this->where($params)
+        ));
+    }
+
     public function onModelQuery(Middleware $chain, ModelQuery $query): \Generator
     {
         // Check preloader for single-UUID lookup
@@ -221,8 +275,14 @@ class DbalAdapter
 
         $limit = $query->limit ?? 0;
 
+        // Resolve uniqueField to GROUP BY clause (needed for both count and select)
+        $groupBy = null;
+        if ($query->uniqueField) {
+            $groupBy = $this->configuration->resolveUniqueField($query->uniqueField);
+        }
+
         if ($query->pager && !$limit) {
-            $count = iterator_to_array($this->query($this->select($filters, 'COUNT(*) AS count'), $queryParams))[0]['count'] ?? 0;
+            $count = iterator_to_array($this->query($this->count($filters, $groupBy), $queryParams))[0]['count'] ?? 0;
             $query->pager->bind($count);
 
             if ($count === 0) {
@@ -256,6 +316,7 @@ class DbalAdapter
                     offset: $query->pager?->offset ?? null,
                     sortBy: $sortBy ?? null,
                     sortDirection: $query->sorter?->direction->value ?? 'asc',
+                    groupBy: $groupBy,
                 ),
                 $queryParams
             )

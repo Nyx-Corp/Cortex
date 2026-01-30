@@ -94,6 +94,26 @@ class ClubListAction implements ControllerInterface
 }
 ```
 
+### 5. [Action Events](./events.md)
+
+Système d'événements pour intercepter et modifier les réponses des Actions. Compatible PSR-14.
+
+```php
+class Handler implements ActionHandler, EventDispatcherAwareInterface
+{
+    use EmitsActionEvents;
+
+    public function __invoke(Command $command): Response
+    {
+        // ... logique métier ...
+
+        $this->emit($event = new Event(new Response($model)));
+
+        return $event->getResponse(); // Peut être modifiée par les listeners
+    }
+}
+```
+
 ## Flux de Données Typique
 
 Le diagramme suivant illustre le flux complet d'une requête HTTP jusqu'au rendu de la collection :
@@ -269,4 +289,5 @@ public function __invoke(PersonCollection $persons): array
 - **[AsyncCollection](./async-collection.md)** - Collections lazy avec context propagation
 - **[Bridge/Doctrine](./bridge-doctrine.md)** - Persistence DBAL avec JOINs et preloading
 - **[Bridge/Symfony](./bridge-symfony.md)** - Intégration Symfony complète
+- **[Action Events](./events.md)** - Système d'événements pour les Actions
 - **[Makers](./makers.md)** - Générateurs de code
