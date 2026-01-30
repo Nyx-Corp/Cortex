@@ -1,6 +1,6 @@
 {# template route : {module}/{model}/{action} #}
 
-{% trans_default_domain '{module}' %}
+{% trans_default_domain '{domain}' %}
 
 {% extends "{module}/{model}/_layout.html.twig" %}
 
@@ -8,91 +8,47 @@
 
 {% form_theme form _self %}
 
-{#
-    Block overrides priority for form theming :
-        > {% block _{action}_<fieldName>_widget %}{% endblock %}
-        > {% block <fieldType>_<fieldName>_widget %}{% endblock %}}
-        > {% block <fieldName>_widget %}{% endblock %}
-        > {% block <fieldType>_widget %}{% endblock %}
-        > {% block form_widget %}{% endblock %}
-
-    Idem : *_row / *_label /*_errors
-
-    Custom field rendering example (e.g., for radio buttons):
-    {% block gender_row %}
-        <div class="flex items-center gap-6">
-            {{ form_label(form) }}
-            {%- for child in form %}
-                <label class="inline-flex items-center gap-2 cursor-pointer">
-                    <input type="radio" name="{{ child.vars.full_name }}" value="{{ child.vars.value }}"
-                        {{ child.vars.checked ? 'checked' : '' }}
-                        class="size-4 appearance-none rounded-full border border-form-border bg-form-bg checked:border-dark-light checked:bg-dark-lighter relative before:absolute before:inset-1 before:rounded-full before:bg-white before:hidden checked:before:block" />
-                    <span class="text-sm text-form-label">{{ child.vars.label|trans }}</span>
-                </label>
-            {% endfor -%}
-        </div>
-    {% endblock %}
-#}
-
 {% block form_row %}
-    {# Override le sm:col-span-4 par défaut de forms.html.twig #}
     {% set row_attr = { class: '' }|merge(row_attr|default({})) %}
+    {% set widget_container_attr = { class: 'mt-1' }|merge(widget_container_attr|default({})) %}
     {{ parent() }}
 {% endblock %}
 
-{% block main %}
-    {{ form_start(form, { 'attr': { 'class': 'flex flex-col gap-8 max-w-4xl p-4' } }) }}
+{% block form_label %}
+    {% set label_attr = {'class': 'text-sm font-medium text-form-label'} | merge(label_attr|default({})) %}
+    {{ parent() }}
+{% endblock %}
 
-        {# Header #}
-        <div class="flex items-center justify-between border-b border-gray-200 pb-4">
-            <div>
-                <h1 class="text-2xl font-semibold text-dark">{% block title '' %}</h1>
-                <p class="mt-1 text-sm text-form-label">{{ '{model}.form.description'|trans }}</p>
-            </div>
-            {% block title_icon %}{% endblock %}
-        </div>
+{% block form_widget_simple %}
+    {% set base_classes = 'block w-full rounded-md bg-white px-3 py-1.5 text-sm text-form border border-zinc-300 placeholder:text-form-placeholder placeholder:italic focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary' %}
+    {% set attr = attr|default({})|merge({class: (attr.class|default('') ~ ' ' ~ base_classes)|trim}) %}
+    {{ parent() }}
+{% endblock %}
 
-        {#
-            Multiple fieldsets example - customize sections based on your model:
+{% block page_icon %}<i data-lucide="{{ {model}_icon }}" class="size-6"></i>{% endblock %}
+{% block page_backlink %}{{ path('{module}/{model}/index') }}{% endblock %}
+{% block page_backlink_text %}{{ '{model}.title'|trans }}{% endblock %}
 
-            {# Section 1 - Identity #}
-            <fieldset class="bg-white rounded-lg border border-gray-200 p-6">
-                <legend class="text-base font-semibold text-dark px-2">{{ '{model}.form.section.identity'|trans }}</legend>
-                <div class="grid grid-cols-2 gap-6 mt-4">
-                    <div class="col-span-2">
-                        {{ form_row(form.gender) }}
-                    </div>
-                    {{ form_row(form.firstname) }}
-                    {{ form_row(form.lastname) }}
-                </div>
-            </fieldset>
-
-            {# Section 2 - Details #}
-            <fieldset class="bg-white rounded-lg border border-gray-200 p-6">
-                <legend class="text-base font-semibold text-dark px-2">{{ '{model}.form.section.details'|trans }}</legend>
-                <div class="grid grid-cols-2 gap-6 mt-4">
-                    {{ form_row(form.field1) }}
-                    {{ form_row(form.field2) }}
-                </div>
-            </fieldset>
-        #}
+{% block page_content %}
+    {{ form_start(form, { 'attr': { 'class': 'flex flex-col gap-6' } }) }}
 
         {# Section principale #}
-        <fieldset class="bg-white rounded-lg border border-gray-200 p-6">
-            <legend class="text-base font-semibold text-dark px-2">{{ '{model}.form.section.main'|trans }}</legend>
-
-            <div class="grid grid-cols-2 gap-6 mt-4">
+        <div class="border border-zinc-200 bg-white">
+            <div class="px-4 py-3 border-b border-zinc-200 flex items-center gap-3">
+                <i data-lucide="{{ {model}_icon }}" class="size-5 text-primary"></i>
+                <h2 class="font-medium text-zinc-700">{{ '{model}.form.section.main'|trans }}</h2>
+            </div>
+            <div class="p-4 grid grid-cols-2 gap-4">
                 {{ form_rest(form) }}
             </div>
-        </fieldset>
+        </div>
 
         {# Actions #}
-        <div class="flex items-center justify-end gap-x-4 pt-6 border-t border-gray-200">
+        <div class="flex items-center justify-end gap-x-4">
             <a href="{{ path('{module}/{model}/index') }}" class="inline-flex items-center cursor-pointer text-sm/6 font-semibold text-gray-900 gap-2 hover:text-gray-700">
-                <i data-lucide="list-restart" class="size-4"></i>
-                {{ 'admin.action.back'|trans({}, 'admin') }}
+                {{ 'admin.action.cancel'|trans({}, 'admin') }}
             </a>
-            <button type="submit" class="inline-flex cursor-pointer items-center gap-2 rounded-md bg-form-btn px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-form-btn-hover">
+            <button type="submit" id="submit-btn" class="inline-flex cursor-pointer items-center gap-2 bg-primary/10 border border-primary/30 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/20 transition-colors">
                 <i data-lucide="check" class="size-4"></i>
                 {{ 'admin.action.submit'|trans({}, 'admin') }}
             </button>

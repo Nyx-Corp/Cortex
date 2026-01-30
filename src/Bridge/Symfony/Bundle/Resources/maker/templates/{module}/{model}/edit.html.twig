@@ -1,8 +1,6 @@
-{# template route : {module}/{model}/{action} #}
+{# template route : {module}/{model}/{uuid}/edit #}
 
-{% trans_default_domain '{module}' %}
-
-{% set title = '{model}.edit.title'|trans({ '%model%': {model} }) %}
+{% trans_default_domain '{domain}' %}
 
 {% extends "{module}/{model}/_form.html.twig" %}
 
@@ -12,4 +10,9 @@
     {{ breadcrumbs.item({model}, null, null, true) }}
 {% endblock %}
 
-{% block title title %}
+{% block page_title %}
+    <i data-lucide="chevron-right" class="size-5 text-zinc-300"></i>
+    {{ {model} }}
+    <i data-lucide="chevron-right" class="size-5 text-zinc-300"></i>
+    <span class="text-zinc-400 font-normal">{{ '{model}.action.edit'|trans }}</span>
+{% endblock %}

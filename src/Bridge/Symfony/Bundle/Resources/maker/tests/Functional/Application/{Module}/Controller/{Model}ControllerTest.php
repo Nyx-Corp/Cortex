@@ -63,6 +63,24 @@ class {Model}ControllerTest extends {Module}WebTestCase
         $this->assertSelectorExists('form');
     }
 
+    public function testFilterByUuidDisplaysActiveFilterChip(): void
+    {
+        $client = static::createAppClient();
+
+        // Create an item and filter by its UUID
+        $uuid = $this->createTestItem($client);
+        $crawler = $client->request('GET', sprintf('/{model}s?q=uuid:%s', $uuid));
+
+        $this->assertResponseIsSuccessful();
+
+        // Verify the active filter chip is displayed with remove button
+        $this->assertSelectorExists('[data-action*="removeFilter"][data-filter-field="uuid"]');
+
+        // Verify the UUID is displayed in the chip (parent contains the value)
+        $chipText = $crawler->filter('[data-action*="removeFilter"][data-filter-field="uuid"]')->ancestors()->first()->text();
+        $this->assertStringContainsString($uuid, $chipText);
+    }
+
     // Uncomment if model uses Archivable trait:
     // public function testArchiveRemovesFromDefaultList(): void
     // {

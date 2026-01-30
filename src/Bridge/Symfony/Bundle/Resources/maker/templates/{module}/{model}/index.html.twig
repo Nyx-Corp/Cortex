@@ -10,18 +10,16 @@
     {{ breadcrumbs.item('{model}.list.title'|trans, null, null, true) }}
 {% endblock %}
 
-{% block main %}
+{% block page_icon %}<i data-lucide="{{ {model}_icon }}" class="size-6 text-primary"></i>{% endblock %}
+{% block page_title %}{{ '{model}.title'|trans }}{% endblock %}
+
+{% block page_content %}
     {#
         Options list.html.twig:
         - trans_default_domain: Domain de traduction
         - hide_filters: true pour masquer le panneau de filtres
     #}
     {% embed '@_theme/layout/list.html.twig' with { trans_default_domain: '{module}', hide_filters: false }%}
-
-        {% block title %}
-            <i data-lucide="{{ {model}_icon }}" class="size-5 text-dark-lighter"></i>
-            <span>{{ '{model}.index.title'|trans }}</span>
-        {% endblock %}
 
         {% block create_link path('{module}/{model}/create') %}
 

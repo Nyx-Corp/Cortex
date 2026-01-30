@@ -21,6 +21,16 @@ trait DbalModelAdapterTrait
         return $this->dbal;
     }
 
+    /**
+     * Get the DBAL mapping configuration.
+     *
+     * Used by other mappers to configure JOINs.
+     */
+    public function getConfiguration(): DbalMappingConfiguration
+    {
+        return $this->getDbal()->getConfiguration();
+    }
+
     public function onDbal(Middleware $chain, $command): \Generator
     {
         switch (true) {

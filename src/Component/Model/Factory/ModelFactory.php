@@ -21,7 +21,7 @@ class ModelFactory
 
     private MiddlewareChain $creationMiddlewares;
     private MiddlewareChain $fetchingMiddlewares;
-    private ModelPrototype $modelPrototype;
+    public private(set) ModelPrototype $modelPrototype;
 
     public function __construct(
         RegisteredClass|string $modelClass,

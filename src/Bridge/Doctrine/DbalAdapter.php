@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Cortex\Bridge\Doctrine;
 
 use Cortex\Component\Collection\AsyncCollection;
@@ -19,8 +21,17 @@ class DbalAdapter
     public function __construct(
         protected Connection $dbalConnection,
         private DbalMappingConfiguration $configuration,
+        private ?DbalPreloader $preloader = null,
     ) {
         self::$operatorFilterPattern ??= '/^('.Operator::pattern().')/';
+    }
+
+    /**
+     * Get the configuration.
+     */
+    public function getConfiguration(): DbalMappingConfiguration
+    {
+        return $this->configuration;
     }
 
     public function query(string $query, array $params = []): \Generator
@@ -30,7 +41,9 @@ class DbalAdapter
             array_map(
                 static fn ($param) => match(true) {
                     $param === null => null,
-                    is_scalar($param) => preg_filter(self::$operatorFilterPattern, '', $param) ?? $param,
+                    $param instanceof \BackedEnum => $param->value,
+                    is_string($param) => preg_filter(self::$operatorFilterPattern, '', $param) ?? $param,
+                    is_scalar($param) => $param,
                     is_array($param) => $param,
                     default => (string) $param,
                 },
@@ -55,21 +68,36 @@ class DbalAdapter
 
     public function where(array $params): string
     {
+        $hasJoins = !empty($this->configuration->joins);
+
         return count($params) ? ' WHERE '.implode(' AND ', array_map(
-            function ($key, $value): string {
+            function ($key, $value) use ($hasJoins): string {
+                // Qualify column with main table if joins exist and column is not already qualified
+                $column = $key;
+                if ($hasJoins && !str_contains($key, '.')) {
+                    $column = $this->configuration->table . '.' . $key;
+                }
+
+                // Use unqualified key for parameter binding
+                $paramKey = str_replace('.', '_', $key);
+
                 if (is_array($value)) {
-                    return sprintf('%s IN (:%s)', $key, $key);
+                    return sprintf('%s IN (:%s)', $column, $paramKey);
                 }
                 if (is_null($value)) {
-                    return sprintf('%s IS NULL', $key);
+                    return sprintf('%s IS NULL', $column);
                 }
 
-                $operator = array_find(
-                    Operator::cases(),
-                    static fn (Operator $op) => str_starts_with($value, $op->value)
-                ) ?: Operator::Equal;
+                // Handle BackedEnum - use its value for operator detection
+                $stringValue = $value instanceof \BackedEnum ? (string) $value->value : $value;
 
-                return sprintf('%s %s :%s', $key, $operator->toSql(), $key);
+                $operator = is_string($stringValue) ? array_find(
+                    Operator::cases(),
+                    static fn (Operator $op) => str_starts_with($stringValue, $op->value)
+                ) : null;
+                $operator ??= Operator::Equal;
+
+                return sprintf('%s %s :%s', $column, $operator->toSql(), $paramKey);
             },
             array_keys($params),
             array_values($params)
@@ -84,10 +112,25 @@ class DbalAdapter
         ?string $sortBy = null,
         string $sortDirection = 'asc',
     ): string {
+        // Build JOIN clauses from configuration
+        $joinClauses = $this->configuration->buildJoinClauses();
+        $joinSelectFields = $this->configuration->buildJoinSelectFields();
+
+        // Enhance fields with join fields when selecting all
+        if ($fields === '*' && $joinSelectFields !== '') {
+            $fields = $this->configuration->table . '.*, ' . $joinSelectFields;
+        }
+
+        // Qualify sortBy with table name if it's not already qualified and joins exist
+        if ($sortBy && !empty($this->configuration->joins) && !str_contains($sortBy, '.')) {
+            $sortBy = $this->configuration->table . '.' . $sortBy;
+        }
+
         return trim(sprintf(
-            'SELECT %s FROM %s%s%s%s%s',
+            'SELECT %s FROM %s%s%s%s%s%s',
             $fields,
             $this->configuration->table,
+            $joinClauses,
             $this->where($params),
             $sortBy ? ' ORDER BY '.$sortBy.' '.strtoupper($sortDirection) : '',
             $limit > 0 ? ' LIMIT '.$limit : '',
@@ -148,14 +191,38 @@ class DbalAdapter
 
     public function onModelQuery(Middleware $chain, ModelQuery $query): \Generator
     {
+        // Check preloader for single-UUID lookup
+        $uuidFilter = $query->filters->get('uuid');
+        if ($uuidFilter && $this->preloader && $this->configuration->modelClass) {
+            if ($this->preloader->has($this->configuration->modelClass, $uuidFilter)) {
+                $cachedData = $this->preloader->get($this->configuration->modelClass, $uuidFilter);
+                $mappedData = $this->configuration->tableToModelMapper?->map($cachedData) ?? $cachedData;
+
+                yield $uuidFilter => [
+                    $this->configuration->dataChannel => $mappedData,
+                ];
+
+                // Consume-once: remove after use
+                $this->preloader->remove($this->configuration->modelClass, $uuidFilter);
+
+                return;
+            }
+        }
+
         $filters = $this->configuration->modelToTableMapper?->map($query->filters->all())
             ?? $query->filters->all()
         ;
 
+        // Process filters for join-qualified fields (e.g., "organisation.name" -> "org.name")
+        $filters = $this->resolveJoinFilters($filters);
+
+        // Normalize filter keys for parameter binding (dots to underscores)
+        $queryParams = $this->normalizeParamKeys($filters);
+
         $limit = $query->limit ?? 0;
 
         if ($query->pager && !$limit) {
-            $count = iterator_to_array($this->query($this->select($filters, 'COUNT(*) AS count'), $filters))[0]['count'] ?? 0;
+            $count = iterator_to_array($this->query($this->select($filters, 'COUNT(*) AS count'), $queryParams))[0]['count'] ?? 0;
             $query->pager->bind($count);
 
             if ($count === 0) {
@@ -165,6 +232,7 @@ class DbalAdapter
             }
         }
 
+        $sortBy = null;
         if ($query->sorter) {
             // Convert field name from model (camelCase) to table (snake_case)
             $sortBy = array_key_first(
@@ -172,6 +240,12 @@ class DbalAdapter
                     $query->sorter->field => '', // Use empty string as placeholder
                 ])
             );
+
+            // Check if sortBy targets a joined table
+            $joinInfo = $this->configuration->resolveJoinFilter($query->sorter->field);
+            if ($joinInfo) {
+                $sortBy = $joinInfo['join']->getAlias() . '.' . $this->toSnakeCase($joinInfo['field']);
+            }
         }
 
         $results = AsyncCollection::create(
@@ -183,7 +257,7 @@ class DbalAdapter
                     sortBy: $sortBy ?? null,
                     sortDirection: $query->sorter?->direction->value ?? 'asc',
                 ),
-                $filters
+                $queryParams
             )
         );
 
@@ -195,9 +269,13 @@ class DbalAdapter
                     throw new \InvalidArgumentException(sprintf('Identifier "%s" not found in data line: %s', $this->configuration->pivotKey, new JsonString($dataLine)));
                 }
 
+                // Preload joined data for related mappers and clean up joined columns
+                $this->preloadJoinedData($dataLine);
+                $cleanedDataLine = $this->stripJoinedColumns($dataLine);
+
                 yield $identifierValue => [
                     $this->configuration->dataChannel => $this->configuration
-                        ->tableToModelMapper->map($dataLine),
+                        ->tableToModelMapper->map($cleanedDataLine),
                 ];
             }
 
@@ -215,14 +293,117 @@ class DbalAdapter
                 continue;
             }
 
+            // Preload joined data for related mappers and clean up joined columns
+            $this->preloadJoinedData($resultLine);
+            $cleanedResultLine = $this->stripJoinedColumns($resultLine);
+
             yield $identifier => array_replace_recursive(
                 $dataLine,
                 [
                     '_dbal' => $resultLine,
-                    $this->configuration->dataChannel => $this->configuration->tableToModelMapper->map($resultLine),
+                    $this->configuration->dataChannel => $this->configuration->tableToModelMapper->map($cleanedResultLine),
                 ],
             );
         }
+    }
+
+    /**
+     * Preload joined data into the preloader for consumption by related mappers.
+     *
+     * For each join, extracts prefixed columns and stores them in the preloader
+     * so the related mapper can use them instead of executing a separate query.
+     */
+    private function preloadJoinedData(array $dataLine): void
+    {
+        if (!$this->preloader) {
+            return;
+        }
+
+        foreach ($this->configuration->joins as $join) {
+            $modelClass = $join->getModelClass();
+            if (!$modelClass) {
+                continue;
+            }
+
+            // Use JoinDefinition's extractJoinedData method
+            $joinedData = $join->extractJoinedData($dataLine);
+            if ($joinedData === null) {
+                continue;
+            }
+
+            // Get identifier from joined data (primary key)
+            $identifier = $joinedData[$join->getForeignKey()] ?? null;
+            if ($identifier === null) {
+                continue;
+            }
+
+            // Preload data for the related mapper
+            $this->preloader->set($modelClass, $identifier, $joinedData);
+        }
+    }
+
+    /**
+     * Remove joined columns from data line before passing to tableToModelMapper.
+     *
+     * Keeps the local key (foreign key column) as it's needed by the tableToModelMapper
+     * to convert it to the relation property name.
+     */
+    private function stripJoinedColumns(array $dataLine): array
+    {
+        foreach ($this->configuration->joins as $join) {
+            // Remove all prefixed columns (alias_column)
+            foreach ($join->getPrefixedColumns() as $prefixedColumn) {
+                unset($dataLine[$prefixedColumn]);
+            }
+            // Keep the local key (e.g., organisation_uuid) - the tableToModelMapper needs it
+            // to map it to the relation property name (e.g., organisation)
+        }
+        return $dataLine;
+    }
+
+    /**
+     * Resolve join filters: convert "relation.field" to "alias.column".
+     */
+    private function resolveJoinFilters(array $filters): array
+    {
+        $resolved = [];
+
+        foreach ($filters as $key => $value) {
+            $joinInfo = $this->configuration->resolveJoinFilter($key);
+
+            if ($joinInfo) {
+                // Convert to qualified column name: alias.snake_case_field
+                $qualifiedKey = $joinInfo['join']->getAlias() . '.' . $this->toSnakeCase($joinInfo['field']);
+                $resolved[$qualifiedKey] = $value;
+            } else {
+                $resolved[$key] = $value;
+            }
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Normalize parameter keys: replace dots with underscores for PDO binding.
+     */
+    private function normalizeParamKeys(array $params): array
+    {
+        $normalized = [];
+
+        foreach ($params as $key => $value) {
+            $normalizedKey = str_replace('.', '_', $key);
+            $normalized[$normalizedKey] = $value;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Convert camelCase to snake_case.
+     */
+    private function toSnakeCase(string $input): string
+    {
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $input));
     }
 
     public function onModelSync(Middleware $chain, SyncCommand $command): \Generator

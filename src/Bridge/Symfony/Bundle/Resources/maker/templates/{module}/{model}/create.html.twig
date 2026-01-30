@@ -1,6 +1,6 @@
-{# template route : {module}/{model}/{action} #}
+{# template route : {module}/{model}/create #}
 
-{% trans_default_domain '{module}' %}
+{% trans_default_domain '{domain}' %}
 
 {% extends "{module}/{model}/_form.html.twig" %}
 
@@ -10,4 +10,7 @@
     {{ breadcrumbs.item('{model}.create.title'|trans, null, null, true) }}
 {% endblock %}
 
-{% block title '{model}.create.title'|trans %}
+{% block page_title %}
+    <i data-lucide="chevron-right" class="size-5 text-zinc-300"></i>
+    <span class="text-zinc-400 font-normal">{{ '{model}.action.create'|trans }}</span>
+{% endblock %}

@@ -8,6 +8,7 @@ class DbalBridge
 {
     public function __construct(
         protected Connection $dbalConnection,
+        protected ?DbalPreloader $preloader = null,
     ) {
     }
 
@@ -15,7 +16,8 @@ class DbalBridge
     {
         return new DbalAdapter(
             $this->dbalConnection,
-            $configuration
+            $configuration,
+            $this->preloader,
         );
     }
 }
