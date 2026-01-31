@@ -185,12 +185,11 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        // Use filters_config keys order (user-specified) for columns
         $filterConfigKeys = array_keys($options['filters_config'] ?? []);
         $sortableFields = $options['sortable_fields'] ?? [];
 
-        // Merge: filters_config order first, then sortable-only fields
-        $view->vars['fields'] = array_unique(array_merge($filterConfigKeys, $sortableFields));
+        // Merge: sortable fields order first, then filter-only fields
+        $view->vars['fields'] = array_unique(array_merge($sortableFields, $filterConfigKeys));
         $view->vars['filters'] = array_diff_key(
             $view->children,
             ['q' => true, 'page' => true, 'limit' => true, 'sort' => true]

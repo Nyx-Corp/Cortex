@@ -251,7 +251,7 @@
                     {% else %}
                         {% for item in collection %}
                             <tr class="{{ loop.index is odd ? 'bg-white' : 'bg-zinc-50' }} hover:bg-spade/10 transition-colors group">
-                                <td class="pl-4 py-2 w-10 align-top pt-3.5">
+                                <td class="pl-4 pt-2.5 pb-1.5 w-10 align-middle">
                                     <input type="checkbox" name="selected_items[]" value="{{ item.uuid }}"
                                         class="row-checkbox size-4 rounded border-zinc-300 text-primary accent-primary focus:ring-primary/20 focus:ring-2 cursor-pointer"
                                         data-action="change->batch#toggle">

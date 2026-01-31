@@ -252,6 +252,11 @@ class DbalAdapter
                 $cachedData = $this->preloader->get($this->configuration->modelClass, $uuidFilter);
                 $mappedData = $this->configuration->tableToModelMapper?->map($cachedData) ?? $cachedData;
 
+                // Auto-hydrate relations if enabled
+                if ($this->configuration->autoHydrate) {
+                    $mappedData = $this->hydrateRelations($mappedData);
+                }
+
                 yield $uuidFilter => [
                     $this->configuration->dataChannel => $mappedData,
                 ];
@@ -334,9 +339,15 @@ class DbalAdapter
                 $this->preloadJoinedData($dataLine);
                 $cleanedDataLine = $this->stripJoinedColumns($dataLine);
 
+                $mappedData = $this->configuration->tableToModelMapper->map($cleanedDataLine);
+
+                // Auto-hydrate relations if enabled
+                if ($this->configuration->autoHydrate) {
+                    $mappedData = $this->hydrateRelations($mappedData);
+                }
+
                 yield $identifierValue => [
-                    $this->configuration->dataChannel => $this->configuration
-                        ->tableToModelMapper->map($cleanedDataLine),
+                    $this->configuration->dataChannel => $mappedData,
                 ];
             }
 
@@ -358,11 +369,18 @@ class DbalAdapter
             $this->preloadJoinedData($resultLine);
             $cleanedResultLine = $this->stripJoinedColumns($resultLine);
 
+            $mappedData = $this->configuration->tableToModelMapper->map($cleanedResultLine);
+
+            // Auto-hydrate relations if enabled
+            if ($this->configuration->autoHydrate) {
+                $mappedData = $this->hydrateRelations($mappedData);
+            }
+
             yield $identifier => array_replace_recursive(
                 $dataLine,
                 [
                     '_dbal' => $resultLine,
-                    $this->configuration->dataChannel => $this->configuration->tableToModelMapper->map($cleanedResultLine),
+                    $this->configuration->dataChannel => $mappedData,
                 ],
             );
         }
@@ -373,15 +391,33 @@ class DbalAdapter
      *
      * For each join, extracts prefixed columns and stores them in the preloader
      * so the related mapper can use them instead of executing a separate query.
+     * Supports nested JOINs up to the configured joinDepth.
+     *
+     * @param array                        $dataLine The data row containing prefixed columns
+     * @param array<string,JoinDefinition>|null $joins    Joins to process (null = use configuration)
+     * @param int                          $depth    Current recursion depth
+     * @param array                        $visited  Visited model classes to prevent circular refs
      */
-    private function preloadJoinedData(array $dataLine): void
-    {
+    private function preloadJoinedData(
+        array $dataLine,
+        ?array $joins = null,
+        int $depth = 1,
+        array $visited = []
+    ): void {
         if (!$this->preloader) {
             return;
         }
 
-        foreach ($this->configuration->joins as $join) {
+        $joins ??= $this->configuration->joins;
+
+        foreach ($joins as $join) {
             $modelClass = $join->getModelClass();
+
+            // Prevent circular references
+            if ($modelClass && in_array($modelClass, $visited, true)) {
+                continue;
+            }
+
             if (!$modelClass) {
                 continue;
             }
@@ -400,6 +436,26 @@ class DbalAdapter
 
             // Preload data for the related mapper
             $this->preloader->set($modelClass, $identifier, $joinedData);
+
+            // Recursively preload nested joins if within depth limit
+            $nestedJoins = $join->joinConfig->joins;
+            if ($depth < $this->configuration->joinDepth && !empty($nestedJoins)) {
+                // Create nested joins with proper aliases
+                $nestedWithAliases = [];
+                foreach ($nestedJoins as $name => $nestedJoin) {
+                    $nestedWithAliases[$name] = $nestedJoin->withParentAlias($join->getAlias());
+                }
+
+                $visitedWithCurrent = $visited;
+                $visitedWithCurrent[] = $modelClass;
+
+                $this->preloadJoinedData(
+                    $dataLine,
+                    $nestedWithAliases,
+                    $depth + 1,
+                    $visitedWithCurrent
+                );
+            }
         }
     }
 
@@ -408,18 +464,86 @@ class DbalAdapter
      *
      * Keeps the local key (foreign key column) as it's needed by the tableToModelMapper
      * to convert it to the relation property name.
+     * Supports nested JOINs up to the configured joinDepth.
+     *
+     * @param array                        $dataLine The data row containing prefixed columns
+     * @param array<string,JoinDefinition>|null $joins    Joins to process (null = use configuration)
+     * @param int                          $depth    Current recursion depth
+     * @param array                        $visited  Visited model classes to prevent circular refs
      */
-    private function stripJoinedColumns(array $dataLine): array
-    {
-        foreach ($this->configuration->joins as $join) {
+    private function stripJoinedColumns(
+        array $dataLine,
+        ?array $joins = null,
+        int $depth = 1,
+        array $visited = []
+    ): array {
+        $joins ??= $this->configuration->joins;
+
+        foreach ($joins as $join) {
+            $modelClass = $join->getModelClass();
+
+            // Prevent circular references
+            if ($modelClass && in_array($modelClass, $visited, true)) {
+                continue;
+            }
+
             // Remove all prefixed columns (alias_column)
             foreach ($join->getPrefixedColumns() as $prefixedColumn) {
                 unset($dataLine[$prefixedColumn]);
             }
             // Keep the local key (e.g., organisation_uuid) - the tableToModelMapper needs it
             // to map it to the relation property name (e.g., organisation)
+
+            // Recursively strip nested join columns if within depth limit
+            $nestedJoins = $join->joinConfig->joins;
+            if ($depth < $this->configuration->joinDepth && !empty($nestedJoins)) {
+                // Create nested joins with proper aliases
+                $nestedWithAliases = [];
+                foreach ($nestedJoins as $name => $nestedJoin) {
+                    $nestedWithAliases[$name] = $nestedJoin->withParentAlias($join->getAlias());
+                }
+
+                $visitedWithCurrent = $visited;
+                if ($modelClass) {
+                    $visitedWithCurrent[] = $modelClass;
+                }
+
+                $dataLine = $this->stripJoinedColumns(
+                    $dataLine,
+                    $nestedWithAliases,
+                    $depth + 1,
+                    $visitedWithCurrent
+                );
+            }
         }
+
         return $dataLine;
+    }
+
+    /**
+     * Hydrate relation properties using factories declared in JOINs.
+     *
+     * For each JOIN definition, if the mapped data contains a string UUID for that relation,
+     * it is resolved to the actual model instance via the factory (using preloaded data).
+     */
+    private function hydrateRelations(array $mappedData): array
+    {
+        foreach ($this->configuration->joins as $relationName => $join) {
+            $value = $mappedData[$relationName] ?? null;
+
+            // Skip if null, already an object, or not a string UUID
+            if ($value === null || !is_string($value)) {
+                continue;
+            }
+
+            // Hydrate via the factory (uses preloaded data from preloader)
+            $mappedData[$relationName] = $join->factory
+                ->query()
+                ->filterBy('uuid', $value)
+                ->first();
+        }
+
+        return $mappedData;
     }
 
     /**

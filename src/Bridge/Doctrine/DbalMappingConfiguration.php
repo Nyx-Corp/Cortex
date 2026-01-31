@@ -44,6 +44,9 @@ use Cortex\Component\Mapper\Mapper;
  */
 class DbalMappingConfiguration
 {
+    /** @var array<string, JoinDefinition> JOIN definitions with injected relation names */
+    public readonly array $joins;
+
     /**
      * @param string                        $table              Main table name
      * @param class-string|null             $modelClass         Model class for preloader lookup (e.g., Club::class)
@@ -54,22 +57,34 @@ class DbalMappingConfiguration
      * @param string                        $modelIdentifier    Model identifier property name
      * @param string                        $dataChannel        Data channel name for middleware
      * @param string                        $pivotKey           Pivot key for result grouping
+     * @param bool                          $autoHydrate        Auto-hydrate relations from JOINed data
+     * @param int                           $joinDepth          Maximum depth for nested JOINs (1 = no nesting, 2 = one level deep, etc.)
      */
     public function __construct(
         public readonly string $table,
         public readonly ?string $modelClass = null,
-        public readonly array $joins = [],
+        array $joins = [],
         public readonly ?Mapper $modelToTableMapper = null,
         public readonly ?Mapper $tableToModelMapper = null,
         public readonly string $primaryKey = 'uuid',
         public readonly string $modelIdentifier = 'uuid',
         public readonly string $dataChannel = '_default',
         public readonly string $pivotKey = 'uuid',
+        public readonly bool $autoHydrate = true,
+        public readonly int $joinDepth = 1,
     ) {
+        // Inject relationName into each JoinDefinition for convention-based FK
+        $processedJoins = [];
+        foreach ($joins as $relationName => $join) {
+            $processedJoins[$relationName] = $join->withRelationName($relationName);
+        }
+        $this->joins = $processedJoins;
     }
 
     /**
      * Build SQL JOIN clauses from all join definitions.
+     *
+     * Supports nested JOINs up to the configured joinDepth.
      */
     public function buildJoinClauses(): string
     {
@@ -77,16 +92,68 @@ class DbalMappingConfiguration
             return '';
         }
 
-        return ' ' . implode(' ', array_map(
-            fn(JoinDefinition $join) => $join->toSql($this->table),
-            $this->joins
-        ));
+        $clauses = [];
+        foreach ($this->joins as $join) {
+            $clauses[] = $this->buildJoinClausesRecursive($join, $this->table, 1, []);
+        }
+
+        return ' ' . implode(' ', array_filter($clauses));
+    }
+
+    /**
+     * Recursively build JOIN clauses for nested joins.
+     *
+     * @param JoinDefinition $join         The join definition to process
+     * @param string         $parentTable  The parent table name (or alias)
+     * @param int            $currentDepth Current nesting depth
+     * @param array          $visited      Visited model classes to prevent circular references
+     */
+    private function buildJoinClausesRecursive(
+        JoinDefinition $join,
+        string $parentTable,
+        int $currentDepth,
+        array $visited
+    ): string {
+        if ($currentDepth > $this->joinDepth) {
+            return '';
+        }
+
+        // Prevent circular references
+        $modelClass = $join->getModelClass();
+        if ($modelClass && in_array($modelClass, $visited, true)) {
+            return '';
+        }
+        if ($modelClass) {
+            $visited[] = $modelClass;
+        }
+
+        // SQL for this join
+        $sql = $join->toSql($parentTable);
+
+        // Process nested joins from joinConfig
+        $nestedJoins = $join->joinConfig->joins;
+        foreach ($nestedJoins as $nestedJoin) {
+            // Create a copy with hierarchical alias
+            $nestedWithParentAlias = $nestedJoin->withParentAlias($join->getAlias());
+            $nestedSql = $this->buildJoinClausesRecursive(
+                $nestedWithParentAlias,
+                $join->getAlias(),
+                $currentDepth + 1,
+                $visited
+            );
+            if ($nestedSql !== '') {
+                $sql .= ' ' . $nestedSql;
+            }
+        }
+
+        return $sql;
     }
 
     /**
      * Build SELECT fields from all join definitions.
      *
      * Uses unique alias prefix for each join to avoid column collisions.
+     * Supports nested JOINs up to the configured joinDepth.
      */
     public function buildJoinSelectFields(): string
     {
@@ -94,12 +161,59 @@ class DbalMappingConfiguration
             return '';
         }
 
-        $fields = array_filter(array_map(
-            fn(JoinDefinition $join) => $join->getSelectFields(),
-            $this->joins
-        ));
+        $fields = [];
+        foreach ($this->joins as $join) {
+            $this->buildJoinSelectFieldsRecursive($join, 1, [], $fields);
+        }
 
-        return empty($fields) ? '' : implode(', ', $fields);
+        return empty($fields) ? '' : implode(', ', array_filter($fields));
+    }
+
+    /**
+     * Recursively collect SELECT fields for nested joins.
+     *
+     * @param JoinDefinition $join         The join definition to process
+     * @param int            $currentDepth Current nesting depth
+     * @param array          $visited      Visited model classes to prevent circular references
+     * @param array          &$fields      Collected field strings (passed by reference)
+     */
+    private function buildJoinSelectFieldsRecursive(
+        JoinDefinition $join,
+        int $currentDepth,
+        array $visited,
+        array &$fields
+    ): void {
+        if ($currentDepth > $this->joinDepth) {
+            return;
+        }
+
+        // Prevent circular references
+        $modelClass = $join->getModelClass();
+        if ($modelClass && in_array($modelClass, $visited, true)) {
+            return;
+        }
+        if ($modelClass) {
+            $visited[] = $modelClass;
+        }
+
+        // Add fields for this join
+        $selectFields = $join->getSelectFields();
+        if ($selectFields !== '') {
+            $fields[] = $selectFields;
+        }
+
+        // Process nested joins from joinConfig
+        $nestedJoins = $join->joinConfig->joins;
+        foreach ($nestedJoins as $nestedJoin) {
+            // Create a copy with hierarchical alias
+            $nestedWithParentAlias = $nestedJoin->withParentAlias($join->getAlias());
+            $this->buildJoinSelectFieldsRecursive(
+                $nestedWithParentAlias,
+                $currentDepth + 1,
+                $visited,
+                $fields
+            );
+        }
     }
 
     /**

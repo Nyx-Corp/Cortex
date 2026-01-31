@@ -78,6 +78,8 @@ class DbalMappingConfiguration
         public readonly string $modelIdentifier = 'uuid',
         public readonly string $dataChannel = '_default',
         public readonly string $pivotKey = 'uuid',
+        public readonly bool $autoHydrate = true,  // Auto-hydratation des relations
+        public readonly int $joinDepth = 1,       // Profondeur max des JOINs imbriqués
     )
 }
 ```
@@ -95,6 +97,8 @@ class DbalMappingConfiguration
 | `modelIdentifier` | `string` | `'uuid'` | Propriété identifiant du modèle |
 | `dataChannel` | `string` | `'_default'` | Canal de données pour middleware |
 | `pivotKey` | `string` | `'uuid'` | Clé de regroupement des résultats |
+| `autoHydrate` | `bool` | `true` | Auto-hydrate relations déclarées dans `joins` |
+| `joinDepth` | `int` | `1` | Profondeur max des JOINs imbriqués (1 = pas d'imbrication) |
 
 ### Méthodes
 
@@ -316,6 +320,93 @@ enum JoinType: string
     case Right = 'RIGHT JOIN';
 }
 ```
+
+---
+
+## JOINs Imbriqués (Nested JOINs)
+
+Le paramètre `joinDepth` permet de résoudre les relations multi-niveaux en une seule requête,
+évitant les problèmes N+1 pour les relations de second niveau et au-delà.
+
+### Problème N+1 avec relations imbriquées
+
+Sans nested JOINs, les relations de second niveau causent des requêtes N+1 :
+
+```
+Attendance → Meeting (JOIN OK, preloaded)
+               ↓
+           Meeting → Club (N+1 query!)
+                   → Event (N+1 query!)
+```
+
+### Solution avec joinDepth
+
+Augmenter `joinDepth` permet de joindre automatiquement les relations déclarées dans les
+`joinConfig` des `JoinDefinition`.
+
+```php
+// AttendanceMapper avec joinDepth: 2
+$this->dbal = $dbalBridge->createAdapter(new DbalMappingConfiguration(
+    table: 'club_attendance',
+    modelClass: Attendance::class,
+    joinDepth: 2,  // Meeting (niveau 1) + Club/Event (niveau 2)
+    joins: [
+        'meeting' => new JoinDefinition(
+            factory: $this->meetingFactory,
+            joinConfig: $this->meetingMapper->getConfiguration(), // contient joins club/event
+            localKey: 'meeting_uuid',
+        ),
+    ],
+    // ...
+));
+```
+
+### SQL Généré
+
+Avec `joinDepth: 2`, le SQL généré inclut les JOINs imbriqués :
+
+```sql
+SELECT attendance.*,
+       c1.uuid AS c1_uuid, c1.club_uuid AS c1_club_uuid, ...
+       c1_c2.uuid AS c1_c2_uuid, c1_c2.name AS c1_c2_name, ...
+       c1_c3.uuid AS c1_c3_uuid, c1_c3.title AS c1_c3_title, ...
+FROM club_attendance
+INNER JOIN club_meeting AS c1 ON club_attendance.meeting_uuid = c1.uuid
+INNER JOIN club_club AS c1_c2 ON c1.club_uuid = c1_c2.uuid
+INNER JOIN agenda_event AS c1_c3 ON c1.event_uuid = c1_c3.uuid
+```
+
+### Alias Hiérarchiques
+
+Les alias sont générés hiérarchiquement pour éviter les collisions :
+
+| Niveau | Join | Alias |
+|--------|------|-------|
+| 1 | Meeting | `c1` |
+| 2 | Meeting → Club | `c1_c2` |
+| 2 | Meeting → Event | `c1_c3` |
+
+### Protection Références Circulaires
+
+Les références circulaires (ex: `Organisation → parent`) sont automatiquement détectées
+et stoppent la récursion pour éviter les boucles infinies.
+
+```php
+// Organisation a parent: Organisation (self-reference)
+// Le système détecte que Organisation::class est déjà visité et arrête
+```
+
+### Compatibilité Ascendante
+
+- `joinDepth: 1` (défaut) = comportement identique à l'existant (pas d'imbrication)
+- `joinDepth: 2` = un niveau d'imbrication
+- `joinDepth: 3` = deux niveaux d'imbrication, etc.
+
+### Recommandations
+
+1. **Utiliser avec parcimonie** : Plus de JOINs = requêtes plus lourdes
+2. **Profiler les performances** : Vérifier que le gain N+1 compense la complexité
+3. **Commencer par 2** : Rarement besoin de plus de 2 niveaux
 
 ---
 
@@ -673,6 +764,95 @@ sequenceDiagram
 
 ---
 
+## Auto-hydratation des Relations
+
+L'option `autoHydrate` (activée par défaut) permet d'hydrater automatiquement les relations
+déclarées dans `joins` sans code boilerplate dans les mappers.
+
+### Fonctionnement
+
+Quand `autoHydrate: true` :
+
+1. `DbalAdapter::onModelQuery()` mappe les données de la table vers le modèle
+2. Les colonnes de relation (ex: `organisation_uuid`) sont converties en UUID string via `Relation::toModel('organisation')`
+3. `DbalAdapter::hydrateRelations()` parcourt les `joins` déclarés
+4. Pour chaque relation dont la valeur est un UUID string, elle est hydratée via la factory
+
+```php
+// Dans DbalAdapter::hydrateRelations()
+foreach ($this->configuration->joins as $relationName => $join) {
+    $value = $mappedData[$relationName] ?? null;
+
+    // Skip si null ou déjà un objet
+    if ($value === null || !is_string($value)) {
+        continue;
+    }
+
+    // Hydrate via la factory (utilise données préchargées)
+    $mappedData[$relationName] = $join->factory
+        ->query()
+        ->filterBy('uuid', $value)
+        ->first();
+}
+```
+
+### Avant / Après
+
+**Avant (hydratation manuelle)** :
+```php
+public function onDbal(Middleware $chain, $command): \Generator
+{
+    foreach ($this->getDbal()->onModelQuery($chain, $command) as $identifier => $dataLine) {
+        $orgUuid = $dataLine['_default']['organisation'] ?? null;
+        if ($orgUuid && is_string($orgUuid)) {
+            $dataLine['_default']['organisation'] = $this->organisationFactory
+                ->query()->filterBy('uuid', $orgUuid)->first();
+        }
+        yield $identifier => $dataLine;
+    }
+}
+```
+
+**Après (auto-hydratation)** :
+```php
+public function onDbal(Middleware $chain, $command): \Generator
+{
+    // Relations with JOIN are auto-hydrated
+    yield from $this->getDbal()->onModelQuery($chain, $command);
+}
+```
+
+### Relations sans JOIN
+
+Les relations **sans** `JoinDefinition` déclarée ne sont **pas** auto-hydratées.
+Elles doivent être hydratées manuellement dans le mapper si nécessaire.
+
+```php
+// contact a un JOIN → auto-hydraté
+// organisation n'a PAS de JOIN → hydratation manuelle
+foreach ($this->getDbal()->onModelQuery($chain, $command) as $identifier => $dataLine) {
+    $orgUuid = $dataLine['_default']['organisation'] ?? null;
+    if ($orgUuid && is_string($orgUuid)) {
+        $dataLine['_default']['organisation'] = $this->organisationFactory
+            ->query()->filterBy('uuid', $orgUuid)->first();
+    }
+    yield $identifier => $dataLine;
+}
+```
+
+### Désactiver l'auto-hydratation
+
+Pour un mapper spécifique qui nécessite un contrôle manuel :
+
+```php
+$this->dbal = $dbalBridge->createAdapter(new DbalMappingConfiguration(
+    // ...
+    autoHydrate: false,
+));
+```
+
+---
+
 ## DbalBridge & Trait
 
 ### DbalBridge
@@ -815,7 +995,10 @@ class DbalOrganisationMapper implements ModelMiddleware
 }
 ```
 
-### Exemple 2 : Mapper avec JOIN et résolution de relation
+### Exemple 2 : Mapper avec JOIN (auto-hydratation)
+
+Avec `autoHydrate: true` (défaut), les relations déclarées dans `joins` sont automatiquement
+hydratées par `DbalAdapter`. Le mapper n'a pas besoin de code d'hydratation manuel.
 
 ```php
 #[Middleware(Club::class, on: Scope::All, handler: 'onDbal', priority: 2)]
@@ -865,22 +1048,19 @@ class DbalClubMapper implements ModelMiddleware
             return;
         }
 
-        // Process DBAL results
-        foreach ($this->getDbal()->onModelQuery($chain, $command) as $identifier => $dataLine) {
-            $orgUuid = $dataLine['_default']['organisation'] ?? null;
-
-            if ($orgUuid && is_string($orgUuid)) {
-                // Résout via factory (utilise preloaded data)
-                $dataLine['_default']['organisation'] = $this->organisationFactory
-                    ->query()
-                    ->filterBy('uuid', $orgUuid)
-                    ->first();
-            }
-
-            yield $identifier => $dataLine;
-        }
+        // Organisation relation is auto-hydrated via DbalAdapter (has JOIN)
+        yield from $this->getDbal()->onModelQuery($chain, $command);
     }
 }
+```
+
+Pour désactiver l'auto-hydratation (cas particuliers) :
+
+```php
+$this->dbal = $dbalBridge->createAdapter(new DbalMappingConfiguration(
+    // ...
+    autoHydrate: false,  // Désactiver l'auto-hydratation
+));
 ```
 
 ### Exemple 3 : Query avec filtres sur relation

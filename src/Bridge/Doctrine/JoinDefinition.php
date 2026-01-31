@@ -12,57 +12,113 @@ use function Symfony\Component\String\u;
  * Defines a JOIN relationship using the joined model's DBAL configuration.
  *
  * Columns are automatically discovered from the factory's model prototype,
- * with optional overrides for non-standard mappings.
+ * with convention-based FK detection for relation properties.
+ *
+ * Convention: FK = {relation}_uuid
  *
  * @example
- *     // Minimal: auto-discover columns
+ *     // Minimal: uses convention {relation}_uuid for localKey
  *     new JoinDefinition(
  *         factory: $this->organisationFactory,
  *         joinConfig: $this->organisationMapper->getConfiguration(),
- *         localKey: 'organisation_uuid',
  *     )
  *
- *     // With column overrides for non-standard mappings (e.g., parent → parent_uuid)
+ *     // With explicit localKey (overrides convention)
  *     new JoinDefinition(
  *         factory: $this->organisationFactory,
  *         joinConfig: $this->organisationMapper->getConfiguration(),
- *         localKey: 'organisation_uuid',
- *         columnOverrides: ['parent' => 'parent_uuid'],
+ *         localKey: 'custom_org_uuid',
  *     )
  */
-final readonly class JoinDefinition
+final class JoinDefinition
 {
-    private string $alias;
+    private readonly string $alias;
 
     /** @var array<string> Column names in snake_case */
-    private array $columns;
+    private readonly array $columns;
 
     /**
      * @param ModelFactory              $factory         Factory to resolve the joined model (provides column discovery)
      * @param DbalMappingConfiguration  $joinConfig      DBAL config of the joined model
-     * @param string                    $localKey        Foreign key column in the main table
+     * @param string|null               $localKey        Foreign key column in the main table (defaults to {relation}_uuid)
      * @param JoinType                  $type            Type of join (INNER, LEFT, RIGHT)
      * @param string|null               $alias           Table alias (auto-generated as c1, c2... if null)
      * @param array<string, string>     $columnOverrides Override auto-discovered column names (model_prop => column_name)
+     * @param string|null               $parentAlias     Parent alias for nested joins (used internally)
+     * @param string|null               $relationName    Relation name for convention-based FK (injected by DbalMappingConfiguration)
      */
     public function __construct(
-        public ModelFactory $factory,
-        public DbalMappingConfiguration $joinConfig,
-        public string $localKey,
-        public JoinType $type = JoinType::Inner,
+        public readonly ModelFactory $factory,
+        public readonly DbalMappingConfiguration $joinConfig,
+        public readonly ?string $localKey = null,
+        public readonly JoinType $type = JoinType::Inner,
         ?string $alias = null,
-        array $columnOverrides = [],
+        private readonly array $columnOverrides = [],
+        private readonly ?string $parentAlias = null,
+        private readonly ?string $relationName = null,
     ) {
         // Generate stable alias using static counter
         static $counter = 0;
-        $this->alias = $alias ?? ('c' . ++$counter);
+        $baseAlias = $alias ?? ('c' . ++$counter);
+        $this->alias = $parentAlias ? "{$parentAlias}_{$baseAlias}" : $baseAlias;
 
         // Discover columns from factory's model prototype constructor parameters
-        // Convert camelCase keys to snake_case for SQL, with optional overrides
+        // Convert camelCase keys to snake_case for SQL
+        // Convention: if property is a class type (relation), add _uuid suffix
+        $modelClass = (string) $factory->modelPrototype->modelClass;
+        $parameterTypes = $this->getConstructorParameterTypes($modelClass);
+
         $this->columns = array_map(
-            static fn(string $key) => $columnOverrides[$key]
-                ?? u($key)->snake()->toString(),
+            function (string $key) use ($parameterTypes): string {
+                // Explicit override takes precedence
+                if (isset($this->columnOverrides[$key])) {
+                    return $this->columnOverrides[$key];
+                }
+
+                $snakeKey = u($key)->snake()->toString();
+
+                // If this property is a relation (class type or in joinConfig.joins), use FK convention
+                if (isset($this->joinConfig->joins[$key])) {
+                    return $snakeKey . '_uuid';
+                }
+
+                // Check if the property type is a class (indicates a relation)
+                if (isset($parameterTypes[$key]) && $parameterTypes[$key]['isClass']) {
+                    return $snakeKey . '_uuid';
+                }
+
+                return $snakeKey;
+            },
             $factory->modelPrototype->constructors->declaredKeys()
+        );
+    }
+
+    /**
+     * Get the effective local key, using convention if not explicitly set.
+     *
+     * Convention: {relationName}_uuid
+     */
+    public function getLocalKey(): string
+    {
+        return $this->localKey ?? ($this->relationName . '_uuid');
+    }
+
+    /**
+     * Create a copy with the relation name set.
+     *
+     * Used by DbalMappingConfiguration to inject the relation name for convention-based FK.
+     */
+    public function withRelationName(string $name): self
+    {
+        return new self(
+            factory: $this->factory,
+            joinConfig: $this->joinConfig,
+            localKey: $this->localKey,
+            type: $this->type,
+            alias: $this->alias,
+            columnOverrides: $this->columnOverrides,
+            parentAlias: $this->parentAlias,
+            relationName: $name,
         );
     }
 
@@ -119,7 +175,7 @@ final readonly class JoinDefinition
             $this->joinConfig->table,
             $this->alias,
             $mainTable,
-            $this->localKey,
+            $this->getLocalKey(),
             $this->alias,
             $this->joinConfig->primaryKey
         );
@@ -209,5 +265,127 @@ final readonly class JoinDefinition
             $mapping[$column] = sprintf('%s_%s', $this->alias, $column);
         }
         return $mapping;
+    }
+
+    /**
+     * Create a copy of this join with a parent alias for hierarchical nesting.
+     *
+     * Used internally by DbalMappingConfiguration::buildJoinClausesRecursive()
+     * to create properly aliased nested joins.
+     */
+    public function withParentAlias(string $parentAlias): self
+    {
+        // Get base alias: if we already have a parent, strip it; otherwise use our alias directly
+        $baseAlias = $this->alias;
+        if ($this->parentAlias !== null) {
+            // Current alias is "parent_base", extract base
+            $prefix = $this->parentAlias . '_';
+            if (str_starts_with($this->alias, $prefix)) {
+                $baseAlias = substr($this->alias, strlen($prefix));
+            }
+        }
+
+        return new self(
+            factory: $this->factory,
+            joinConfig: $this->joinConfig,
+            localKey: $this->localKey,
+            type: $this->type,
+            alias: $baseAlias, // preserve base alias, constructor will add new parent prefix
+            columnOverrides: $this->columnOverrides,
+            parentAlias: $parentAlias,
+            relationName: $this->relationName,
+        );
+    }
+
+    /**
+     * Get constructor parameter types using reflection.
+     *
+     * Returns an array keyed by parameter name with type info.
+     * Only model classes are marked as relations (excludes value objects, enums, dates).
+     *
+     * @param class-string $modelClass
+     * @return array<string, array{isClass: bool, type: string|null}>
+     */
+    private function getConstructorParameterTypes(string $modelClass): array
+    {
+        $types = [];
+
+        try {
+            $refClass = new \ReflectionClass($modelClass);
+            $constructor = $refClass->getConstructor();
+
+            if ($constructor === null) {
+                return $types;
+            }
+
+            foreach ($constructor->getParameters() as $param) {
+                $paramType = $param->getType();
+                $isRelation = false;
+                $typeName = null;
+
+                if ($paramType instanceof \ReflectionNamedType) {
+                    $typeName = $paramType->getName();
+                    // Check if this is likely a model class (relation)
+                    // Exclude: builtin types, enums, value objects, dates
+                    $isRelation = $this->isModelType($typeName);
+                }
+
+                $types[$param->getName()] = [
+                    'isClass' => $isRelation,
+                    'type' => $typeName,
+                ];
+            }
+        } catch (\ReflectionException) {
+            // Ignore reflection errors
+        }
+
+        return $types;
+    }
+
+    /**
+     * Check if a type name represents a model class (as opposed to a value object).
+     *
+     * Model classes are relations that should be stored as FK (uuid).
+     * Value objects (Uuid, DateTime, Email, enums) are stored directly.
+     */
+    private function isModelType(string $typeName): bool
+    {
+        // Builtin types are not models
+        if (in_array($typeName, ['string', 'int', 'float', 'bool', 'array', 'object', 'mixed', 'null', 'callable', 'iterable', 'void', 'never', 'true', 'false'], true)) {
+            return false;
+        }
+
+        // Enums are not models
+        if (enum_exists($typeName)) {
+            return false;
+        }
+
+        // Check if class exists before checking interfaces
+        if (!class_exists($typeName) && !interface_exists($typeName)) {
+            return false;
+        }
+
+        // DateTime types are not models
+        if (is_a($typeName, \DateTimeInterface::class, true)) {
+            return false;
+        }
+
+        // Symfony Uid types (Uuid, Ulid) are not models
+        if (is_a($typeName, \Symfony\Component\Uid\AbstractUid::class, true)) {
+            return false;
+        }
+
+        // Cortex value objects are not models
+        if (is_a($typeName, \Cortex\ValueObject\ValueObject::class, true)) {
+            return false;
+        }
+
+        // Stringable interface is not a model
+        if ($typeName === \Stringable::class) {
+            return false;
+        }
+
+        // Otherwise, assume it's a model class (relation)
+        return true;
     }
 }
