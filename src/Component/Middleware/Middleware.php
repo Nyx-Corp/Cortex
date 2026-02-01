@@ -8,7 +8,7 @@ class Middleware
 
     public private(set) ?\Closure $next = null;
     public bool $isLast {
-        get => $this->next === null;
+        get => null === $this->next;
     }
 
     public function __construct(

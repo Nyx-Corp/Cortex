@@ -4,9 +4,9 @@ namespace Cortex\Component\Json;
 
 final class JsonString implements \Stringable, \JsonSerializable
 {
-    protected string $json;
+    private string $json;
 
-    protected array|\JsonSerializable|null $data = null;
+    private array|\JsonSerializable|null $data = null;
 
     public function __construct(array|string|\JsonSerializable|null $payload)
     {

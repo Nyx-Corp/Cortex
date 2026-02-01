@@ -52,7 +52,6 @@ class CommandMapperExtension extends AbstractTypeExtension
     {
         $builder
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-
                 $form = $event->getForm();
                 $commandClass = $form->getConfig()->getOption('command_class');
                 if (!$commandClass) {
@@ -67,7 +66,6 @@ class CommandMapperExtension extends AbstractTypeExtension
                 $event->setData(get_object_vars($data));
             })
             ->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-
                 $form = $event->getForm();
                 $commandClass = $form->getConfig()->getOption('command_class');
                 if (!$commandClass) {

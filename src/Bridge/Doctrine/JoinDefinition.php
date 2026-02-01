@@ -38,14 +38,14 @@ final class JoinDefinition
     private readonly array $columns;
 
     /**
-     * @param ModelFactory              $factory         Factory to resolve the joined model (provides column discovery)
-     * @param DbalMappingConfiguration  $joinConfig      DBAL config of the joined model
-     * @param string|null               $localKey        Foreign key column in the main table (defaults to {relation}_uuid)
-     * @param JoinType                  $type            Type of join (INNER, LEFT, RIGHT)
-     * @param string|null               $alias           Table alias (auto-generated as c1, c2... if null)
-     * @param array<string, string>     $columnOverrides Override auto-discovered column names (model_prop => column_name)
-     * @param string|null               $parentAlias     Parent alias for nested joins (used internally)
-     * @param string|null               $relationName    Relation name for convention-based FK (injected by DbalMappingConfiguration)
+     * @param ModelFactory             $factory         Factory to resolve the joined model (provides column discovery)
+     * @param DbalMappingConfiguration $joinConfig      DBAL config of the joined model
+     * @param string|null              $localKey        Foreign key column in the main table (defaults to {relation}_uuid)
+     * @param JoinType                 $type            Type of join (INNER, LEFT, RIGHT)
+     * @param string|null              $alias           Table alias (auto-generated as c1, c2... if null)
+     * @param array<string, string>    $columnOverrides Override auto-discovered column names (model_prop => column_name)
+     * @param string|null              $parentAlias     Parent alias for nested joins (used internally)
+     * @param string|null              $relationName    Relation name for convention-based FK (injected by DbalMappingConfiguration)
      */
     public function __construct(
         public readonly ModelFactory $factory,
@@ -59,7 +59,7 @@ final class JoinDefinition
     ) {
         // Generate stable alias using static counter
         static $counter = 0;
-        $baseAlias = $alias ?? ('c' . ++$counter);
+        $baseAlias = $alias ?? ('c'.++$counter);
         $this->alias = $parentAlias ? "{$parentAlias}_{$baseAlias}" : $baseAlias;
 
         // Discover columns from factory's model prototype constructor parameters
@@ -79,12 +79,12 @@ final class JoinDefinition
 
                 // If this property is a relation (class type or in joinConfig.joins), use FK convention
                 if (isset($this->joinConfig->joins[$key])) {
-                    return $snakeKey . '_uuid';
+                    return $snakeKey.'_uuid';
                 }
 
                 // Check if the property type is a class (indicates a relation)
                 if (isset($parameterTypes[$key]) && $parameterTypes[$key]['isClass']) {
-                    return $snakeKey . '_uuid';
+                    return $snakeKey.'_uuid';
                 }
 
                 return $snakeKey;
@@ -100,7 +100,7 @@ final class JoinDefinition
      */
     public function getLocalKey(): string
     {
-        return $this->localKey ?? ($this->relationName . '_uuid');
+        return $this->localKey ?? ($this->relationName.'_uuid');
     }
 
     /**
@@ -191,7 +191,8 @@ final class JoinDefinition
         $parts = [];
         foreach ($this->columns as $column) {
             // alias.column AS alias_column
-            $parts[] = sprintf('%s.%s AS %s_%s',
+            $parts[] = sprintf(
+                '%s.%s AS %s_%s',
                 $this->alias,
                 $column,
                 $this->alias,
@@ -208,11 +209,12 @@ final class JoinDefinition
      * Removes prefixed columns and returns clean data keyed by original column names.
      *
      * @param array $row The result row containing prefixed columns
+     *
      * @return array|null Clean data keyed by column names, or null if primary key not found
      */
     public function extractJoinedData(array $row): ?array
     {
-        $prefix = $this->alias . '_';
+        $prefix = $this->alias.'_';
         $prefixLen = strlen($prefix);
         $joinedData = [];
 
@@ -238,9 +240,10 @@ final class JoinDefinition
      */
     public function getPrefixedColumns(): array
     {
-        $prefix = $this->alias . '_';
+        $prefix = $this->alias.'_';
+
         return array_map(
-            static fn(string $col) => $prefix . $col,
+            static fn (string $col) => $prefix.$col,
             $this->columns
         );
     }
@@ -264,6 +267,7 @@ final class JoinDefinition
         foreach ($this->columns as $column) {
             $mapping[$column] = sprintf('%s_%s', $this->alias, $column);
         }
+
         return $mapping;
     }
 
@@ -277,9 +281,9 @@ final class JoinDefinition
     {
         // Get base alias: if we already have a parent, strip it; otherwise use our alias directly
         $baseAlias = $this->alias;
-        if ($this->parentAlias !== null) {
+        if (null !== $this->parentAlias) {
             // Current alias is "parent_base", extract base
-            $prefix = $this->parentAlias . '_';
+            $prefix = $this->parentAlias.'_';
             if (str_starts_with($this->alias, $prefix)) {
                 $baseAlias = substr($this->alias, strlen($prefix));
             }
@@ -304,6 +308,7 @@ final class JoinDefinition
      * Only model classes are marked as relations (excludes value objects, enums, dates).
      *
      * @param class-string $modelClass
+     *
      * @return array<string, array{isClass: bool, type: string|null}>
      */
     private function getConstructorParameterTypes(string $modelClass): array
@@ -314,7 +319,7 @@ final class JoinDefinition
             $refClass = new \ReflectionClass($modelClass);
             $constructor = $refClass->getConstructor();
 
-            if ($constructor === null) {
+            if (null === $constructor) {
                 return $types;
             }
 
@@ -381,7 +386,7 @@ final class JoinDefinition
         }
 
         // Stringable interface is not a model
-        if ($typeName === \Stringable::class) {
+        if (\Stringable::class === $typeName) {
             return false;
         }
 

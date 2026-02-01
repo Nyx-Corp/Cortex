@@ -19,7 +19,7 @@ final class PhpVar
         public readonly string $doc = '',
         mixed $default = self::NO_DEFAULT, // Valeur par défaut, si applicable
     ) {
-        $this->hasDefault = $default !== self::NO_DEFAULT;
+        $this->hasDefault = self::NO_DEFAULT !== $default;
         $this->default = $default;
     }
 

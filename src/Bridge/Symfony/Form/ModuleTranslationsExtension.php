@@ -70,7 +70,7 @@ class ModuleTranslationsExtension extends AbstractTypeExtension
 
         $view->vars['module_name'] = $options['module_name'];
 
-        if ($view->vars['label'] === false || !empty($view->vars['label']) || empty($view->vars['full_name'])) {
+        if (false === $view->vars['label'] || !empty($view->vars['label']) || empty($view->vars['full_name'])) {
             return;
         }
         if (!preg_match('/^([^\[]+)\[(.+)\]$/', $view->vars['full_name'], $m)) {

@@ -32,7 +32,7 @@ class ArrayMapper implements Mapper
 
     private function strategize(string $string): string
     {
-        return $this->format === Strategy::AutoMapCamel
+        return Strategy::AutoMapCamel === $this->format
             ? u($string)->camel()->toString()
             : u($string)->snake()->toString();
     }
@@ -46,7 +46,7 @@ class ArrayMapper implements Mapper
 
     private function mapValue(mixed $value, string $sourceKey, string $destKey): mixed
     {
-        if (is_scalar($value) || $value === null) {
+        if (is_scalar($value) || null === $value) {
             return $value;
         }
 
@@ -84,7 +84,7 @@ class ArrayMapper implements Mapper
             $result[$destKey] = $this->mapValue($source[$mapping], $mapping, $destKey);
         }
 
-        if ($this->automap === Strategy::AutoMapAll) {
+        if (Strategy::AutoMapAll === $this->automap) {
             foreach ($source as $sourceKey => $value) {
                 $destKey = $this->strategize($sourceKey);
 
@@ -92,7 +92,7 @@ class ArrayMapper implements Mapper
                     continue;
                 }
 
-                if (isset($this->mapping[$destKey]) && $this->mapping[$destKey] === Value::Ignore) {
+                if (isset($this->mapping[$destKey]) && Value::Ignore === $this->mapping[$destKey]) {
                     continue;
                 }
 
@@ -100,14 +100,14 @@ class ArrayMapper implements Mapper
                     continue;
                 }
 
-                if (isset($this->mapping[$destKey]) && $this->mapping[$destKey] === Value::Json) {
+                if (isset($this->mapping[$destKey]) && Value::Json === $this->mapping[$destKey]) {
                     $jsonValue = new JsonString($value);
                     $result[$destKey] = is_string($value) ? $jsonValue->decode() : (string) $jsonValue;
                     continue;
                 }
 
-                if (isset($this->mapping[$destKey]) && $this->mapping[$destKey] === Value::Date) {
-                    if ($value === null || $value === '') {
+                if (isset($this->mapping[$destKey]) && Value::Date === $this->mapping[$destKey]) {
+                    if (null === $value || '' === $value) {
                         $result[$destKey] = null;
                         continue;
                     }
@@ -116,7 +116,7 @@ class ArrayMapper implements Mapper
                     continue;
                 }
 
-                if (isset($this->mapping[$destKey]) && $this->mapping[$destKey] === Value::Bool) {
+                if (isset($this->mapping[$destKey]) && Value::Bool === $this->mapping[$destKey]) {
                     $result[$destKey] = is_bool($value) ? (int) $value : (bool) $value;
                     continue;
                 }
@@ -137,7 +137,7 @@ class ArrayMapper implements Mapper
                     $targetColumn = $relation->column;
 
                     // Skip if nullable and value is null
-                    if ($value === null && $relation->nullable) {
+                    if (null === $value && $relation->nullable) {
                         $result[$targetColumn] = null;
                         continue;
                     }
@@ -148,7 +148,7 @@ class ArrayMapper implements Mapper
                     } elseif (is_string($value)) {
                         // tableToModel case: just rename the key
                         $result[$targetColumn] = $value;
-                    } elseif ($value === null && $relation->nullable) {
+                    } elseif (null === $value && $relation->nullable) {
                         $result[$targetColumn] = null;
                     }
                     continue;

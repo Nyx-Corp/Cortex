@@ -18,6 +18,9 @@ class {Model}EditTool
     ) {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function __invoke(
         #[Schema(description: 'UUID of the {Model} to update')]
         string $uuid,
@@ -28,7 +31,7 @@ class {Model}EditTool
                 ->filter(uuid: Uuid::fromString($uuid))
                 ->first();
 
-            if (${model} === null) {
+            if (null === ${model}) {
                 return ['success' => false, 'error' => '{Model} not found'];
             }
 

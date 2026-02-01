@@ -16,7 +16,7 @@ class RemovePrivateConstructorServicesPass implements CompilerPassInterface
         foreach ($container->getDefinitions() as $id => $definition) {
             $class = $definition->getClass();
 
-            if ($class === null) {
+            if (null === $class) {
                 continue;
             }
 
@@ -28,7 +28,7 @@ class RemovePrivateConstructorServicesPass implements CompilerPassInterface
                 $reflection = new \ReflectionClass($class);
                 $constructor = $reflection->getConstructor();
 
-                if ($constructor !== null && $constructor->isPrivate()) {
+                if (null !== $constructor && $constructor->isPrivate()) {
                     $container->removeDefinition($id);
                 }
             } catch (\ReflectionException) {

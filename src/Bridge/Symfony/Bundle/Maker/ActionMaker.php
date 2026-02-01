@@ -93,7 +93,8 @@ final class ActionMaker extends CortexMaker
                     '{action}' => $actionUnicode->snake()->toString(),
                     '{Action}' => $Action = $actionUnicode->camel()->title()->toString(),
                     '{ActionForm}' => $Action,
-                    '{tool_name}' => sprintf('%s-%s-%s',
+                    '{tool_name}' => sprintf(
+                        '%s-%s-%s',
                         $domainUnicode->snake()->replace('_', '-')->toString(),
                         $modelUnicode->snake()->replace('_', '-')->toString(),
                         $actionUnicode->snake()->replace('_', '-')->toString()

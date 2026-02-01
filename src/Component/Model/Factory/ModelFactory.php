@@ -81,7 +81,7 @@ class ModelFactory
             builder: fn (StructuredMap $arguments) => $this->creationMiddlewares
                 ->compile(new CreationCommand($this->modelClass, $arguments))
                 ->map(fn (array $modelData) => $this->instancePipeline($modelData))
-                ->filter(fn ($model) => $model !== null)
+                ->filter(fn ($model) => null !== $model)
                 ->first()
         );
     }
@@ -94,7 +94,7 @@ class ModelFactory
             resolver: fn (ModelQuery $query) => $this->fetchingMiddlewares
                 ->compile($query)
                 ->map(fn (array $modelData) => $this->instancePipeline($modelData))
-                ->filter(fn ($model) => $model !== null)
+                ->filter(fn ($model) => null !== $model)
         );
     }
 }

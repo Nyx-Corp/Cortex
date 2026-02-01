@@ -128,7 +128,7 @@ class AsyncCollectionTest extends TestCase
     public function testFilterIntegers(): void
     {
         $result = AsyncCollection::create([1, 2, 3, 4, 5])
-            ->filter(fn ($x) => $x % 2 === 0)
+            ->filter(fn ($x) => 0 === $x % 2)
             ->toArray();
 
         $this->assertEquals([2, 4], array_values($result));
@@ -191,7 +191,7 @@ class AsyncCollectionTest extends TestCase
     public function testReduceConcat(): void
     {
         $result = AsyncCollection::create(['a', 'b', 'c'])
-            ->reduce(fn ($acc, $x) => $acc . $x, '');
+            ->reduce(fn ($acc, $x) => $acc.$x, '');
 
         $this->assertEquals('abc', $result);
     }
@@ -227,7 +227,7 @@ class AsyncCollectionTest extends TestCase
     public function testReduceWithKeyAccess(): void
     {
         $result = AsyncCollection::create(['a' => 1, 'b' => 2, 'c' => 3])
-            ->reduce(fn ($acc, $value, $key) => $acc . "$key=$value,", '');
+            ->reduce(fn ($acc, $value, $key) => $acc."$key=$value,", '');
 
         $this->assertEquals('a=1,b=2,c=3,', $result);
     }
@@ -249,7 +249,7 @@ class AsyncCollectionTest extends TestCase
     public function testFilterThenMap(): void
     {
         $result = AsyncCollection::create([1, 2, 3, 4, 5])
-            ->filter(fn ($x) => $x % 2 === 0)  // [2, 4]
+            ->filter(fn ($x) => 0 === $x % 2)  // [2, 4]
             ->map(fn ($x) => $x * 10)          // [20, 40]
             ->toArray();
 
@@ -280,8 +280,8 @@ class AsyncCollectionTest extends TestCase
     public function testMultipleFilters(): void
     {
         $result = AsyncCollection::create(range(1, 20))
-            ->filter(fn ($x) => $x % 2 === 0)   // even
-            ->filter(fn ($x) => $x % 3 === 0)   // divisible by 3
+            ->filter(fn ($x) => 0 === $x % 2)   // even
+            ->filter(fn ($x) => 0 === $x % 3)   // divisible by 3
             ->toArray();
 
         $this->assertEquals([6, 12, 18], array_values($result));
@@ -401,7 +401,7 @@ class AsyncCollectionTest extends TestCase
     public function testCountAfterFilter(): void
     {
         $count = AsyncCollection::create([1, 2, 3, 4, 5])
-            ->filter(fn ($x) => $x % 2 === 0)
+            ->filter(fn ($x) => 0 === $x % 2)
             ->count();
 
         $this->assertEquals(2, $count);
@@ -550,7 +550,7 @@ class AsyncCollectionTest extends TestCase
     public function testLargeCollection(): void
     {
         $result = AsyncCollection::create(range(1, 10000))
-            ->filter(fn ($x) => $x % 1000 === 0)
+            ->filter(fn ($x) => 0 === $x % 1000)
             ->toArray();
 
         $this->assertEquals([1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000], array_values($result));
@@ -559,7 +559,7 @@ class AsyncCollectionTest extends TestCase
     public function testWithNullValues(): void
     {
         $result = AsyncCollection::create([1, null, 2, null, 3])
-            ->filter(fn ($x) => $x !== null)
+            ->filter(fn ($x) => null !== $x)
             ->toArray();
 
         $this->assertEquals([1, 2, 3], array_values($result));

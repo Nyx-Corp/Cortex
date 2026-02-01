@@ -13,8 +13,8 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -201,13 +201,13 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
             $view->vars['sorts'][$sortField] = [
                 'asc' => [
                     'name' => $view['sort']->vars['full_name'],
-                    'value' => $sortField . '_asc',
-                    'checked' => $currentSort === $sortField . '_asc',
+                    'value' => $sortField.'_asc',
+                    'checked' => $currentSort === $sortField.'_asc',
                 ],
                 'desc' => [
                     'name' => $view['sort']->vars['full_name'],
-                    'value' => $sortField . '_desc',
-                    'checked' => $currentSort === $sortField . '_desc',
+                    'value' => $sortField.'_desc',
+                    'checked' => $currentSort === $sortField.'_desc',
                 ],
             ];
         }

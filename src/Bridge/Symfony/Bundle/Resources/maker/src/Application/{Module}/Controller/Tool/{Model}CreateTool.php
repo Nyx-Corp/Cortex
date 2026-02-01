@@ -15,6 +15,9 @@ class {Model}CreateTool
     ) {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function __invoke(
         // TODO: Add required fields for creation
     ): array {

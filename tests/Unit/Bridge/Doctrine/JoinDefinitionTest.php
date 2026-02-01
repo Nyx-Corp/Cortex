@@ -18,7 +18,8 @@ class TestOrg
         public string $uuid,
         public string $name,
         public ?TestOrg $parent = null,
-    ) {}
+    ) {
+    }
 }
 
 class TestClubModel
@@ -27,7 +28,8 @@ class TestClubModel
         public string $uuid,
         public string $name,
         public ?TestOrg $organisation = null,
-    ) {}
+    ) {
+    }
 }
 
 /**
@@ -110,11 +112,11 @@ class JoinDefinitionTest extends TestCase
         ];
 
         foreach ($testCases as $relationName => $expectedLocalKey) {
-            $join = (new JoinDefinition(
+            $join = new JoinDefinition(
                 factory: $factory,
                 joinConfig: $config,
-                alias: 'test_' . $relationName,
-            ))->withRelationName($relationName);
+                alias: 'test_'.$relationName,
+            )->withRelationName($relationName);
 
             $this->assertEquals(
                 $expectedLocalKey,
@@ -283,11 +285,11 @@ class JoinDefinitionTest extends TestCase
             modelClass: TestOrg::class,
         );
 
-        $original = (new JoinDefinition(
+        $original = new JoinDefinition(
             factory: $orgFactory,
             joinConfig: $orgConfig,
             alias: 'base',
-        ))->withRelationName('organisation');
+        )->withRelationName('organisation');
 
         // getLocalKey before withParentAlias
         $this->assertEquals('organisation_uuid', $original->getLocalKey());
@@ -313,12 +315,12 @@ class JoinDefinitionTest extends TestCase
             primaryKey: 'uuid',
         );
 
-        $join = (new JoinDefinition(
+        $join = new JoinDefinition(
             factory: $orgFactory,
             joinConfig: $orgConfig,
             // No localKey - uses convention
             alias: 'sql_test',
-        ))->withRelationName('organisation');
+        )->withRelationName('organisation');
 
         $sql = $join->toSql('main_table');
 
@@ -336,12 +338,12 @@ class JoinDefinitionTest extends TestCase
             primaryKey: 'uuid',
         );
 
-        $join = (new JoinDefinition(
+        $join = new JoinDefinition(
             factory: $orgFactory,
             joinConfig: $orgConfig,
             localKey: 'custom_fk_column', // Explicit
             alias: 'sql_explicit',
-        ))->withRelationName('organisation');
+        )->withRelationName('organisation');
 
         $sql = $join->toSql('main_table');
 

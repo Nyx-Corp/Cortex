@@ -47,7 +47,7 @@ final class PhpMethod
             is_int($value) => new Scalar\LNumber($value),
             is_float($value) => new Scalar\DNumber($value),
             is_bool($value) => new Expr\ConstFetch(new Name($value ? 'true' : 'false')),
-            $value === null => new Expr\ConstFetch(new Name('null')),
+            null === $value => new Expr\ConstFetch(new Name('null')),
             is_array($value) => new Expr\Array_([]), // simpliste, tu peux l'améliorer
             default => throw new \InvalidArgumentException('Unsupported default value type'),
         };
@@ -77,7 +77,7 @@ final class PhpMethod
             $type = $var->type;
 
             if ($var->hasDefault) {
-                if ($var->default === null) {
+                if (null === $var->default) {
                     $type = new NullableType(
                         $var->isScalar()
                             ? new Name($var->type)
@@ -112,10 +112,10 @@ final class PhpMethod
 
         if ($this->doc) {
             $method->setDocComment(trim(<<<PHPDOC
-                /**
-                 * $this->doc
-                 */
-            PHPDOC));
+                    /**
+                     * $this->doc
+                     */
+                PHPDOC));
         }
 
         return $method->getNode();

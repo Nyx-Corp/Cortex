@@ -61,7 +61,7 @@ class ControllerRouteLoader extends Loader
      * Resource can be: 'admin', 'api', 'front', etc.
      * Matches against namespace patterns:
      *   - Application\{Resource}\Controller\Action (e.g., Application\Admin\Controller\Action)
-     *   - Controller\Action\{Resource} (e.g., Application\Contact\Controller\Action\Admin)
+     *   - Controller\Action\{Resource} (e.g., Application\Contact\Controller\Action\Admin).
      */
     private function matchesResource(string $controllerClass, string $resource): bool
     {
@@ -99,7 +99,7 @@ class ControllerRouteLoader extends Loader
     {
         $prefix = $this->getNamespacePrefix($reflection);
         $routeName = $routeAttr->name
-            ? $prefix . $routeAttr->name
+            ? $prefix.$routeAttr->name
             : $this->generateRouteName($reflection);
 
         $defaults = $routeAttr->defaults;
@@ -119,7 +119,7 @@ class ControllerRouteLoader extends Loader
     /**
      * Extract prefix from namespace.
      *   - Application\Contact\Controller\Action\Admin → 'admin/'
-     *   - Application\Admin\Controller\Action → '' (no prefix for main module)
+     *   - Application\Admin\Controller\Action → '' (no prefix for main module).
      */
     private function getNamespacePrefix(\ReflectionClass $reflection): string
     {
@@ -127,7 +127,7 @@ class ControllerRouteLoader extends Loader
 
         // Pattern: Controller\Action\{SubModule} (e.g., Contact module's Admin controllers)
         if (preg_match('/Controller\\\\Action\\\\(\w+)$/', $namespace, $matches)) {
-            return strtolower($matches[1]) . '/';
+            return strtolower($matches[1]).'/';
         }
 
         // Pattern: Application\{Module}\Controller\Action (main module, no extra prefix)
@@ -149,7 +149,7 @@ class ControllerRouteLoader extends Loader
         // Extract module from namespace (e.g., 'Admin' from 'Controller\Action\Admin')
         $prefix = '';
         if (preg_match('/Controller\\\\Action\\\\(\w+)$/', $namespace, $matches)) {
-            $prefix = strtolower($matches[1]) . '/';
+            $prefix = strtolower($matches[1]).'/';
         }
 
         // Extract model/action from class name (e.g., ContactListAction → contact/index)
@@ -160,18 +160,18 @@ class ControllerRouteLoader extends Loader
             $action = strtolower($matches[2]);
 
             // Normalize 'list' to 'index'
-            if ($action === 'list') {
+            if ('list' === $action) {
                 $action = 'index';
             }
 
-            return $prefix . $model . '/' . $action;
+            return $prefix.$model.'/'.$action;
         }
 
-        return $prefix . strtolower($name);
+        return $prefix.strtolower($name);
     }
 
     public function supports(mixed $resource, ?string $type = null): bool
     {
-        return $type === 'cortex';
+        return 'cortex' === $type;
     }
 }

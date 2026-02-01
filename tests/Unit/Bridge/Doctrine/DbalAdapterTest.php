@@ -28,7 +28,8 @@ class TestOrganisation
     public function __construct(
         public string $uuid,
         public string $name,
-    ) {}
+    ) {
+    }
 }
 
 class TestClub
@@ -37,7 +38,8 @@ class TestClub
         public string $uuid,
         public string $name,
         public ?TestOrganisation $organisation = null,
-    ) {}
+    ) {
+    }
 }
 
 /**
@@ -65,7 +67,7 @@ class DbalAdapterTest extends TestCase
         $filters->declare('uuid', nullable: true);
 
         return new ModelQuery(
-            resolver: fn() => yield from [],
+            resolver: fn () => yield from [],
             modelCollectionClass: new RegisteredClass(ModelCollection::class),
             filters: $filters,
         );
@@ -77,9 +79,10 @@ class DbalAdapterTest extends TestCase
     private function createLastMiddleware(): Middleware
     {
         // Create a middleware without a next, so isLast will be true
-        $middleware = new Middleware(fn($chain, $cmd) => yield from []);
+        $middleware = new Middleware(fn ($chain, $cmd) => yield from []);
         // wrap() with null makes isLast = true
         $middleware->wrap(null, []);
+
         return $middleware;
     }
 
@@ -331,7 +334,7 @@ class DbalAdapterTest extends TestCase
             ->with(
                 TestOrganisation::class,
                 'org-uuid-123',
-                $this->callback(fn($data) => $data['uuid'] === 'org-uuid-123')
+                $this->callback(fn ($data) => 'org-uuid-123' === $data['uuid'])
             );
 
         $adapter = new DbalAdapter($this->connection, $config, $this->preloader);

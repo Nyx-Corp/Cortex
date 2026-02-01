@@ -10,7 +10,7 @@ trait Archivable
 
     public function isArchived(): bool
     {
-        return $this->archivedAt !== null;
+        return null !== $this->archivedAt;
     }
 
     public function archive(?\DateTimeInterface $archivedAt = null): void

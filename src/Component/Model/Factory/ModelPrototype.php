@@ -2,8 +2,8 @@
 
 namespace Cortex\Component\Model\Factory;
 
-use Cortex\Component\Model\Query\Operator;
 use Cortex\Component\Collection\StructuredMap;
+use Cortex\Component\Model\Query\Operator;
 use Cortex\ValueObject\RegisteredClass;
 
 class ModelPrototype

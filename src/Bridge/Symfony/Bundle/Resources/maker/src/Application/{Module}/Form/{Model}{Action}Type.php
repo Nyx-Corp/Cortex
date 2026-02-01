@@ -7,6 +7,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class {Model}{Action}Type extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
@@ -17,9 +20,7 @@ class {Model}{Action}Type extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     * @return void
+     * @param array<string, mixed> $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

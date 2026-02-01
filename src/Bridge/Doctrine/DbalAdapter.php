@@ -39,8 +39,8 @@ class DbalAdapter
         $stmt = $this->dbalConnection->executeQuery(
             $query,
             array_map(
-                static fn ($param) => match(true) {
-                    $param === null => null,
+                static fn ($param) => match (true) {
+                    null === $param => null,
                     $param instanceof \BackedEnum => $param->value,
                     is_string($param) => preg_filter(self::$operatorFilterPattern, '', $param) ?? $param,
                     is_scalar($param) => $param,
@@ -50,8 +50,8 @@ class DbalAdapter
                 $params
             ),
             array_map(
-                static fn ($param) => match(true) {
-                    $param === null => ParameterType::NULL,
+                static fn ($param) => match (true) {
+                    null === $param => ParameterType::NULL,
                     is_array($param) => ArrayParameterType::STRING,
                     default => ParameterType::STRING,
                 },
@@ -75,7 +75,7 @@ class DbalAdapter
                 // Qualify column with main table if joins exist and column is not already qualified
                 $column = $key;
                 if ($hasJoins && !str_contains($key, '.')) {
-                    $column = $this->configuration->table . '.' . $key;
+                    $column = $this->configuration->table.'.'.$key;
                 }
 
                 // Use unqualified key for parameter binding
@@ -118,13 +118,13 @@ class DbalAdapter
         $joinSelectFields = $this->configuration->buildJoinSelectFields();
 
         // Enhance fields with join fields when selecting all
-        if ($fields === '*' && $joinSelectFields !== '') {
-            $fields = $this->configuration->table . '.*, ' . $joinSelectFields;
+        if ('*' === $fields && '' !== $joinSelectFields) {
+            $fields = $this->configuration->table.'.*, '.$joinSelectFields;
         }
 
         // Qualify sortBy with table name if it's not already qualified and joins exist
         if ($sortBy && !empty($this->configuration->joins) && !str_contains($sortBy, '.')) {
-            $sortBy = $this->configuration->table . '.' . $sortBy;
+            $sortBy = $this->configuration->table.'.'.$sortBy;
         }
 
         // When groupBy is specified, use subquery to get unique primary keys first
@@ -148,9 +148,9 @@ class DbalAdapter
                 $this->configuration->table,
                 $this->configuration->pivotKey,
                 $subquery,
-                $sortBy ? ' ORDER BY ' . $sortBy . ' ' . strtoupper($sortDirection) : '',
-                $limit > 0 ? ' LIMIT ' . $limit : '',
-                $limit > 0 && $offset !== null ? ' OFFSET ' . $offset : '',
+                $sortBy ? ' ORDER BY '.$sortBy.' '.strtoupper($sortDirection) : '',
+                $limit > 0 ? ' LIMIT '.$limit : '',
+                $limit > 0 && null !== $offset ? ' OFFSET '.$offset : '',
             ));
         }
 
@@ -162,7 +162,7 @@ class DbalAdapter
             $this->where($params),
             $sortBy ? ' ORDER BY '.$sortBy.' '.strtoupper($sortDirection) : '',
             $limit > 0 ? ' LIMIT '.$limit : '',
-            $limit > 0 && $offset !== null ? ' OFFSET '.$offset : '',
+            $limit > 0 && null !== $offset ? ' OFFSET '.$offset : '',
         ));
     }
 
@@ -290,7 +290,7 @@ class DbalAdapter
             $count = iterator_to_array($this->query($this->count($filters, $groupBy), $queryParams))[0]['count'] ?? 0;
             $query->pager->bind($count);
 
-            if ($count === 0) {
+            if (0 === $count) {
                 yield from [];
 
                 return; // no results
@@ -309,7 +309,7 @@ class DbalAdapter
             // Check if sortBy targets a joined table
             $joinInfo = $this->configuration->resolveJoinFilter($query->sorter->field);
             if ($joinInfo) {
-                $sortBy = $joinInfo['join']->getAlias() . '.' . $this->toSnakeCase($joinInfo['field']);
+                $sortBy = $joinInfo['join']->getAlias().'.'.$this->toSnakeCase($joinInfo['field']);
             }
         }
 
@@ -331,7 +331,7 @@ class DbalAdapter
         if ($chain->isLast) {
             foreach ($results as $dataLine) {
                 $identifierValue = $dataLine[$this->configuration->pivotKey] ?? null;
-                if ($identifierValue === null) {
+                if (null === $identifierValue) {
                     throw new \InvalidArgumentException(sprintf('Identifier "%s" not found in data line: %s', $this->configuration->pivotKey, new JsonString($dataLine)));
                 }
 
@@ -356,10 +356,9 @@ class DbalAdapter
 
         // try to map results to next middleware
         foreach ($chain->next() as $identifier => $dataLine) {
-
             // find the identifier in results
             $resultLine = $results->find(static fn ($line) => $line[$this->configuration->pivotKey] === $identifier);
-            if ($resultLine === null) {
+            if (null === $resultLine) {
                 // log ?
                 yield $identifier => $dataLine; // pass through unchanged
                 continue;
@@ -393,10 +392,10 @@ class DbalAdapter
      * so the related mapper can use them instead of executing a separate query.
      * Supports nested JOINs up to the configured joinDepth.
      *
-     * @param array                        $dataLine The data row containing prefixed columns
+     * @param array                             $dataLine The data row containing prefixed columns
      * @param array<string,JoinDefinition>|null $joins    Joins to process (null = use configuration)
-     * @param int                          $depth    Current recursion depth
-     * @param array                        $visited  Visited model classes to prevent circular refs
+     * @param int                               $depth    Current recursion depth
+     * @param array                             $visited  Visited model classes to prevent circular refs
      */
     private function preloadJoinedData(
         array $dataLine,
@@ -424,13 +423,13 @@ class DbalAdapter
 
             // Use JoinDefinition's extractJoinedData method
             $joinedData = $join->extractJoinedData($dataLine);
-            if ($joinedData === null) {
+            if (null === $joinedData) {
                 continue;
             }
 
             // Get identifier from joined data (primary key)
             $identifier = $joinedData[$join->getForeignKey()] ?? null;
-            if ($identifier === null) {
+            if (null === $identifier) {
                 continue;
             }
 
@@ -466,10 +465,10 @@ class DbalAdapter
      * to convert it to the relation property name.
      * Supports nested JOINs up to the configured joinDepth.
      *
-     * @param array                        $dataLine The data row containing prefixed columns
+     * @param array                             $dataLine The data row containing prefixed columns
      * @param array<string,JoinDefinition>|null $joins    Joins to process (null = use configuration)
-     * @param int                          $depth    Current recursion depth
-     * @param array                        $visited  Visited model classes to prevent circular refs
+     * @param int                               $depth    Current recursion depth
+     * @param array                             $visited  Visited model classes to prevent circular refs
      */
     private function stripJoinedColumns(
         array $dataLine,
@@ -532,7 +531,7 @@ class DbalAdapter
             $value = $mappedData[$relationName] ?? null;
 
             // Skip if null, already an object, or not a string UUID
-            if ($value === null || !is_string($value)) {
+            if (null === $value || !is_string($value)) {
                 continue;
             }
 
@@ -558,7 +557,7 @@ class DbalAdapter
 
             if ($joinInfo) {
                 // Convert to qualified column name: alias.snake_case_field
-                $qualifiedKey = $joinInfo['join']->getAlias() . '.' . $this->toSnakeCase($joinInfo['field']);
+                $qualifiedKey = $joinInfo['join']->getAlias().'.'.$this->toSnakeCase($joinInfo['field']);
                 $resolved[$qualifiedKey] = $value;
             } else {
                 $resolved[$key] = $value;

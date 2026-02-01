@@ -4,10 +4,10 @@ namespace Cortex\Bridge\Symfony\Collection;
 
 use Cortex\Bridge\Symfony\Form\CollectionDecoratorType;
 use Cortex\Component\Collection\AsyncCollection;
-use Cortex\Component\Model\Factory\Builder\FetchBuilder;
 use Cortex\Component\Model\Decorator\Pager;
 use Cortex\Component\Model\Decorator\SortDirection;
 use Cortex\Component\Model\Decorator\Sorter;
+use Cortex\Component\Model\Factory\Builder\FetchBuilder;
 use Cortex\ValueObject\RegisteredClass;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;

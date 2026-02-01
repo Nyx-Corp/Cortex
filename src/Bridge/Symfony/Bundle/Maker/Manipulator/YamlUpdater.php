@@ -30,7 +30,7 @@ final class YamlUpdater
 
         $keys = array_keys($this->configData);
 
-        if ($beforeKey === null || !in_array($beforeKey, $keys, true)) {
+        if (null === $beforeKey || !in_array($beforeKey, $keys, true)) {
             array_unshift($keys, $entryName);
         } else {
             $beforeKeyIndex = array_search($beforeKey, $keys, true);

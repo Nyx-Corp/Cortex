@@ -86,7 +86,7 @@ class ArrayMapperTest extends TestCase
     public function testCallbackWithContext(): void
     {
         $mapper = new ArrayMapper([
-            'processed' => fn ($value, $key, $extra) => $value . '-' . $extra,
+            'processed' => fn ($value, $key, $extra) => $value.'-'.$extra,
         ], sourceKeys: ['processed']);
 
         // Context is passed as variadic arguments

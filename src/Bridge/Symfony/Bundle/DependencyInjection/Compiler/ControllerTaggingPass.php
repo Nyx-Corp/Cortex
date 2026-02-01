@@ -20,7 +20,7 @@ class ControllerTaggingPass implements CompilerPassInterface
         foreach ($container->getDefinitions() as $id => $definition) {
             $class = $definition->getClass();
 
-            if ($class === null) {
+            if (null === $class) {
                 continue;
             }
 

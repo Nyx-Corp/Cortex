@@ -98,7 +98,7 @@ class StructuredMapTest extends TestCase
     public function testCustomValidationCallback(): void
     {
         $map = new StructuredMap();
-        $map->declare('email', fn ($v) => filter_var($v, FILTER_VALIDATE_EMAIL) !== false);
+        $map->declare('email', fn ($v) => false !== filter_var($v, FILTER_VALIDATE_EMAIL));
 
         $map->set('email', 'valid@test.com');
         $this->assertEquals('valid@test.com', $map->get('email'));
@@ -143,7 +143,7 @@ class StructuredMapTest extends TestCase
     public function testNullableWithValidation(): void
     {
         $map = new StructuredMap();
-        $map->declare('email', fn ($v) => filter_var($v, FILTER_VALIDATE_EMAIL) !== false, nullable: true);
+        $map->declare('email', fn ($v) => false !== filter_var($v, FILTER_VALIDATE_EMAIL), nullable: true);
 
         // Null is OK for nullable
         $map->set('email', null);
@@ -478,7 +478,7 @@ class StructuredMapTest extends TestCase
     public function testPrototypePreservesValidation(): void
     {
         $map = new StructuredMap();
-        $map->declare('email', fn ($v) => filter_var($v, FILTER_VALIDATE_EMAIL) !== false);
+        $map->declare('email', fn ($v) => false !== filter_var($v, FILTER_VALIDATE_EMAIL));
 
         $prototype = $map->prototype();
 
@@ -595,7 +595,7 @@ class StructuredMapTest extends TestCase
     {
         $map = new StructuredMap(
             elements: ['email' => null],
-            validation: ['email' => fn ($v) => filter_var($v, FILTER_VALIDATE_EMAIL) !== false],
+            validation: ['email' => fn ($v) => false !== filter_var($v, FILTER_VALIDATE_EMAIL)],
             nullables: ['email'],
         );
 

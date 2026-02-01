@@ -104,7 +104,7 @@ class ModelQueryDecorator extends ModelQuery
     }
 
     /**
-     * Parse Gmail-style query string: "field:value field2:value2"
+     * Parse Gmail-style query string: "field:value field2:value2".
      */
     private function parseQueryString(string $query): void
     {
@@ -137,7 +137,7 @@ class ModelQueryDecorator extends ModelQuery
     }
 
     /**
-     * Format filter value for display in chips
+     * Format filter value for display in chips.
      */
     private function formatFilterDisplay(string $field, string $value): string
     {
@@ -158,7 +158,7 @@ class ModelQueryDecorator extends ModelQuery
 
         // For boolean
         if (($config['type'] ?? '') === 'boolean') {
-            return $value === 'true' || $value === '1' ? 'Oui' : 'Non';
+            return 'true' === $value || '1' === $value ? 'Oui' : 'Non';
         }
 
         return $value;

@@ -102,7 +102,7 @@ class ControllerSubscriber implements EventSubscriberInterface
         }
 
         // json ?
-        if ($format === 'json') {
+        if ('json' === $format) {
             $event->setResponse(new JsonResponse(
                 $result = $event->getControllerResult(),
                 empty($result) ? Response::HTTP_NO_CONTENT : Response::HTTP_OK,
@@ -119,7 +119,7 @@ class ControllerSubscriber implements EventSubscriberInterface
     public function onKernelException(ExceptionEvent $event): void
     {
         $request = $event->getRequest();
-        if ($request->getRequestFormat() !== 'json') {
+        if ('json' !== $request->getRequestFormat()) {
             return;
         }
 

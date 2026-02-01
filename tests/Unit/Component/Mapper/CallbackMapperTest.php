@@ -30,8 +30,8 @@ class CallbackMapperTest extends TestCase
     public function testCallbackAccessesAllData(): void
     {
         $mapper = new CallbackMapper(fn ($data) => [
-            'fullName' => $data['first'] . ' ' . $data['last'],
-            'initials' => $data['first'][0] . $data['last'][0],
+            'fullName' => $data['first'].' '.$data['last'],
+            'initials' => $data['first'][0].$data['last'][0],
         ]);
 
         $result = $mapper->map(['first' => 'John', 'last' => 'Doe']);
@@ -108,7 +108,7 @@ class CallbackMapperTest extends TestCase
     public function testCallbackWithMultipleContextArgs(): void
     {
         $mapper = new CallbackMapper(function ($data, &$dest, $prefix, $suffix) {
-            return ['result' => $prefix . $data['value'] . $suffix];
+            return ['result' => $prefix.$data['value'].$suffix];
         });
 
         $dest = [];
@@ -137,9 +137,9 @@ class CallbackMapperTest extends TestCase
 
             foreach ($data as $key => $value) {
                 if (is_numeric($value)) {
-                    $result[$key . '_doubled'] = $value * 2;
+                    $result[$key.'_doubled'] = $value * 2;
                 } elseif (is_string($value)) {
-                    $result[$key . '_upper'] = strtoupper($value);
+                    $result[$key.'_upper'] = strtoupper($value);
                 }
             }
 

@@ -3,6 +3,7 @@
 namespace Application\{Module}\Controller\Action;
 
 use Cortex\Bridge\Symfony\Controller\ControllerInterface;
+use Cortex\Bridge\Symfony\Model\Query\ModelQueryDecorator;
 use Domain\{Domain}\Factory\{Model}Factory;
 use Domain\{Domain}\Model\{Model}Collection;
 use Symfony\Component\Form\Extension\Core\Type as Form;
@@ -25,6 +26,9 @@ class {Model}ListAction implements ControllerInterface
     ) {
     }
 
+    /**
+     * @return array<string, mixed>|Response
+     */
     public function __invoke({Model}Collection ${model}s): array|Response
     {
         /** @var ModelQueryDecorator $query */
@@ -34,17 +38,15 @@ class {Model}ListAction implements ControllerInterface
         // The Gmail-style query parser allows overriding with ?q=archivedAt:true
         // $query->filter(archivedAt: null);
 
-        $query
-            ->decorate(
-                // Define sortable columns (must match template _th/_td blocks)
-                sortables: [/* 'firstname', 'lastname' */],
-                filters: fn (FormBuilderInterface $filtersFormBuilder) => $filtersFormBuilder
-                    // ->add('firstname', Form\TextType::class)
-                    // ->add('lastname', Form\TextType::class)
-                    // If model uses Archivable trait, add this filter for ?q=archivedAt:true support:
-                    // ->add('archivedAt', Form\CheckboxType::class, ['required' => false, 'label' => 'Archivé'])
-            )
-        ;
+        $query->decorate(
+            // Define sortable columns (must match template _th/_td blocks)
+            sortables: [/* 'firstname', 'lastname' */],
+            filters: fn (FormBuilderInterface $filtersFormBuilder) => $filtersFormBuilder
+                // ->add('firstname', Form\TextType::class)
+                // ->add('lastname', Form\TextType::class)
+                // If model uses Archivable trait, add this filter for ?q=archivedAt:true support:
+                // ->add('archivedAt', Form\CheckboxType::class, ['required' => false, 'label' => 'Archivé'])
+        );
 
         return [
             'collection' => ${model}s->toArray(),

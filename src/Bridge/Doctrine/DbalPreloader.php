@@ -45,6 +45,7 @@ interface DbalPreloader
      *
      * @param class-string $modelClass The model class
      * @param string       $identifier The unique identifier
+     *
      * @return array|null The cached data or null if not found
      */
     public function get(string $modelClass, string $identifier): ?array;

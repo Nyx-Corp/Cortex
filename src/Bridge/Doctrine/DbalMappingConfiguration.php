@@ -97,7 +97,7 @@ class DbalMappingConfiguration
             $clauses[] = $this->buildJoinClausesRecursive($join, $this->table, 1, []);
         }
 
-        return ' ' . implode(' ', array_filter($clauses));
+        return ' '.implode(' ', array_filter($clauses));
     }
 
     /**
@@ -141,8 +141,8 @@ class DbalMappingConfiguration
                 $currentDepth + 1,
                 $visited
             );
-            if ($nestedSql !== '') {
-                $sql .= ' ' . $nestedSql;
+            if ('' !== $nestedSql) {
+                $sql .= ' '.$nestedSql;
             }
         }
 
@@ -198,7 +198,7 @@ class DbalMappingConfiguration
 
         // Add fields for this join
         $selectFields = $join->getSelectFields();
-        if ($selectFields !== '') {
+        if ('' !== $selectFields) {
             $fields[] = $selectFields;
         }
 
@@ -223,6 +223,7 @@ class DbalMappingConfiguration
      * Underscore notation is useful for form field names which don't allow dots.
      *
      * @param string $filterKey The filter key to check
+     *
      * @return array{join: JoinDefinition, field: string}|null The join and field if found
      */
     public function resolveJoinFilter(string $filterKey): ?array
@@ -240,9 +241,10 @@ class DbalMappingConfiguration
 
         // Check for underscore notation: "relation_field" (for form compatibility)
         foreach ($this->joins as $relationName => $join) {
-            $prefix = $relationName . '_';
+            $prefix = $relationName.'_';
             if (str_starts_with($filterKey, $prefix)) {
                 $field = substr($filterKey, strlen($prefix));
+
                 return [
                     'join' => $join,
                     'field' => $field,
@@ -259,6 +261,7 @@ class DbalMappingConfiguration
      * Maps model field name (e.g., 'contact') to qualified column (e.g., 'contact_role.contact_uuid').
      *
      * @param string $field Model field name
+     *
      * @return string Qualified SQL column name
      */
     public function resolveUniqueField(string $field): string
@@ -270,11 +273,11 @@ class DbalMappingConfiguration
 
             if ($column && $column !== $field) {
                 // Qualify with table name
-                return $this->table . '.' . $column;
+                return $this->table.'.'.$column;
             }
         }
 
         // Fallback: use field as-is, qualified with table name
-        return $this->table . '.' . $field;
+        return $this->table.'.'.$field;
     }
 }

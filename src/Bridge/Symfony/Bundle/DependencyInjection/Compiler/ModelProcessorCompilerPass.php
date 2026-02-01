@@ -124,7 +124,7 @@ class ModelProcessorCompilerPass implements CompilerPassInterface
                     $container->setDefinition($proxyId, $proxyDefinition);
 
                     $scopes = [$strategy];
-                    if ($strategy === Scope::All) {
+                    if (Scope::All === $strategy) {
                         $scopes = Scope::cases();
                     }
 

@@ -96,7 +96,7 @@ class PathCollection extends FileCollection
             ->map(function (array $fileInfo) {
                 $destFolder = dirname($fileInfo['dest_path']);
                 if (!$this->filesystem->exists($destFolder)) {
-                    $this->filesystem->mkdir($destFolder, 0755);
+                    $this->filesystem->mkdir($destFolder, 0o755);
                 }
 
                 $this->filesystem->dumpFile($fileInfo['dest_path'], str_replace(

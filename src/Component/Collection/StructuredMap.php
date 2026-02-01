@@ -21,11 +21,11 @@ class StructuredMap implements \IteratorAggregate, \Countable
     ) {
         foreach ($validation as $key => $validation) {
             $nullableIndex = array_search($key, $nullables);
-            if ($nullableIndex !== false) {
+            if (false !== $nullableIndex) {
                 unset($nullables[$nullableIndex]);
             }
 
-            $this->declare($key, $validation, $nullableIndex !== false);
+            $this->declare($key, $validation, false !== $nullableIndex);
         }
 
         foreach ($nullables as $nullable) {
@@ -88,8 +88,8 @@ class StructuredMap implements \IteratorAggregate, \Countable
     {
         $mappedKey = $this->assertMappedKey($key);
 
-        if ($value === null) {
-            if (!isset($this->nullables[$mappedKey]) || $this->nullables[$mappedKey] === false) {
+        if (null === $value) {
+            if (!isset($this->nullables[$mappedKey]) || false === $this->nullables[$mappedKey]) {
                 throw new \InvalidArgumentException('Not null');
             }
 

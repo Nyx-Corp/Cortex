@@ -2,9 +2,9 @@
 
 namespace Application\{Module}\Controller\Action;
 
+use Application\{Module}\Form\{Model}EditType;
 use Cortex\Bridge\Symfony\Controller\ControllerInterface;
 use Cortex\Component\Exception\DomainException;
-use Application\{Module}\Form\{Model}EditType;
 use Domain\{Domain}\Model\{Model};
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -15,8 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Handles {Model} creation/edition form
- *
+ * Handles {Model} creation/edition form.
  */
 #[Route(name: '{model}/create', path: '/{model}/create', methods: ['GET', 'POST'])]
 #[Route(name: '{model}/edit', path: '/{model}/{uuid}/edit', methods: ['GET', 'POST'])]
@@ -27,13 +26,17 @@ class {Model}EditAction implements ControllerInterface
         private UrlGeneratorInterface $urlGenerator,
         #[Autowire('%kernel.debug%')]
         private readonly bool $debug,
-    ) {}
- 
+    ) {
+    }
+
+    /**
+     * @return array<string, mixed>|Response
+     */
     public function __invoke(Request $request, ?{Model} $model): Response|array
     {
-        $isNew = $model === null;
-        
-        /** @var Symfony\Component\HttpFoundation\Session\Session $session */
+        $isNew = null === $model;
+
+        /** @var \Symfony\Component\HttpFoundation\Session\Session|null $session */
         $session = $request->hasSession() ? $request->getSession() : null;
 
         $form = $this->formFactory->createNamed(
@@ -45,9 +48,9 @@ class {Model}EditAction implements ControllerInterface
             ]
         );
 
-        try {    
+        try {
             $form->handleRequest($request);
-            
+
             if ($form->isSubmitted()) {
                 if (!$form->isValid()) {
                     $session?->getFlashBag()->add('error', [
@@ -55,9 +58,7 @@ class {Model}EditAction implements ControllerInterface
                         'message' => '{model}.alert.edit.error.details',
                         'domain' => '{domain}',
                     ]);
-                }
-                else {
-
+                } else {
                     if ($isNew) {
                         $session?->getFlashBag()->add('success', [
                             'title' => '{model}.alert.create.success.title',
@@ -80,8 +81,7 @@ class {Model}EditAction implements ControllerInterface
                     ]);
                 }
             }
-        }
-        catch (DomainException $th) {
+        } catch (DomainException $th) {
             $session?->getFlashBag()->add('error', [
                 'title' => '{model}.alert.error.title',
                 'message' => '{model}.alert.error.'.$th->getMessage(),

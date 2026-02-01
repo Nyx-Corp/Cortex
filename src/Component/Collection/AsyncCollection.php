@@ -23,7 +23,7 @@ class AsyncCollection implements \Iterator, \Countable, \JsonSerializable
         $collection = new static($origin);
         $expectedType = static::expectedType();
 
-        return $expectedType === null ? $collection :
+        return null === $expectedType ? $collection :
             $collection->filter(fn (mixed $element) => $expectedType->assertInstanceOf($element))
         ;
     }
@@ -292,7 +292,7 @@ class AsyncCollection implements \Iterator, \Countable, \JsonSerializable
     public function ifEmpty(callable $then, ?callable $else = null): static
     {
         return $this->if(
-            fn (self $origin) => $origin->count() === 0,
+            fn (self $origin) => 0 === $origin->count(),
             $then,
             $else
         );

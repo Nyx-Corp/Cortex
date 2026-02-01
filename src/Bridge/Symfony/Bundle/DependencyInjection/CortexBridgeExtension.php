@@ -20,7 +20,7 @@ class CortexBridgeExtension extends Extension
         // load services
         $loader = new YamlFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
         $loader->load('services.yaml');
-        if ($container->getParameter('kernel.environment') === 'dev') {
+        if ('dev' === $container->getParameter('kernel.environment')) {
             $loader->load('services_dev.yaml');
         }
     }

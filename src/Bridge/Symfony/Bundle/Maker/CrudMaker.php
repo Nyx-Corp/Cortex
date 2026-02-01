@@ -96,19 +96,23 @@ final class CrudMaker extends CortexMaker
                     '{Module}' => $Module = $moduleUnicode->camel()->title()->toString(),
                     '{domain}' => $domainUnicode->snake()->toString(),
                     '{Domain}' => $Domain = $domainUnicode->camel()->title()->toString(),
-                    '{tool_name_list}' => sprintf('%s-%s-list',
+                    '{tool_name_list}' => sprintf(
+                        '%s-%s-list',
                         $domainUnicode->snake()->replace('_', '-')->toString(),
                         $modelUnicode->snake()->replace('_', '-')->toString()
                     ),
-                    '{tool_name_create}' => sprintf('%s-%s-create',
+                    '{tool_name_create}' => sprintf(
+                        '%s-%s-create',
                         $domainUnicode->snake()->replace('_', '-')->toString(),
                         $modelUnicode->snake()->replace('_', '-')->toString()
                     ),
-                    '{tool_name_edit}' => sprintf('%s-%s-edit',
+                    '{tool_name_edit}' => sprintf(
+                        '%s-%s-edit',
                         $domainUnicode->snake()->replace('_', '-')->toString(),
                         $modelUnicode->snake()->replace('_', '-')->toString()
                     ),
-                    '{tool_name_archive}' => sprintf('%s-%s-archive',
+                    '{tool_name_archive}' => sprintf(
+                        '%s-%s-archive',
                         $domainUnicode->snake()->replace('_', '-')->toString(),
                         $modelUnicode->snake()->replace('_', '-')->toString()
                     ),

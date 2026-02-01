@@ -11,7 +11,7 @@ class RegisteredClass extends ValueObject
 
     public function __construct(string $value)
     {
-        if (self::exists($value) === false) {
+        if (false === self::exists($value)) {
             throw new \InvalidArgumentException(sprintf('Class or interface "%s" does not exists.', $value));
         }
 

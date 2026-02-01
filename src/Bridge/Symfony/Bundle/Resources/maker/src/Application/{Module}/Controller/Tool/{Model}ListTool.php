@@ -15,6 +15,9 @@ class {Model}ListTool
     ) {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function __invoke(
         #[Schema(description: 'Page number (1-indexed)')]
         int $page = 1,
@@ -36,14 +39,14 @@ class {Model}ListTool
 
             return [
                 'success' => true,
-                'items' => array_map(fn(${model}) => [
+                'items' => array_map(fn (${model}) => [
                     'uuid' => (string) ${model}->uuid,
                     // TODO: Add model fields
                 ], $collection->toArray()),
                 'paging' => [
                     'page' => $page,
                     'limit' => $limit,
-                    'total' => $query->pager?->nbRecords ?? count($collection),
+                    'total' => $query->pager->nbRecords ?? count($collection),
                 ],
             ];
         } catch (\Throwable $e) {
