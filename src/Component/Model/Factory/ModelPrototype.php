@@ -50,7 +50,8 @@ class ModelPrototype
                     'string' => 'is_string',
                     'bool' => 'is_bool',
                     'float' => fn ($value) => is_numeric($value) || Operator::hasOperator($value),
-                    'array' => 'is_array',
+                    // Arrays can be filtered with LIKE patterns (string) or exact match (JSON string)
+                    'array' => fn ($value) => is_array($value) || is_string($value),
                     'object' => 'is_object',
                     'mixed' => null,
                     'callable' => 'is_callable',

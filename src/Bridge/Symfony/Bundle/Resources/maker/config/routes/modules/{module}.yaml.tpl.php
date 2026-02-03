@@ -1,0 +1,3 @@
+actions:
+    resource: ../../../src/Application/<?= $Module ?>/Controller/Action/
+    type: attribute

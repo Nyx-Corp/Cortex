@@ -24,10 +24,13 @@ final class CommandMaker extends CortexMaker
         return 'Crée une commande Symfony dans la structure à module.';
     }
 
+    /**
+     * @return list<string>
+     */
     public static function getGeneratedPaths(): array
     {
         return [
-            'src/Application/{Module}/Command/{Command}Command.php',
+            'src/Application/{Module}/Command/{Command}Command.php.tpl.php',
         ];
     }
 

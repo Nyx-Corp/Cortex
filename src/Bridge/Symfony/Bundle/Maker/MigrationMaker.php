@@ -24,10 +24,15 @@ final class MigrationMaker extends CortexMaker
         return 'Creates a migration just with Dbal logic.';
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return list<string>
+     */
     public static function getGeneratedPaths(array $options): array
     {
         return [
-            'migrations/Version{datetime}.php',
+            'migrations/Version{datetime}.php.tpl.php',
         ];
     }
 

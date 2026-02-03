@@ -672,4 +672,91 @@ class AsyncCollectionTest extends TestCase
 
         $this->assertSame($collection, $same);
     }
+
+    // =======================================================================
+    // GROUPBY TESTS
+    // =======================================================================
+
+    public function testGroupByIntegers(): void
+    {
+        $result = AsyncCollection::create([1, 2, 3, 4, 5, 6])
+            ->groupBy(fn ($x) => 0 === $x % 2 ? 'even' : 'odd');
+
+        $this->assertArrayHasKey('odd', $result);
+        $this->assertArrayHasKey('even', $result);
+        $this->assertEquals([1, 3, 5], array_values($result['odd']->toArray()));
+        $this->assertEquals([2, 4, 6], array_values($result['even']->toArray()));
+    }
+
+    public function testGroupByObjects(): void
+    {
+        $users = [
+            ['name' => 'Alice', 'department' => 'sales'],
+            ['name' => 'Bob', 'department' => 'tech'],
+            ['name' => 'Charlie', 'department' => 'sales'],
+            ['name' => 'Diana', 'department' => 'tech'],
+        ];
+
+        $result = AsyncCollection::create($users)
+            ->groupBy(fn ($u) => $u['department']);
+
+        $this->assertCount(2, $result);
+        $this->assertCount(2, $result['sales']);
+        $this->assertCount(2, $result['tech']);
+    }
+
+    public function testGroupByReturnsStaticCollections(): void
+    {
+        $result = AsyncCollection::create([1, 2, 3])
+            ->groupBy(fn ($x) => 'all');
+
+        $this->assertInstanceOf(AsyncCollection::class, $result['all']);
+    }
+
+    public function testGroupByEmpty(): void
+    {
+        $result = AsyncCollection::create([])
+            ->groupBy(fn ($x) => 'group');
+
+        $this->assertEquals([], $result);
+    }
+
+    public function testGroupBySingleGroup(): void
+    {
+        $result = AsyncCollection::create([1, 2, 3])
+            ->groupBy(fn ($x) => 'same');
+
+        $this->assertCount(1, $result);
+        $this->assertEquals([1, 2, 3], array_values($result['same']->toArray()));
+    }
+
+    public function testGroupByWithKeyAccess(): void
+    {
+        $result = AsyncCollection::create(['a' => 1, 'b' => 2, 'c' => 3])
+            ->groupBy(fn ($value, $key) => str_starts_with($key, 'a') ? 'first' : 'rest');
+
+        $this->assertCount(1, $result['first']);
+        $this->assertCount(2, $result['rest']);
+    }
+
+    public function testGroupByPreservesCollectionType(): void
+    {
+        // Vérifie que les sous-collections conservent le type original
+        $collection = AsyncCollection::create([1, 2, 3, 4]);
+        $groups = $collection->groupBy(fn ($x) => $x % 2);
+
+        foreach ($groups as $group) {
+            $this->assertInstanceOf(AsyncCollection::class, $group);
+        }
+    }
+
+    public function testGroupByChainedWithFilter(): void
+    {
+        $result = AsyncCollection::create([1, 2, 3, 4, 5, 6])
+            ->filter(fn ($x) => $x > 2)
+            ->groupBy(fn ($x) => 0 === $x % 2 ? 'even' : 'odd');
+
+        $this->assertEquals([3, 5], array_values($result['odd']->toArray()));
+        $this->assertEquals([4, 6], array_values($result['even']->toArray()));
+    }
 }

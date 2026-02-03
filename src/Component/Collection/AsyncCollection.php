@@ -317,4 +317,27 @@ class AsyncCollection implements \Iterator, \Countable, \JsonSerializable
                 ->toArray()
         );
     }
+
+    /**
+     * Groupe les éléments par clé extraite.
+     * Méthode eager : déclenche l'exécution complète.
+     *
+     * @param callable(T, int|string): string|int $keyExtractor
+     *
+     * @return array<string|int, static>
+     */
+    public function groupBy(callable $keyExtractor): array
+    {
+        $groups = [];
+
+        foreach ($this as $key => $element) {
+            $groupKey = $keyExtractor($element, $key);
+            $groups[$groupKey][] = $element;
+        }
+
+        return array_map(
+            fn (array $items) => static::create($items),
+            $groups
+        );
+    }
 }

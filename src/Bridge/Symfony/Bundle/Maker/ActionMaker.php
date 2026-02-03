@@ -25,31 +25,37 @@ final class ActionMaker extends CortexMaker
         return 'Create a new Cortex action';
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return list<string>
+     */
     public static function getGeneratedPaths(array $options): array
     {
         $paths = [
-            'src/Domain/{Domain}/Error/{Model}Exception.php',
-            'src/Domain/{Domain}/Action/{Model}{Action}/Command.php',
-            'src/Domain/{Domain}/Action/{Model}{Action}/Exception.php',
-            'src/Domain/{Domain}/Action/{Model}{Action}/Handler.php',
-            'src/Domain/{Domain}/Action/{Model}{Action}/Response.php',
+            'src/Domain/{Domain}/Error/{Model}Exception.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}{Action}/Command.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}{Action}/Event.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}{Action}/Exception.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}{Action}/Handler.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}{Action}/Response.php.tpl.php',
         ];
 
         // MCP Tool
         if ($options['mcp-tool'] ?? false) {
-            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}{Action}Tool.php';
+            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}{Action}Tool.php.tpl.php';
         }
 
         return array_merge($paths, match ($options['controller']) {
             'form' => [
-                'src/Application/{Module}/Form/{Model}{Action}Type.php',
-                'src/Application/{Module}/Controller/Action/{Model}{Action}FormAction.php',
+                'src/Application/{Module}/Form/{Model}{Action}Type.php.tpl.php',
+                'src/Application/{Module}/Controller/Action/{Model}{Action}FormAction.php.tpl.php',
             ],
             'list' => [
-                'src/Application/{Module}/Controller/Action/{Model}ListAction.php',
+                'src/Application/{Module}/Controller/Action/{Model}ListAction.php.tpl.php',
             ],
             'model' => [
-                'src/Application/{Module}/Controller/Action/{Model}{Action}Action.php',
+                'src/Application/{Module}/Controller/Action/{Model}{Action}Action.php.tpl.php',
             ],
             default => [],
         });
@@ -64,6 +70,7 @@ final class ActionMaker extends CortexMaker
             ->addArgument('action', InputArgument::REQUIRED, 'Action to generate')
             ->addOption('controller', 'null', InputOption::VALUE_REQUIRED, 'Controller (model|form|list)', 'model')
             ->addOption('mcp-tool', null, InputOption::VALUE_NONE, 'Generate MCP Tool wrapper')
+            ->addOption('output-subpath', null, InputOption::VALUE_OPTIONAL, 'Subpath for controllers (Admin, Front, Api)', '')
         ;
     }
 
@@ -73,8 +80,14 @@ final class ActionMaker extends CortexMaker
         $domainUnicode = u($input->getArgument('domain'));
         $modelUnicode = u($input->getArgument('model'));
         $actionUnicode = u($input->getArgument('action'));
+        $subpathUnicode = u($input->getOption('output-subpath') ?? '');
 
         $sourcePath = self::getGeneratedPaths($input->getOptions());
+
+        // Compute subpath values for namespace and folder
+        $Subpath = $subpathUnicode->camel()->title()->toString();
+        $subpath = $subpathUnicode->snake()->toString();
+        $subpath_namespace = '' !== $Subpath ? '\\'.$Subpath : '';
 
         $this->pathCollection
             ->filter(fn (SplFileInfo $file) => in_array(
@@ -93,6 +106,10 @@ final class ActionMaker extends CortexMaker
                     '{action}' => $actionUnicode->snake()->toString(),
                     '{Action}' => $Action = $actionUnicode->camel()->title()->toString(),
                     '{ActionForm}' => $Action,
+                    '{_action}' => $actionUnicode->snake()->toString(),
+                    '{Subpath}' => $Subpath,
+                    '{subpath}' => $subpath,
+                    '{subpath_namespace}' => $subpath_namespace,
                     '{tool_name}' => sprintf(
                         '%s-%s-%s',
                         $domainUnicode->snake()->replace('_', '-')->toString(),

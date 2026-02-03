@@ -4,18 +4,65 @@ Générateurs de code pour l'architecture DDD. Ces commandes permettent de crée
 
 ## Principe
 
-Les makers génèrent du code à partir de templates situés dans `src/Bridge/Symfony/Bundle/Resources/maker/`. Les placeholders suivants sont remplacés automatiquement :
+Les makers génèrent du code à partir de templates `.tpl.php` situés dans `src/Bridge/Symfony/Bundle/Resources/maker/`. Ce format suit les conventions Symfony MakerBundle et permet d'utiliser la logique PHP (boucles, conditions) dans les templates.
 
-| Placeholder | Description | Exemple |
-|-------------|-------------|---------|
-| `{Module}` | Nom du module (PascalCase) | `Admin` |
-| `{module}` | Nom du module (snake_case) | `admin` |
-| `{Domain}` | Nom du domaine (PascalCase) | `Contact` |
-| `{domain}` | Nom du domaine (snake_case) | `contact` |
-| `{Model}` | Nom du modèle (PascalCase) | `Person` |
-| `{model}` | Nom du modèle (snake_case) | `person` |
-| `{Action}` | Nom de l'action (PascalCase) | `Archive` |
-| `{action}` | Nom de l'action (snake_case) | `archive` |
+### Format des templates
+
+Les templates utilisent la syntaxe PHP avec `<?= $Variable ?>` pour l'interpolation :
+
+```php
+// Fichier: {Model}.php.tpl.php
+<?= "<?php\n" ?>
+
+namespace Domain\<?= $Domain ?>\Model;
+
+class <?= $Model ?> implements \Stringable
+{
+    // ...
+}
+```
+
+**Convention de nommage :**
+
+| Type | Fichier template | Fichier généré |
+|------|------------------|----------------|
+| PHP | `{Model}.php.tpl.php` | `{Model}.php` |
+| Twig | `index.html.twig.tpl.php` | `index.html.twig` |
+| YAML | `routes.yaml.tpl.php` | `routes.yaml` |
+
+### Variables disponibles
+
+Les variables suivantes sont extraites dans le scope des templates :
+
+| Variable | Description | Exemple |
+|----------|-------------|---------|
+| `$Module` | Nom du module (PascalCase) | `Admin` |
+| `$module` | Nom du module (snake_case) | `admin` |
+| `$Domain` | Nom du domaine (PascalCase) | `Contact` |
+| `$domain` | Nom du domaine (snake_case) | `contact` |
+| `$Model` | Nom du modèle (PascalCase) | `Person` |
+| `$model` | Nom du modèle (snake_case) | `person` |
+| `$Action` | Nom de l'action (PascalCase) | `Archive` |
+| `$action` | Nom de l'action (snake_case) | `archive` |
+| `$Subpath` | Sous-dossier (PascalCase) | `Admin` |
+| `$subpath` | Sous-dossier (snake_case) | `admin` |
+| `$subpath_namespace` | Namespace du sous-dossier | `\Admin` ou `` |
+| `$table` | Nom de la table SQL | `contact_person` |
+| `$datetime` | Timestamp pour migrations | `20260201120000` |
+
+### Logique conditionnelle
+
+Les templates `.tpl.php` supportent la logique PHP complète :
+
+```php
+<?php if ($archivable): ?>
+    use Archivable;
+<?php endif ?>
+
+<?php foreach ($fields as $field): ?>
+    public readonly <?= $field['type'] ?> $<?= $field['name'] ?>,
+<?php endforeach ?>
+```
 
 ---
 
@@ -60,6 +107,7 @@ Crée une action DDD (Command/Handler/Response) avec son controller optionnel.
 ./bin/php bin/console make:cortex:action {Module} {Domain} {Model} {Action} --controller=form
 ./bin/php bin/console make:cortex:action {Module} {Domain} {Model} {Action} --controller=list
 ./bin/php bin/console make:cortex:action {Module} {Domain} {Model} {Action} --mcp-tool
+./bin/php bin/console make:cortex:action {Module} {Domain} {Model} {Action} --output-subpath=Front
 ```
 
 ### Options
@@ -70,6 +118,7 @@ Crée une action DDD (Command/Handler/Response) avec son controller optionnel.
 | `--controller=form` | Controller avec formulaire |
 | `--controller=list` | Controller de liste |
 | `--mcp-tool` | Génère un MCP Tool wrapper |
+| `--output-subpath` | Sous-dossier et namespace (Admin, Front, Api) |
 
 ### Fichiers générés
 
@@ -125,6 +174,7 @@ Crée un CRUD complet (List, Edit, Archive) avec templates et tests.
 ```bash
 ./bin/php bin/console make:cortex:crud {Module} {Domain} {Model}
 ./bin/php bin/console make:cortex:crud {Module} {Domain} {Model} --mcp-tool
+./bin/php bin/console make:cortex:crud {Module} {Domain} {Model} --output-subpath=Admin
 ```
 
 ### Options
@@ -132,6 +182,24 @@ Crée un CRUD complet (List, Edit, Archive) avec templates et tests.
 | Option | Description |
 |--------|-------------|
 | `--mcp-tool` | Génère les MCP Tools (List, Create, Edit, Archive) |
+| `--output-subpath` | Sous-dossier et namespace (Admin, Front, Api) |
+
+### Option --output-subpath
+
+L'option `--output-subpath` permet de générer les controllers dans un sous-dossier avec un namespace adapté :
+
+```bash
+./bin/php bin/console make:cortex:crud Admin Contact Person --output-subpath=Admin
+```
+
+**Génère :**
+- **Fichier :** `src/Application/Admin/Controller/Action/Admin/PersonListAction.php`
+- **Namespace :** `Application\Admin\Controller\Action\Admin`
+
+Les variables passées aux templates :
+- `$Subpath` = `Admin` (PascalCase)
+- `$subpath` = `admin` (snake_case)
+- `$subpath_namespace` = `\Admin` (pour concaténation dans les namespaces)
 
 ### Fichiers générés
 

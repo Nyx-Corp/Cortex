@@ -25,40 +25,47 @@ final class CrudMaker extends CortexMaker
         return 'Create a new Cortex CRUD structure with its DDD architecture';
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return list<string>
+     */
     public static function getGeneratedPaths(array $options): array
     {
         $paths = [
-            'templates/{module}/_layout.html.twig',
-            'templates/{module}/{model}/_layout.html.twig',
+            'templates/{module}/_layout.html.twig.tpl.php',
+            'templates/{module}/{model}/_layout.html.twig.tpl.php',
 
-            'src/Application/{Module}/Controller/Action/{Model}ListAction.php',
-            'templates/{module}/{model}/index.html.twig',
+            'src/Application/{Module}/Controller/Action/{Model}ListAction.php.tpl.php',
+            'templates/{module}/{model}/index.html.twig.tpl.php',
 
-            'src/Application/{Module}/Controller/Action/{Model}EditAction.php',
-            'src/Application/{Module}/Form/{Model}EditType.php',
-            'src/Domain/{Domain}/Action/{Model}Edit/Command.php',
-            'src/Domain/{Domain}/Action/{Model}Edit/Exception.php',
-            'src/Domain/{Domain}/Action/{Model}Edit/Handler.php',
-            'src/Domain/{Domain}/Action/{Model}Edit/Response.php',
-            'templates/{module}/{model}/_form.html.twig',
-            'templates/{module}/{model}/edit.html.twig',
-            'templates/{module}/{model}/create.html.twig',
+            'src/Application/{Module}/Controller/Action/{Model}EditAction.php.tpl.php',
+            'src/Application/{Module}/Form/{Model}EditType.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Edit/Command.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Edit/Event.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Edit/Exception.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Edit/Handler.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Edit/Response.php.tpl.php',
+            'templates/{module}/{model}/_form.html.twig.tpl.php',
+            'templates/{module}/{model}/edit.html.twig.tpl.php',
+            'templates/{module}/{model}/create.html.twig.tpl.php',
 
-            'src/Application/{Module}/Controller/Action/{Model}ArchiveAction.php',
-            'src/Domain/{Domain}/Action/{Model}Archive/Command.php',
-            'src/Domain/{Domain}/Action/{Model}Archive/Handler.php',
-            'src/Domain/{Domain}/Action/{Model}Archive/Response.php',
+            'src/Application/{Module}/Controller/Action/{Model}ArchiveAction.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Archive/Command.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Archive/Event.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Archive/Handler.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Archive/Response.php.tpl.php',
 
             // Tests
-            'tests/Functional/Application/{Module}/Controller/{Model}ControllerTest.php',
+            'tests/Functional/Application/{Module}/Controller/{Model}ControllerTest.php.tpl.php',
         ];
 
         // MCP Tools
         if ($options['mcp-tool'] ?? false) {
-            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}ListTool.php';
-            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}CreateTool.php';
-            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}EditTool.php';
-            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}ArchiveTool.php';
+            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}ListTool.php.tpl.php';
+            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}CreateTool.php.tpl.php';
+            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}EditTool.php.tpl.php';
+            $paths[] = 'src/Application/{Module}/Controller/Tool/{Model}ArchiveTool.php.tpl.php';
         }
 
         return $paths;
@@ -71,6 +78,7 @@ final class CrudMaker extends CortexMaker
             ->addArgument('domain', InputArgument::REQUIRED, 'CRUD related domain')
             ->addArgument('model', InputArgument::REQUIRED, 'CRUD related model')
             ->addOption('mcp-tool', null, InputOption::VALUE_NONE, 'Generate MCP Tools (List, Create, Edit, Archive)')
+            ->addOption('output-subpath', null, InputOption::VALUE_OPTIONAL, 'Subpath for controllers/templates (Admin, Front, Api)', '')
         ;
     }
 
@@ -79,14 +87,20 @@ final class CrudMaker extends CortexMaker
         $moduleUnicode = u($input->getArgument('module'));
         $domainUnicode = u($input->getArgument('domain'));
         $modelUnicode = u($input->getArgument('model'));
+        $subpathUnicode = u($input->getOption('output-subpath') ?? '');
 
         $sourcePath = self::getGeneratedPaths($input->getOptions());
 
+        // Compute subpath values for namespace and folder
+        $Subpath = $subpathUnicode->camel()->title()->toString();
+        $subpath = $subpathUnicode->snake()->toString();
+        $subpath_namespace = '' !== $Subpath ? '\\'.$Subpath : '';
+
         $this->pathCollection
-        ->filter(fn (SplFileInfo $file) => in_array(
-            $file->getRelativePathname(),
-            $sourcePath,
-        ))
+            ->filter(fn (SplFileInfo $file) => in_array(
+                $file->getRelativePathname(),
+                $sourcePath,
+            ))
             ->mirror(
                 $generator->getRootDirectory(),
                 [
@@ -96,6 +110,9 @@ final class CrudMaker extends CortexMaker
                     '{Module}' => $Module = $moduleUnicode->camel()->title()->toString(),
                     '{domain}' => $domainUnicode->snake()->toString(),
                     '{Domain}' => $Domain = $domainUnicode->camel()->title()->toString(),
+                    '{Subpath}' => $Subpath,
+                    '{subpath}' => $subpath,
+                    '{subpath_namespace}' => $subpath_namespace,
                     '{tool_name_list}' => sprintf(
                         '%s-%s-list',
                         $domainUnicode->snake()->replace('_', '-')->toString(),

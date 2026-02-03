@@ -1,0 +1,44 @@
+<?= "<?php\n" ?>
+
+/**
+ * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Domain/{Domain}/Action/{Model}Edit/Handler.php.tpl.php
+ * @see src/Lib/Cortex/README.md
+ * @see src/Lib/Cortex/docs/events.md
+ */
+
+namespace Domain\<?= $Domain ?>\Action\<?= $Model ?>Edit;
+
+use Cortex\Component\Action\ActionHandler;
+use Cortex\Component\Event\EmitsActionEvents;
+use Cortex\Component\Event\EventDispatcherAwareInterface;
+use Domain\<?= $Domain ?>\Persistence\<?= $Model ?>Store;
+use Domain\<?= $Domain ?>\Factory\<?= $Model ?>Factory;
+
+class Handler implements ActionHandler, EventDispatcherAwareInterface
+{
+    use EmitsActionEvents;
+
+    public function __construct(
+        private readonly <?= $Model ?>Factory $factory,
+        private readonly <?= $Model ?>Store $store,
+    ) {
+    }
+
+    /**
+     * Handles <?= $Model ?> edition through factory as a new instance.
+     * If inner model has inner state, consider not using this handler, make one by state transition.
+     */
+    public function __invoke(Command $command): Response
+    {
+        $model = $this->factory->create()
+            ->with(...get_object_vars($command))
+            ->build()
+        ;
+
+        $this->store->sync($model);
+
+        $this->emit($event = new Event(new Response($model)));
+
+        return $event->getResponse();
+    }
+}

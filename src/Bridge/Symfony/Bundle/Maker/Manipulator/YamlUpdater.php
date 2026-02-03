@@ -8,6 +8,7 @@ use Symfony\Component\Yaml\Yaml;
 
 final class YamlUpdater
 {
+    /** @var array<string, mixed> */
     private array $configData;
 
     public function __construct(
@@ -21,6 +22,9 @@ final class YamlUpdater
         $this->configData = Yaml::parseFile($this->config->getPathname(), Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT | Yaml::PARSE_DATETIME) ?? [];
     }
 
+    /**
+     * @param array<string, mixed> $entryConfig
+     */
     public function addEntry(string $entryName, array $entryConfig, ?string $beforeKey = null): self
     {
         // Ne rien faire si déjà présent

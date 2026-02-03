@@ -36,6 +36,9 @@ class DbalAdapter
 
     public function query(string $query, array $params = []): \Generator
     {
+        // Expand LIKE pattern arrays into individual parameters
+        $params = $this->expandLikeParams($params);
+
         $stmt = $this->dbalConnection->executeQuery(
             $query,
             array_map(
@@ -66,6 +69,40 @@ class DbalAdapter
         $stmt->free();
     }
 
+    /**
+     * Expand arrays of LIKE patterns into individual named parameters.
+     * ['roles' => ['~%"admin"%', '~%"member"%']] becomes ['roles_0' => '%"admin"%', 'roles_1' => '%"member"%'].
+     */
+    private function expandLikeParams(array $params): array
+    {
+        $expanded = [];
+
+        foreach ($params as $key => $value) {
+            if (!is_array($value)) {
+                $expanded[$key] = $value;
+                continue;
+            }
+
+            // Check if all values are LIKE patterns
+            $allLikePatterns = count($value) > 0 && array_reduce(
+                $value,
+                fn (bool $carry, $v) => $carry && is_string($v) && str_starts_with($v, Operator::Like->value),
+                true
+            );
+
+            if ($allLikePatterns) {
+                // Expand to individual parameters with ~ prefix stripped
+                foreach ($value as $i => $pattern) {
+                    $expanded[$key.'_'.$i] = $pattern;
+                }
+            } else {
+                $expanded[$key] = $value;
+            }
+        }
+
+        return $expanded;
+    }
+
     public function where(array $params): string
     {
         $hasJoins = !empty($this->configuration->joins);
@@ -82,6 +119,23 @@ class DbalAdapter
                 $paramKey = str_replace('.', '_', $key);
 
                 if (is_array($value)) {
+                    // Check if all values are LIKE patterns (start with ~)
+                    $allLikePatterns = count($value) > 0 && array_reduce(
+                        $value,
+                        fn (bool $carry, $v) => $carry && is_string($v) && str_starts_with($v, Operator::Like->value),
+                        true
+                    );
+
+                    if ($allLikePatterns) {
+                        // Generate OR clause for LIKE patterns: (col LIKE :key_0 OR col LIKE :key_1)
+                        $likeClauses = array_map(
+                            fn (int $i) => sprintf('%s LIKE :%s_%d', $column, $paramKey, $i),
+                            array_keys($value)
+                        );
+
+                        return '('.implode(' OR ', $likeClauses).')';
+                    }
+
                     return sprintf('%s IN (:%s)', $column, $paramKey);
                 }
                 if (is_null($value)) {

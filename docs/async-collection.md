@@ -441,6 +441,30 @@ public function join(string $joiner): string
 $csv = $collection->map(fn($x) => $x->name)->join(', ');
 ```
 
+### groupBy()
+
+Groupe les éléments par une clé extraite. Retourne un tableau associatif de collections.
+
+```php
+public function groupBy(callable $keyExtractor): array
+```
+
+```php
+// Grouper des commandes par statut
+$byStatus = $orders->groupBy(fn(Order $o) => $o->status->value);
+// ['pending' => OrderCollection[...], 'shipped' => OrderCollection[...]]
+
+// Grouper des contacts par organisation
+$byOrg = $contacts->groupBy(fn(Contact $c) => (string) $c->organisation->uuid);
+
+// Accéder à un groupe
+$pendingOrders = $byStatus['pending'];
+$count = $pendingOrders->count();
+```
+
+**Note :** Cette méthode est eager et déclenche l'exécution complète de la collection.
+Les collections retournées dans chaque groupe conservent le type original (ex: `ContactCollection`).
+
 ---
 
 ## ModelCollection - Extension Spécialisée
@@ -633,4 +657,21 @@ $results = $searchService->search($query)
         then: fn() => [new NoResultPlaceholder()],
         else: fn($c) => $c->map(fn($r) => new SearchResult($r))
     );
+```
+
+### Exemple 7 : Groupement avec groupBy()
+
+```php
+// Grouper des invitations par inviteur pour former des équipes
+$teams = $invitations->groupBy(fn(Invitation $inv) => (string) $inv->invitedBy->uuid);
+
+foreach ($teams as $inviterUuid => $team) {
+    $leader = $team->find(fn($inv) => $inv->selfRegistered);
+    $partners = $team->filter(fn($inv) => !$inv->selfRegistered);
+
+    echo "Équipe de {$leader->contact->firstname}:\n";
+    foreach ($partners as $partner) {
+        echo "  - {$partner->contact->firstname}\n";
+    }
+}
 ```

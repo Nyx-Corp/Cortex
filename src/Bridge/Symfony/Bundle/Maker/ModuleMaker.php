@@ -31,14 +31,17 @@ final class ModuleMaker extends CortexMaker
         return 'Crée un module Cortex avec sa structure DDD';
     }
 
+    /**
+     * @return list<string>
+     */
     public static function getGeneratedPaths(): array
     {
         return [
-            'config/routes/modules/{module}.yaml',
+            'config/routes/modules/{module}.yaml.tpl.php',
             'config/routes/application.yaml',
             'src/Application/{Module}/Controller/Action/.gitkeep',
-            'templates/{module}/_layout.html.twig',
-            'translations/{module}+intl-icu.{locales}.yaml',
+            'templates/{module}/_layout.html.twig.tpl.php',
+            'translations/{module}+intl-icu.{locales}.yaml.tpl.php',
         ];
     }
 

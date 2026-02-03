@@ -105,6 +105,11 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
                     'placeholder' => $config['placeholder'] ?? 'Tous',
                     'expanded' => false, // Explicit: use select dropdown, not radio buttons
                 ])),
+                'checkboxes' => $builder->add($fieldName, ChoiceType::class, array_merge($fieldOptions, [
+                    'choices' => array_column($config['choices'] ?? [], 'value', 'label'),
+                    'multiple' => true,
+                    'expanded' => true, // Render as checkboxes
+                ])),
                 'boolean' => $builder->add($fieldName, ChoiceType::class, array_merge($fieldOptions, [
                     'choices' => ['Oui' => '1', 'Non' => '0'],
                     'placeholder' => 'Tous',
@@ -136,9 +141,28 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
                     $modelQuery->sorter->field,
                     $modelQuery->sorter->direction->value
                 )) : null,
-                default => $modelQuery->filters->has($name) ? $form->setData($modelQuery->filters->get($name)) : null,
+                default => $this->mapFilterToForm($form, $name, $modelQuery),
             };
         }
+    }
+
+    /**
+     * Map a filter value to a form field, handling multi-select fields.
+     */
+    private function mapFilterToForm(FormInterface $form, string $name, ModelQueryDecorator $modelQuery): void
+    {
+        if (!$modelQuery->filters->has($name)) {
+            return;
+        }
+
+        $value = $modelQuery->filters->get($name);
+
+        // For multiple choice fields (checkboxes), convert comma-separated string to array
+        if ($form->getConfig()->getOption('multiple') && is_string($value)) {
+            $value = array_map('trim', explode(',', $value));
+        }
+
+        $form->setData($value);
     }
 
     /**
@@ -177,7 +201,13 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
         );
         foreach ($filterForms as $name => $form) {
             $formData = $form->getData();
-            if (!is_null($formData) && $modelQuery->filters->has($name)) {
+
+            // For multiple choice fields (checkboxes), convert array to comma-separated string
+            if (is_array($formData) && $form->getConfig()->getOption('multiple')) {
+                $formData = implode(',', $formData);
+            }
+
+            if (!is_null($formData) && '' !== $formData && $modelQuery->filters->has($name)) {
                 $modelQuery->filters->set($name, $formData);
             }
         }

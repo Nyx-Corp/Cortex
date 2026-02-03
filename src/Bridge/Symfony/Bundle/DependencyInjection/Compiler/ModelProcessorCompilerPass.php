@@ -4,7 +4,7 @@ namespace Cortex\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use Cortex\Bridge\Symfony\Controller\ModelFactoryValueResolver;
 use Cortex\Bridge\Symfony\Model\Attribute\Middleware as MiddlewareAttribute;
-use Cortex\Bridge\Symfony\Model\Attribute\Model;
+use Cortex\Component\Model\Attribute\Model;
 use Cortex\Component\Collection\AsyncCollection;
 use Cortex\Component\Middleware\Middleware;
 use Cortex\Component\Model\Factory\Mapper\ModelMapper;

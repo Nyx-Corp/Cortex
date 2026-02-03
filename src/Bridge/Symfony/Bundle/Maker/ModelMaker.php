@@ -25,22 +25,26 @@ final class ModelMaker extends CortexMaker
         return 'Crée un modèle Cortex avec sa structure DDD';
     }
 
+    /**
+     * @return list<string>
+     */
     public static function getGeneratedPaths(bool $withDbal): array
     {
         $paths = [
-            'src/Domain/{Domain}/Model/{Model}.php',
-            'src/Domain/{Domain}/Model/{Model}Collection.php',
-            'src/Domain/{Domain}/Error/{Domain}Exception.php',
-            'src/Domain/{Domain}/Error/{Model}Exception.php',
-            'src/Domain/{Domain}/Factory/{Model}Factory.php',
-            'src/Domain/{Domain}/Persistence/{Model}Store.php',
+            'src/Domain/{Domain}/Model/{Model}.php.tpl.php',
+            'src/Domain/{Domain}/Model/{Model}Collection.php.tpl.php',
+            'src/Domain/{Domain}/Error/{Domain}Exception.php.tpl.php',
+            'src/Domain/{Domain}/Error/{Model}Exception.php.tpl.php',
+            'src/Domain/{Domain}/Event/{Model}Event.php.tpl.php',
+            'src/Domain/{Domain}/Factory/{Model}Factory.php.tpl.php',
+            'src/Domain/{Domain}/Persistence/{Model}Store.php.tpl.php',
         ];
 
         if ($withDbal) {
             array_push(
                 $paths,
-                'src/Infrastructure/Doctrine/{Domain}/Dbal{Model}Mapper.php',
-                'migrations/Version{datetime}.php'
+                'src/Infrastructure/Doctrine/{Domain}/Dbal{Model}Mapper.php.tpl.php',
+                'migrations/Version{datetime}.php.tpl.php'
             );
         }
 

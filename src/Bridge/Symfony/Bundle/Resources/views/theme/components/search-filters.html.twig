@@ -76,7 +76,7 @@
             <div class="p-4">
                 <div class="grid grid-cols-2 gap-4">
                     {% for field, config in filters_config %}
-                    <div class="{% if config.type == 'boolean' %}col-span-2{% endif %}">
+                    <div class="{% if config.type == 'boolean' or config.type == 'checkboxes' %}col-span-2{% endif %}">
                         <label class="block text-xs text-zinc-500 mb-1">{{ config.label }}</label>
                         {% if config.type == 'text' %}
                         <input
@@ -115,6 +115,24 @@
                             >
                             <span class="text-sm text-zinc-700">{{ config.label }}</span>
                         </label>
+                        {% elseif config.type == 'checkboxes' %}
+                        <div class="flex flex-wrap gap-3">
+                            {% for choice in config.choices|default([]) %}
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name="filter_{{ field }}[]"
+                                    value="{{ choice.value|default(choice) }}"
+                                    {% if (choice.value|default(choice)) in (form.vars.filters[field].vars.value|default('')|split(',')) %}checked{% endif %}
+                                    class="rounded border-zinc-300 text-primary focus:ring-primary/20"
+                                    data-search-filters-target="field"
+                                    data-filter-field="{{ field }}"
+                                    data-filter-type="checkboxes"
+                                >
+                                <span class="text-sm text-zinc-700">{{ choice.label|default(choice) }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
                         {% elseif config.type == 'date' %}
                         <div class="flex items-center gap-2">
                             <input

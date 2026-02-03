@@ -14,6 +14,9 @@ final class PhpMethod
     /** @var PhpVar[] */
     private array $parameters;
 
+    /**
+     * @param list<PhpVar> $parameters
+     */
     public function __construct(
         private string $name,
         private string $body = '',    // Contenu brut (corps PHP)
@@ -53,7 +56,10 @@ final class PhpMethod
         };
     }
 
-    public function addToNode(Stmt\Class_ $node, $parser, $factory): ?Stmt\ClassMethod
+    /**
+     * @param callable(string): (Stmt[]|null) $parser
+     */
+    public function addToNode(Stmt\Class_ $node, callable $parser, \PhpParser\BuilderFactory $factory): ?Stmt\ClassMethod
     {
         // Don't generate duplicates
         foreach ($node->getMethods() as $method) {

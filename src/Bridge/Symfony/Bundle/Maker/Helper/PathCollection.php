@@ -15,6 +15,10 @@ class PathCollection extends FileCollection
         get => $this->filesystem ??= new Filesystem();
     }
 
+    private TemplateRenderer $templateRenderer {
+        get => $this->templateRenderer ??= new TemplateRenderer();
+    }
+
     public static function scan(string $baseDir): static
     {
         return parent::search(
@@ -24,16 +28,44 @@ class PathCollection extends FileCollection
         );
     }
 
-    private function generateDestPath(string $destPath, string $destPattern, array $replacements)
+    /**
+     * Checks if a file is a .tpl.php template.
+     */
+    private function isPhpTemplate(SplFileInfo $file): bool
     {
-        return str_replace(
+        return str_ends_with($file->getRelativePathname(), '.tpl.php');
+    }
+
+    /**
+     * Transforms the destination path by removing .tpl.php suffix if present.
+     */
+    private function transformDestPath(string $path): string
+    {
+        return preg_replace('/\.tpl\.php$/', '', $path) ?? $path;
+    }
+
+    /**
+     * @param array<string, string> $replacements
+     */
+    private function generateDestPath(string $destPath, string $destPattern, array $replacements): string
+    {
+        $path = str_replace(
             array_keys($replacements),
             array_values($replacements),
             sprintf('%s/%s', $destPath, $destPattern)
         );
+
+        return $this->transformDestPath($path);
     }
 
-    private function expandTemplate(array $input)
+    /**
+     * Generates Cartesian product of file variants for multi-value placeholders.
+     *
+     * @param array<string, list<string>> $input Variant keys mapped to possible values
+     *
+     * @return \Generator<array<string, string>>
+     */
+    private function expandTemplate(array $input): \Generator
     {
         if (empty($input)) {
             yield [];
@@ -52,6 +84,60 @@ class PathCollection extends FileCollection
         }
     }
 
+    /**
+     * Converts replacement array to PHP variable format for .tpl.php templates.
+     *
+     * Transforms keys like '{Model}' to 'Model' for use with extract().
+     *
+     * @param array<string, string> $replacements Original replacements with braces
+     *
+     * @return array<string, string> Variables ready for extract()
+     */
+    private function toTemplateVariables(array $replacements): array
+    {
+        $variables = [];
+        foreach ($replacements as $key => $value) {
+            // Transform {Model} to Model, {model} to model, etc.
+            $varName = trim($key, '{}');
+            if ('' !== $varName) {
+                $variables[$varName] = $value;
+            }
+        }
+
+        return $variables;
+    }
+
+    /**
+     * Renders file content based on template type.
+     *
+     * For .tpl.php files: Uses PHP include with extract() for full PHP logic support
+     * For legacy files: Uses simple string replacement
+     *
+     * @param SplFileInfo           $file         The template file
+     * @param array<string, string> $replacements Placeholder replacements
+     *
+     * @return string Rendered content
+     */
+    private function renderContent(SplFileInfo $file, array $replacements): string
+    {
+        if ($this->isPhpTemplate($file)) {
+            $variables = $this->toTemplateVariables($replacements);
+
+            return $this->templateRenderer->render($file->getRealPath(), $variables);
+        }
+
+        // Legacy string replacement for non-.tpl.php files
+        return str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $file->getContents()
+        );
+    }
+
+    /**
+     * @param array<string, string>       $replacements
+     * @param array<string, list<string>> $fileVariants
+     */
     public function mirror(string $destPath, array $replacements, array $fileVariants = []): self
     {
         return $this
@@ -99,11 +185,8 @@ class PathCollection extends FileCollection
                     $this->filesystem->mkdir($destFolder, 0o755);
                 }
 
-                $this->filesystem->dumpFile($fileInfo['dest_path'], str_replace(
-                    array_keys($fileInfo['replacements']),
-                    array_values($fileInfo['replacements']),
-                    $fileInfo['file']->getContents()
-                ));
+                $content = $this->renderContent($fileInfo['file'], $fileInfo['replacements']);
+                $this->filesystem->dumpFile($fileInfo['dest_path'], $content);
 
                 return $fileInfo['dest_path'];
             })
@@ -124,6 +207,9 @@ class PathCollection extends FileCollection
         ;
     }
 
+    /**
+     * @return list<mixed>
+     */
     public function generate(\Closure $mapper): array
     {
         return $this->map($mapper)->toArray();

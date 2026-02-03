@@ -7,7 +7,7 @@ use PhpParser\BuilderFactory;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use PhpParser\ParserAbstract;
+use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PhpVersion;
 use PhpParser\PrettyPrinter;
@@ -26,7 +26,7 @@ final class PhpUpdater extends NodeVisitorAbstract
         get => $this->printer ??= new PrettyPrinter\Standard();
     }
 
-    private ParserAbstract $phpParser {
+    private Parser $phpParser {
         get => $this->phpParser ??= new ParserFactory()
             ->createForVersion(PhpVersion::getHostVersion());
     }
@@ -35,9 +35,9 @@ final class PhpUpdater extends NodeVisitorAbstract
         get => $this->builderFactory ??= new BuilderFactory();
     }
 
-    private ?NodeTraverser $traverser = null {
+    private NodeTraverser $traverser {
         get {
-            if ($this->traverser) {
+            if (isset($this->traverser)) {
                 return $this->traverser;
             }
 
@@ -68,7 +68,7 @@ final class PhpUpdater extends NodeVisitorAbstract
         return $this;
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): ?Node
     {
         if ($node instanceof Node\Stmt\Namespace_) {
             foreach ($this->methods as $method) {

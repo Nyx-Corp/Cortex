@@ -118,9 +118,12 @@ class ModelPrototypeTest extends TestCase
         $prototype->constructors->set('tags', ['a', 'b', 'c']);
         $this->assertEquals(['a', 'b', 'c'], $prototype->constructors->get('tags'));
 
-        // Should reject non-array
-        $this->expectException(\InvalidArgumentException::class);
-        $prototype->constructors->set('tags', 'not-array');
+        // Should also accept strings for filtering (LIKE patterns, JSON exact match)
+        $prototype->constructors->set('tags', '~%"tag"%');
+        $this->assertEquals('~%"tag"%', $prototype->constructors->get('tags'));
+
+        $prototype->constructors->set('tags', '["contact"]');
+        $this->assertEquals('["contact"]', $prototype->constructors->get('tags'));
     }
 
     public function testConstructorMapWithNullableParameter(): void

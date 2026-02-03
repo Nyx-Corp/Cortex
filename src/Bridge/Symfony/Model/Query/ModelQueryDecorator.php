@@ -72,6 +72,8 @@ class ModelQueryDecorator extends ModelQuery
 
     public function resolve(): \Generator
     {
+        $qParam = $this->request?->query->get('q', '');
+
         // Route attributes filters & tags
         if ($this->request) {
             foreach ($this->request->attributes->all() as $key => $value) {
@@ -86,17 +88,21 @@ class ModelQueryDecorator extends ModelQuery
                 $this->tags->set($key, $value); // tag
             }
 
-            // Parse q parameter (Gmail-style query)
-            $this->parseQueryString($this->request->query->get('q', ''));
+            // Parse q parameter BEFORE form creation so filters are set
+            $this->parseQueryString($qParam);
         }
 
         // Posted filter form
         if ($this->formBuilder) {
             $this->form = $this->formBuilder->getForm();
 
-            $this->form->handleRequest($this->request);
-            if ($this->form->isSubmitted() && !$this->form->isValid()) {
-                throw new BadRequestException(implode(' ; ', array_map(fn (FormError $error) => sprintf('%s : %s', $error->getOrigin()->getName(), $error->getMessage()), iterator_to_array($this->form->getErrors(true, true)))));
+            // Only handle form submission if there's no q parameter
+            // When q is present, filters come from parseQueryString and form is just for display
+            if (empty($qParam)) {
+                $this->form->handleRequest($this->request);
+                if ($this->form->isSubmitted() && !$this->form->isValid()) {
+                    throw new BadRequestException(implode(' ; ', array_map(fn (FormError $error) => sprintf('%s : %s', $error->getOrigin()->getName(), $error->getMessage()), iterator_to_array($this->form->getErrors(true, true)))));
+                }
             }
         }
 
@@ -147,8 +153,10 @@ class ModelQueryDecorator extends ModelQuery
             return $value;
         }
 
+        $type = $config['type'] ?? '';
+
         // For enum/choice, find the label
-        if (($config['type'] ?? '') === 'enum' && isset($config['choices'])) {
+        if ('enum' === $type && isset($config['choices'])) {
             foreach ($config['choices'] as $choice) {
                 if (is_array($choice) && ($choice['value'] ?? '') === $value) {
                     return $choice['label'] ?? $value;
@@ -156,8 +164,25 @@ class ModelQueryDecorator extends ModelQuery
             }
         }
 
+        // For checkboxes (comma-separated values), find labels for each value
+        if ('checkboxes' === $type && isset($config['choices'])) {
+            $values = explode(',', $value);
+            $labels = [];
+            foreach ($values as $v) {
+                $v = trim($v);
+                foreach ($config['choices'] as $choice) {
+                    if (is_array($choice) && ($choice['value'] ?? '') === $v) {
+                        $labels[] = $choice['label'] ?? $v;
+                        break;
+                    }
+                }
+            }
+
+            return $labels ? implode(', ', $labels) : $value;
+        }
+
         // For boolean
-        if (($config['type'] ?? '') === 'boolean') {
+        if ('boolean' === $type) {
             return 'true' === $value || '1' === $value ? 'Oui' : 'Non';
         }
 
