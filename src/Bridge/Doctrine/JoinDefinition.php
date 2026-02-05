@@ -385,6 +385,11 @@ final class JoinDefinition
             return false;
         }
 
+        // Cortex StructuredMap (and subclasses) are not models
+        if (is_a($typeName, \Cortex\Component\Collection\StructuredMap::class, true)) {
+            return false;
+        }
+
         // Stringable interface is not a model
         if (\Stringable::class === $typeName) {
             return false;

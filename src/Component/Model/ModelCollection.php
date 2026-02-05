@@ -5,6 +5,11 @@ namespace Cortex\Component\Model;
 use Cortex\Component\Collection\AsyncCollection;
 use Cortex\Component\Model\Query\ModelQuery;
 
+/**
+ * @template T
+ *
+ * @extends AsyncCollection<T>
+ */
 class ModelCollection extends AsyncCollection
 {
     public private(set) ?ModelQuery $query = null;
@@ -18,6 +23,9 @@ class ModelCollection extends AsyncCollection
         return $collection;
     }
 
+    /**
+     * @param AsyncCollection<T> $nextInstance
+     */
     protected function onNext(AsyncCollection $nextInstance): void
     {
         if (!$nextInstance instanceof self) {

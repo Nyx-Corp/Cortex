@@ -340,7 +340,11 @@ class DbalAdapter
             $groupBy = $this->configuration->resolveUniqueField($query->uniqueField);
         }
 
-        if ($query->pager && !$limit) {
+        // Skip COUNT if filtering by primary key with a single value (max 1 result)
+        $pkFilter = $filters[$this->configuration->primaryKey] ?? null;
+        $skipCount = $pkFilter && !is_array($pkFilter);
+
+        if ($query->pager && !$limit && !$skipCount) {
             $count = iterator_to_array($this->query($this->count($filters, $groupBy), $queryParams))[0]['count'] ?? 0;
             $query->pager->bind($count);
 
@@ -610,8 +614,23 @@ class DbalAdapter
             $joinInfo = $this->configuration->resolveJoinFilter($key);
 
             if ($joinInfo) {
-                // Convert to qualified column name: alias.snake_case_field
-                $qualifiedKey = $joinInfo['join']->getAlias().'.'.$this->toSnakeCase($joinInfo['field']);
+                /** @var JoinDefinition $join */
+                $join = $joinInfo['join'];
+                $field = $joinInfo['field'];
+
+                // Try to map via the join's modelToTableMapper
+                $column = $this->toSnakeCase($field);
+                $joinMapper = $join->joinConfig->modelToTableMapper;
+                if ($joinMapper) {
+                    $mapped = $joinMapper->map([$field => '']);
+                    $mappedColumn = array_key_first($mapped);
+                    if ($mappedColumn && $mappedColumn !== $field) {
+                        $column = $mappedColumn;
+                    }
+                }
+
+                // Convert to qualified column name: alias.column
+                $qualifiedKey = $join->getAlias().'.'.$column;
                 $resolved[$qualifiedKey] = $value;
             } else {
                 $resolved[$key] = $value;
