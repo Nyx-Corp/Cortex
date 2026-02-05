@@ -1,4 +1,14 @@
 {% block menu_element %}
+    {# Check roles access - skip element if user doesn't have required role #}
+    {% set element_roles = element.roles|default([]) %}
+    {% if element_roles is not iterable %}{% set element_roles = [element_roles] %}{% endif %}
+    {% set has_access = element_roles|length == 0 %}
+    {% if not has_access %}
+        {% for role in element_roles %}
+            {% if is_granted(role) %}{% set has_access = true %}{% endif %}
+        {% endfor %}
+    {% endif %}
+    {% if has_access %}
     {% set active = element.active|default(false) or element.label == active_menu|default('') %}
     {% set disabled = element.disabled|default(false) %}
     {% set premium = element.premium|default(false) %}
@@ -26,9 +36,20 @@
         {% endif %}
         </a>
     </li>
+    {% endif %}
 {% endblock %}
 
 {% block menu_section %}
+    {# Check roles access - skip section if user doesn't have required role #}
+    {% set section_roles = section.roles|default([]) %}
+    {% if section_roles is not iterable %}{% set section_roles = [section_roles] %}{% endif %}
+    {% set has_section_access = section_roles|length == 0 %}
+    {% if not has_section_access %}
+        {% for role in section_roles %}
+            {% if is_granted(role) %}{% set has_section_access = true %}{% endif %}
+        {% endfor %}
+    {% endif %}
+    {% if has_section_access %}
     <li class="{{ section.class|default('group-[.closed]/sidebar:-mt-5')|raw }}">
     {% if section.label is defined %}
     	<h2 class="text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -44,4 +65,5 @@
             {% endfor %}
         </ul>
     </li>
+    {% endif %}
 {% endblock %}
