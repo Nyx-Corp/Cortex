@@ -2,7 +2,7 @@
     {% set active = element.active|default(false) or element.label == active_menu|default('') %}
     {% set disabled = element.disabled|default(false) %}
     {% set premium = element.premium|default(false) %}
-    {% set link = disabled ? '#' : (element.link is defined ? element.link : (element.route is defined ? path(element.route) : '#')) %}
+    {% set link = disabled ? '#' : (element.link is defined ? element.link : (element.route is defined ? path(element.route, element.routeParams|default({})) : '#')) %}
     <li>
         <a href="{{ link }}" class="flex items-center gap-4 rounded-md p-2 text-sm font-medium group-[.closed]/sidebar:px-0 {{ element.extra_class|default('') }} {{ active ? 'text-white bg-menu-active' : '' }} {{ disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-menu-hover hover:text-white' }}"
             {% if disabled %}aria-disabled="true"{% endif %}
@@ -14,6 +14,10 @@
         {% if premium %}
             <span class="ml-auto flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 px-2 py-0.5 text-xs text-amber-900 font-semibold group-[.closed]/sidebar:hidden">
                 <i data-lucide="crown" class="size-3"></i>
+            </span>
+        {% elseif element.wip|default(false) %}
+            <span class="ml-auto flex items-center gap-1 rounded-full bg-wip px-2 py-0.5 text-xs text-white font-semibold group-[.closed]/sidebar:hidden">
+                <i data-lucide="construction" class="size-3"></i>
             </span>
         {% elseif element.pill is defined %}
             <span class="ml-auto rounded-full {{ element.pill.color|default('bg-green-500') }} px-2 text-xs text-white group-[.closed]/sidebar:hidden">
