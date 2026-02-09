@@ -10,6 +10,8 @@ class FlatModelMapper implements ModelMapper
 {
     private array $keyMap = [];
     private array $ignoredKeys = [];
+    private array $propertyKeys = [];
+    private ?\ReflectionClass $reflection = null;
 
     protected string $defaultKey = '_default';
 
@@ -29,19 +31,32 @@ class FlatModelMapper implements ModelMapper
                 $prototype->constructors->set($this->keyMap[$attribute], $value);
                 continue;
             }
+            if (isset($this->propertyKeys[$attribute])) {
+                $propName = $this->propertyKeys[$attribute];
+                $prototype->callbacks->set($propName, fn ($model) => $model->$propName = $value);
+                continue;
+            }
 
             $uAttribute = new UnicodeString($attribute);
             $triedKeys = [
                 $attribute,
-                $uAttribute->camel(),
-                $uAttribute->snake(),
+                (string) $uAttribute->camel(),
+                (string) $uAttribute->snake(),
             ];
             foreach ($triedKeys as $key) {
-                if ($prototype->constructors->has($attribute)) {
-                    $this->keyMap[$attribute] = $attribute;
-                    $prototype->constructors->set($attribute, $value);
+                if ($prototype->constructors->has($key)) {
+                    $declaredKey = $this->resolveDeclaredKey($prototype, $key);
+                    $this->keyMap[$attribute] = $declaredKey;
+                    $prototype->constructors->set($declaredKey, $value);
                     continue 2;
                 }
+            }
+
+            $propertyName = $this->resolveSettableProperty($prototype, $attribute);
+            if ($propertyName) {
+                $this->propertyKeys[$attribute] = $propertyName;
+                $prototype->callbacks->set($propertyName, fn ($model) => $model->$propertyName = $value);
+                continue;
             }
 
             $this->ignoredKeys[$attribute] = true;
@@ -50,5 +65,39 @@ class FlatModelMapper implements ModelMapper
         $prototype->modelClass = $this->guessModelClass($prototype, $modelData);
 
         return $prototype;
+    }
+
+    private function resolveDeclaredKey(ModelPrototype $prototype, string $key): string
+    {
+        $uKey = new UnicodeString($key);
+        $variants = [$key, (string) $uKey->camel(), (string) $uKey->snake()];
+
+        foreach ($prototype->constructors->declaredKeys() as $declared) {
+            if (\in_array($declared, $variants, true)) {
+                return $declared;
+            }
+        }
+
+        return $key;
+    }
+
+    private function resolveSettableProperty(ModelPrototype $prototype, string $attribute): ?string
+    {
+        $this->reflection ??= new \ReflectionClass($prototype->modelClass->value);
+        $uAttribute = new UnicodeString($attribute);
+        $variants = [$attribute, (string) $uAttribute->camel(), (string) $uAttribute->snake()];
+
+        foreach ($variants as $name) {
+            try {
+                $prop = $this->reflection->getProperty($name);
+            } catch (\ReflectionException) {
+                continue;
+            }
+            if ($prop->isPublic() && !$prop->isReadOnly() && !$prop->isPrivateSet() && !$prop->isProtectedSet()) {
+                return $name;
+            }
+        }
+
+        return null;
     }
 }
