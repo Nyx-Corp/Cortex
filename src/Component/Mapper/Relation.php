@@ -34,8 +34,8 @@ final class Relation
      * Maps a table UUID column back to a model property name.
      * Used in tableToModelMapper to rename the column to the model property.
      */
-    public static function toModel(string $property): self
+    public static function toModel(string $property, bool $nullable = false): self
     {
-        return new self($property, false, $property);
+        return new self($property, $nullable, $property);
     }
 }
