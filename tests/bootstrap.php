@@ -2,5 +2,13 @@
 
 declare(strict_types=1);
 
-// Load the main autoloader
-require_once dirname(__DIR__, 4).'/vendor/autoload.php';
+// Standalone (CI) or embedded (BridgeIt)
+foreach ([
+    __DIR__.'/../vendor/autoload.php',
+    dirname(__DIR__, 4).'/vendor/autoload.php',
+] as $autoloader) {
+    if (file_exists($autoloader)) {
+        require_once $autoloader;
+        break;
+    }
+}

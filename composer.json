@@ -1,0 +1,57 @@
+{
+    "name": "nyx-corp/cortex",
+    "description": "DDD micro-framework for Symfony applications",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.4",
+        "doctrine/dbal": "^3.10",
+        "psr/event-dispatcher": "^1.0",
+        "psr/log": "^3.0",
+        "symfony/config": "^7.4",
+        "symfony/console": "^7.4",
+        "symfony/dependency-injection": "^7.4",
+        "symfony/event-dispatcher": "^7.4",
+        "symfony/filesystem": "^7.4",
+        "symfony/finder": "^7.4",
+        "symfony/form": "^7.4",
+        "symfony/http-foundation": "^7.4",
+        "symfony/http-kernel": "^7.4",
+        "symfony/options-resolver": "^7.4",
+        "symfony/routing": "^7.4",
+        "symfony/string": "^7.4",
+        "symfony/translation": "^7.4",
+        "symfony/uid": "^7.4",
+        "symfony/yaml": "^7.4",
+        "twig/twig": "^3.23"
+    },
+    "require-dev": {
+        "deptrac/deptrac": "^4.6",
+        "friendsofphp/php-cs-fixer": "^3.93",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^9.6"
+    },
+    "suggest": {
+        "doctrine/doctrine-migrations-bundle": "Required for migration maker templates",
+        "nikic/php-parser": "Required for Cortex makers (make:cortex:*)",
+        "symfony/maker-bundle": "Required for Cortex makers (make:cortex:*)"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cortex\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Cortex\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": false,
+            "symfony/runtime": false
+        },
+        "sort-packages": true
+    }
+}

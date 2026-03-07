@@ -1,0 +1,1177 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:count\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:expandLikeParams\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:expandLikeParams\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:hydrateRelations\(\) has parameter \$mappedData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:hydrateRelations\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:insert\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:normalizeParamKeys\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:normalizeParamKeys\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:preloadJoinedData\(\) has parameter \$dataLine with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:preloadJoinedData\(\) has parameter \$visited with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:query\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:resolveJoinFilters\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:resolveJoinFilters\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:select\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:stripJoinedColumns\(\) has parameter \$dataLine with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:stripJoinedColumns\(\) has parameter \$visited with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:stripJoinedColumns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:sync\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:update\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalAdapter\:\:where\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Undefined variable\: \$this$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>nbPerPage" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>offset" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/Bridge/Doctrine/DbalAdapter.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalMappingConfiguration\:\:buildJoinClausesRecursive\(\) has parameter \$visited with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalMappingConfiguration.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalMappingConfiguration\:\:buildJoinSelectFieldsRecursive\(\) has parameter \$fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalMappingConfiguration.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalMappingConfiguration\:\:buildJoinSelectFieldsRecursive\(\) has parameter \$visited with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalMappingConfiguration.php
+
+		-
+			message: '#^Trait Cortex\\Bridge\\Doctrine\\DbalModelAdapterTrait is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Bridge/Doctrine/DbalModelAdapterTrait.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalPreloader\:\:get\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalPreloader.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\DbalPreloader\:\:set\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/DbalPreloader.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\InMemoryDbalPreloader\:\:get\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/InMemoryDbalPreloader.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\InMemoryDbalPreloader\:\:set\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/InMemoryDbalPreloader.php
+
+		-
+			message: '#^Property Cortex\\Bridge\\Doctrine\\InMemoryDbalPreloader\:\:\$cache type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/InMemoryDbalPreloader.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\JoinDefinition\:\:extractJoinedData\(\) has parameter \$row with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/JoinDefinition.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Doctrine\\JoinDefinition\:\:extractJoinedData\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Doctrine/JoinDefinition.php
+
+		-
+			message: '#^Call to method create\(\) on an unknown class Domain\\Account\\Factory\\AccountFactory\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Bundle/Command/TestBuilderCommand.php
+
+		-
+			message: '#^Call to method fetch\(\) on an unknown class Domain\\Account\\Factory\\AccountFactory\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Bundle/Command/TestBuilderCommand.php
+
+		-
+			message: '#^Call to method sync\(\) on an unknown class Domain\\Account\\Persistence\\AccountStore\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Bundle/Command/TestBuilderCommand.php
+
+		-
+			message: '#^Parameter \$accountFactory of method Cortex\\Bridge\\Symfony\\Bundle\\Command\\TestBuilderCommand\:\:__construct\(\) has invalid type Domain\\Account\\Factory\\AccountFactory\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Bundle/Command/TestBuilderCommand.php
+
+		-
+			message: '#^Parameter \$accountStore of method Cortex\\Bridge\\Symfony\\Bundle\\Command\\TestBuilderCommand\:\:__construct\(\) has invalid type Domain\\Account\\Persistence\\AccountStore\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Bundle/Command/TestBuilderCommand.php
+
+		-
+			message: '#^Property Cortex\\Bridge\\Symfony\\Bundle\\Command\\TestBuilderCommand\:\:\$accountFactory has unknown class Domain\\Account\\Factory\\AccountFactory as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Bundle/Command/TestBuilderCommand.php
+
+		-
+			message: '#^Property Cortex\\Bridge\\Symfony\\Bundle\\Command\\TestBuilderCommand\:\:\$accountStore has unknown class Domain\\Account\\Persistence\\AccountStore as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Bundle/Command/TestBuilderCommand.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 2
+			path: src/Bridge/Symfony/Bundle/DependencyInjection/Compiler/ModelProcessorCompilerPass.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Bundle\\DependencyInjection\\Compiler\\ModelProcessorCompilerPass\:\:replaceCollectionClass\(\) has parameter \$modelNode with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Bundle/DependencyInjection/Compiler/ModelProcessorCompilerPass.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Collection\\CollectionDecorator\:\:__construct\(\) has parameter \$collection with generic class Cortex\\Component\\Collection\\AsyncCollection but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecorator.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Collection\\CollectionDecorator\:\:__construct\(\) has parameter \$formBuilder with generic interface Symfony\\Component\\Form\\FormBuilderInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecorator.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Collection\\CollectionDecorator\:\:build\(\) should return Symfony\\Component\\Form\\Form but returns Symfony\\Component\\Form\\FormInterface\<mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecorator.php
+
+		-
+			message: '#^Access to property \$filters on an unknown class Cortex\\Component\\Model\\Factory\\Builder\\FetchBuilder\.$#'
+			identifier: class.notFound
+			count: 3
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Call to method all\(\) on an unknown class Cortex\\Component\\Model\\Factory\\Builder\\FetchBuilder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Call to method paginate\(\) on an unknown class Cortex\\Component\\Model\\Factory\\Builder\\FetchBuilder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Call to method sort\(\) on an unknown class Cortex\\Component\\Model\\Factory\\Builder\\FetchBuilder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Call to static method fromString\(\) on an unknown class Cortex\\Component\\Model\\Decorator\\SortDirection\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Class Cortex\\Bridge\\Symfony\\Form\\CollectionDecoratorType not found\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Instantiated class Cortex\\Component\\Model\\Decorator\\Pager not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Instantiated class Cortex\\Component\\Model\\Decorator\\Sorter not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Collection\\CollectionDecoratorBuilder\:\:create\(\) has parameter \$collection with generic class Cortex\\Component\\Collection\\AsyncCollection but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Collection\\CollectionDecoratorBuilder\:\:prototype\(\) has parameter \$filtersFormOptions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Parameter \$builder of method Cortex\\Bridge\\Symfony\\Collection\\CollectionDecoratorBuilder\:\:prototype\(\) has invalid type Cortex\\Component\\Model\\Factory\\Builder\\FetchBuilder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Parameter \$builder of method Cortex\\Bridge\\Symfony\\Collection\\CollectionDecoratorBuilder\:\:prototypeFromRequest\(\) has invalid type Cortex\\Component\\Model\\Factory\\Builder\\FetchBuilder\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Property Cortex\\Bridge\\Symfony\\Collection\\CollectionDecoratorBuilder\:\:\$decoratorPool type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Unable to resolve the template type TDefault in call to method Symfony\\Component\\HttpFoundation\\InputBag\<string\>\:\:get\(\)$#'
+			identifier: argument.templateType
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Variable \$pager on left side of \?\? is never defined\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Variable \$sorter on left side of \?\? is never defined\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/Bridge/Symfony/Collection/CollectionDecoratorBuilder.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Controller\\ModelFactoryValueResolver\:\:__construct\(\) has parameter \$factoryMapping with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Controller/ModelFactoryValueResolver.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Controller\\ModelFactoryValueResolver\:\:resolve\(\) return type has no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Controller/ModelFactoryValueResolver.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Event\\ControllerSubscriber\:\:onControllerView\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Bridge/Symfony/Event/ControllerSubscriber.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Form\\CommandMapperExtension\:\:getExtendedTypes\(\) return type has no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Form/CommandMapperExtension.php
+
+		-
+			message: '#^Class Cortex\\Bridge\\Symfony\\Form\\DataTransformer\\EmailTransformer implements generic interface Symfony\\Component\\Form\\DataTransformerInterface but does not specify its types\: T, R$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Form/DataTransformer/EmailTransformer.php
+
+		-
+			message: '#^Class Cortex\\Bridge\\Symfony\\Form\\ModelQueryType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Form/ModelQueryType.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Form\\ModelQueryType\:\:mapDataToForms\(\) has parameter \$forms with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Form/ModelQueryType.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Form\\ModelQueryType\:\:mapFilterToForm\(\) has parameter \$form with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Form/ModelQueryType.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Form\\ModelQueryType\:\:mapFormsToData\(\) has parameter \$forms with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Form/ModelQueryType.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>nbPerPage" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/Bridge/Symfony/Form/ModelQueryType.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>page" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/Bridge/Symfony/Form/ModelQueryType.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Form\\ModuleTranslationsExtension\:\:buildView\(\) has parameter \$form with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Form/ModuleTranslationsExtension.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Form\\ModuleTranslationsExtension\:\:buildView\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Form/ModuleTranslationsExtension.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Form\\ModuleTranslationsExtension\:\:getExtendedTypes\(\) return type has no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Form/ModuleTranslationsExtension.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Model\\Query\\ModelQueryDecorator\:\:decorate\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Model/Query/ModelQueryDecorator.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Model\\Query\\ModelQueryDecorator\:\:decorate\(\) has parameter \$sortables with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Model/Query/ModelQueryDecorator.php
+
+		-
+			message: '#^Property Cortex\\Bridge\\Symfony\\Model\\Query\\ModelQueryDecorator\:\:\$activeFilters type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Model/Query/ModelQueryDecorator.php
+
+		-
+			message: '#^Property Cortex\\Bridge\\Symfony\\Model\\Query\\ModelQueryDecorator\:\:\$filtersConfig type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Model/Query/ModelQueryDecorator.php
+
+		-
+			message: '#^Property Cortex\\Bridge\\Symfony\\Model\\Query\\ModelQueryDecorator\:\:\$form with generic interface Symfony\\Component\\Form\\FormInterface does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Model/Query/ModelQueryDecorator.php
+
+		-
+			message: '#^Property Cortex\\Bridge\\Symfony\\Model\\Query\\ModelQueryDecorator\:\:\$formBuilder with generic interface Symfony\\Component\\Form\\FormBuilderInterface does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Model/Query/ModelQueryDecorator.php
+
+		-
+			message: '#^Property Cortex\\Bridge\\Symfony\\Module\\ModuleLoader\:\:\$resolvedRoutes type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Module/ModuleLoader.php
+
+		-
+			message: '#^Using nullsafe property access on non\-nullable type Symfony\\Component\\HttpFoundation\\Request\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/Bridge/Symfony/Module/ModuleLoader.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Routing\\ControllerRouteLoader\:\:addRoute\(\) has parameter \$reflection with generic class ReflectionClass but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Routing/ControllerRouteLoader.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Routing\\ControllerRouteLoader\:\:addRoutesFromController\(\) has parameter \$reflection with generic class ReflectionClass but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Routing/ControllerRouteLoader.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Routing\\ControllerRouteLoader\:\:generateRouteName\(\) has parameter \$reflection with generic class ReflectionClass but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Routing/ControllerRouteLoader.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Routing\\ControllerRouteLoader\:\:getNamespacePrefix\(\) has parameter \$reflection with generic class ReflectionClass but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Bridge/Symfony/Routing/ControllerRouteLoader.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Translation\\ModuleTranslator\:\:__call\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Bridge/Symfony/Translation/ModuleTranslator.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Translation\\ModuleTranslator\:\:__call\(\) has parameter \$arguments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Translation/ModuleTranslator.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Translation\\ModuleTranslator\:\:trans\(\) has parameter \$parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Translation/ModuleTranslator.php
+
+		-
+			message: '#^Method Cortex\\Bridge\\Symfony\\Twig\\Extension\:\:renderBlock\(\) has parameter \$context with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bridge/Symfony/Twig/Extension.php
+
+		-
+			message: '#^Method Cortex\\Component\\Action\\ActionHandlerCollection\:\:__construct\(\) has parameter \$actionHandlers with no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Action/ActionHandlerCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Action\\ActionHandlerCollection\:\:getRegisteredCommands\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Action/ActionHandlerCollection.php
+
+		-
+			message: '#^Property Cortex\\Component\\Action\\ActionHandlerCollection\:\:\$commandMapping type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Action/ActionHandlerCollection.php
+
+		-
+			message: '#^Anonymous function with return type void returns Generator\<int\|string, mixed, mixed, void\> but should not return anything\.$#'
+			identifier: return.void
+			count: 2
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:__construct\(\) has parameter \$origin with no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:create\(\) has parameter \$origin with no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:if\(\) has parameter \$condition with generic class Cortex\\Component\\Collection\\AsyncCollection but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:if\(\) has parameter \$else with generic class Cortex\\Component\\Collection\\AsyncCollection but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:if\(\) has parameter \$then with generic class Cortex\\Component\\Collection\\AsyncCollection but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:ifEmpty\(\) has parameter \$else with generic class Cortex\\Component\\Collection\\AsyncCollection but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:ifEmpty\(\) has parameter \$then with generic class Cortex\\Component\\Collection\\AsyncCollection but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:jsonSerialize\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:onNext\(\) has parameter \$nextInstance with generic class Cortex\\Component\\Collection\\AsyncCollection but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:then\(\) has parameter \$next with no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:then\(\) should return static\(Cortex\\Component\\Collection\\AsyncCollection\<T\>\) but returns object\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\AsyncCollection\:\:wrap\(\) has parameter \$collection with no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^PHPDoc tag @param for parameter \$keyExtractor with type \(callable\)\|int is not subtype of native type callable\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Parameter \#1 \$filter of method Cortex\\Component\\Collection\\AsyncCollection\:\:filter\(\) expects callable\(mixed, int\|string\)\: bool, Closure\(mixed\)\: \(object\|string\) given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Component/Collection/AsyncCollection.php
+
+		-
+			message: '#^Class Cortex\\Component\\Collection\\FileCollection extends generic class Cortex\\Component\\Collection\\AsyncCollection but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Collection/FileCollection.php
+
+		-
+			message: '#^Class Cortex\\Component\\Collection\\StructuredMap implements generic interface IteratorAggregate but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:__construct\(\) has parameter \$elements with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:__construct\(\) has parameter \$nullables with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:__construct\(\) has parameter \$validation with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:add\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:all\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:declaredKeys\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:getIterator\(\) return type with generic class ArrayIterator does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:has\(\) has parameter \$key with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:keys\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:map\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:merge\(\) has parameter \$elements with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:merge\(\) has parameter \$elements with no value type specified in iterable type array\|Cortex\\Component\\Collection\\StructuredMap\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:set\(\) has parameter \$value with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Method Cortex\\Component\\Collection\\StructuredMap\:\:values\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Parameter \#2 \$callback of function array_filter expects \(callable\(mixed\)\: bool\)\|null, Closure\(mixed\)\: Cortex\\Component\\Collection\\StructuredMap given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Property Cortex\\Component\\Collection\\StructuredMap\:\:\$elements type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Property Cortex\\Component\\Collection\\StructuredMap\:\:\$keyMap type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Property Cortex\\Component\\Collection\\StructuredMap\:\:\$keys type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Property Cortex\\Component\\Collection\\StructuredMap\:\:\$nullables type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Property Cortex\\Component\\Collection\\StructuredMap\:\:\$validation type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Collection/StructuredMap.php
+
+		-
+			message: '#^Call to sprintf contains 2 placeholders, 3 values given\.$#'
+			identifier: argument.sprintf
+			count: 1
+			path: src/Component/Date/DateString.php
+
+		-
+			message: '#^Trait Cortex\\Component\\Event\\EmitsActionEvents is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Component/Event/EmitsActionEvents.php
+
+		-
+			message: '#^Method Cortex\\Component\\Json\\JsonString\:\:__construct\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Json/JsonString.php
+
+		-
+			message: '#^Method Cortex\\Component\\Json\\JsonString\:\:decode\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Json/JsonString.php
+
+		-
+			message: '#^Property Cortex\\Component\\Json\\JsonString\:\:\$data type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Json/JsonString.php
+
+		-
+			message: '#^Method Cortex\\Component\\Mapper\\ArrayMapper\:\:__construct\(\) has parameter \$mapping with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Mapper/ArrayMapper.php
+
+		-
+			message: '#^Method Cortex\\Component\\Mapper\\ArrayMapper\:\:__construct\(\) has parameter \$sourceKeys with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Mapper/ArrayMapper.php
+
+		-
+			message: '#^Method Cortex\\Component\\Mapper\\ArrayMapper\:\:map\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Mapper/ArrayMapper.php
+
+		-
+			message: '#^Property Cortex\\Component\\Mapper\\ArrayMapper\:\:\$mapping type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Mapper/ArrayMapper.php
+
+		-
+			message: '#^Method Cortex\\Component\\Mapper\\CallbackMapper\:\:map\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Mapper/CallbackMapper.php
+
+		-
+			message: '#^Method Cortex\\Component\\Mapper\\Mapper\:\:map\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Mapper/Mapper.php
+
+		-
+			message: '#^Method Cortex\\Component\\Middleware\\Middleware\:\:__construct\(\) has parameter \$handler with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Middleware/Middleware.php
+
+		-
+			message: '#^Method Cortex\\Component\\Middleware\\Middleware\:\:__invoke\(\) has parameter \$args with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Middleware/Middleware.php
+
+		-
+			message: '#^Method Cortex\\Component\\Middleware\\Middleware\:\:wrap\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Middleware/Middleware.php
+
+		-
+			message: '#^Property Cortex\\Component\\Middleware\\Middleware\:\:\$handler has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Component/Middleware/Middleware.php
+
+		-
+			message: '#^Method Cortex\\Component\\Middleware\\MiddlewareChain\:\:compile\(\) has parameter \$args with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Middleware/MiddlewareChain.php
+
+		-
+			message: '#^Method Cortex\\Component\\Middleware\\MiddlewareChain\:\:compile\(\) return type with generic class Cortex\\Component\\Collection\\AsyncCollection does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Middleware/MiddlewareChain.php
+
+		-
+			message: '#^Method Cortex\\Component\\Middleware\\MiddlewareChain\:\:run\(\) has parameter \$args with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Middleware/MiddlewareChain.php
+
+		-
+			message: '#^PHPDoc tag @param for parameter \$middlewares with type array\<Cortex\\Component\\Middleware\\Middleware\> is incompatible with native type Cortex\\Component\\Middleware\\Middleware\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: src/Component/Middleware/MiddlewareChain.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<Cortex\\Component\\Middleware\\Middleware\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Component/Middleware/MiddlewareChain.php
+
+		-
+			message: '#^Trait Cortex\\Component\\Model\\Archivable is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Component/Model/Archivable.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\Builder\\Builder\:\:addFilter\(\) has parameter \$filters with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Model/Factory/Builder/Builder.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\Builder\\Builder\:\:endBuild\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Component/Model/Factory/Builder/Builder.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\Builder\\Builder\:\:endBuild\(\) has parameter \$args with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Model/Factory/Builder/Builder.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\Builder\\CreationBuilder\:\:build\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Component/Model/Factory/Builder/CreationBuilder.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\Builder\\CreationBuilder\:\:with\(\) has parameter \$filter with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Model/Factory/Builder/CreationBuilder.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\Builder\\CreationBuilder\:\:with\(\) should return Cortex\\Component\\Model\\Factory\\Builder\\CreationBuilder but returns Cortex\\Component\\Model\\Factory\\Builder\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Component/Model/Factory/Builder/CreationBuilder.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\Mapper\\FlatModelMapper\:\:guessModelClass\(\) has parameter \$modelData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Factory/Mapper/FlatModelMapper.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\Mapper\\FlatModelMapper\:\:prototype\(\) has parameter \$modelData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Factory/Mapper/FlatModelMapper.php
+
+		-
+			message: '#^Property Cortex\\Component\\Model\\Factory\\Mapper\\FlatModelMapper\:\:\$ignoredKeys type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Factory/Mapper/FlatModelMapper.php
+
+		-
+			message: '#^Property Cortex\\Component\\Model\\Factory\\Mapper\\FlatModelMapper\:\:\$keyMap type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Factory/Mapper/FlatModelMapper.php
+
+		-
+			message: '#^Property Cortex\\Component\\Model\\Factory\\Mapper\\FlatModelMapper\:\:\$propertyKeys type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Factory/Mapper/FlatModelMapper.php
+
+		-
+			message: '#^Property Cortex\\Component\\Model\\Factory\\Mapper\\FlatModelMapper\:\:\$reflection with generic class ReflectionClass does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Model/Factory/Mapper/FlatModelMapper.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\Mapper\\ModelMapper\:\:prototype\(\) has parameter \$modelData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Factory/Mapper/ModelMapper.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\ModelFactory\:\:__construct\(\) has parameter \$creationMiddlewares with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Factory/ModelFactory.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\ModelFactory\:\:__construct\(\) has parameter \$fetchingMiddlewares with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Factory/ModelFactory.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\ModelFactory\:\:assemble\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Component/Model/Factory/ModelFactory.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\ModelFactory\:\:instancePipeline\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Component/Model/Factory/ModelFactory.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\ModelFactory\:\:instancePipeline\(\) has parameter \$modelData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Factory/ModelFactory.php
+
+		-
+			message: '#^Call to an undefined method ReflectionType\:\:getName\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Component/Model/Factory/ModelPrototype.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Factory\\ModelPrototype\:\:buildConstructorMap\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Component/Model/Factory/ModelPrototype.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Query\\ModelQuery\:\:all\(\) return type with generic class Cortex\\Component\\Model\\ModelCollection does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Model/Query/ModelQuery.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Query\\ModelQuery\:\:filter\(\) has parameter \$filters with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Model/Query/ModelQuery.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Query\\ModelQuery\:\:getCollection\(\) return type with generic class Cortex\\Component\\Model\\ModelCollection does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Component/Model/Query/ModelQuery.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Query\\ModelQuery\:\:tag\(\) has parameter \$tags with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Model/Query/ModelQuery.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Query\\Pager\:\:getPages\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Query/Pager.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Store\\ModelStore\:\:__construct\(\) has parameter \$removeMiddlewares with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Store/ModelStore.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Store\\ModelStore\:\:__construct\(\) has parameter \$syncMiddlewares with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Store/ModelStore.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Store\\ModelStore\:\:process\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Store/ModelStore.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Store\\ModelStore\:\:remove\(\) has parameter \$model with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Model/Store/ModelStore.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Store\\ModelStore\:\:remove\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Store/ModelStore.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Store\\ModelStore\:\:sync\(\) has parameter \$model with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Component/Model/Store/ModelStore.php
+
+		-
+			message: '#^Method Cortex\\Component\\Model\\Store\\ModelStore\:\:sync\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Component/Model/Store/ModelStore.php
+
+		-
+			message: '#^Property Cortex\\Component\\Model\\Store\\ModelStore\:\:\$collectionClass is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Component/Model/Store/ModelStore.php
+
+		-
+			message: '#^Property Cortex\\Component\\Model\\Store\\ModelStore\:\:\$mapper is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Component/Model/Store/ModelStore.php
+
+		-
+			message: '#^Trait Cortex\\Component\\Model\\Uuidentifiable is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Component/Model/Uuidentifiable.php
+
+		-
+			message: '#^Readonly property Cortex\\ValueObject\\ValueObject\:\:\$value is assigned outside of its declaring class\.$#'
+			identifier: property.readOnlyAssignOutOfClass
+			count: 1
+			path: src/ValueObject/Email.php
+
+		-
+			message: '#^Readonly property Cortex\\ValueObject\\ValueObject\:\:\$value is assigned outside of its declaring class\.$#'
+			identifier: property.readOnlyAssignOutOfClass
+			count: 1
+			path: src/ValueObject/HashedPassword.php
+
+		-
+			message: '#^Readonly property Cortex\\ValueObject\\ValueObject\:\:\$value is assigned outside of its declaring class\.$#'
+			identifier: property.readOnlyAssignOutOfClass
+			count: 2
+			path: src/ValueObject/PositiveInt.php
+
+		-
+			message: '#^Readonly property Cortex\\ValueObject\\ValueObject\:\:\$value is assigned outside of its declaring class\.$#'
+			identifier: property.readOnlyAssignOutOfClass
+			count: 1
+			path: src/ValueObject/SecurityToken.php
+
+		-
+			message: '#^Method Cortex\\ValueObject\\ValueObject\:\:__construct\(\) has parameter \$value with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/ValueObject/ValueObject.php
+
+		-
+			message: '#^Method Cortex\\ValueObject\\ValueObject\:\:__invoke\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/ValueObject/ValueObject.php
+
+		-
+			message: '#^Method Cortex\\ValueObject\\ValueObject\:\:equals\(\) has parameter \$other with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/ValueObject/ValueObject.php

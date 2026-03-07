@@ -1,0 +1,81 @@
+deptrac:
+  paths:
+    - src
+  exclude_files:
+    - '#.*Bundle/Resources/maker.*#'
+
+  layers:
+    - name: CortexCore
+      collectors:
+        - type: directory
+          value: src/Component/.*
+        - type: directory
+          value: src/ValueObject/.*
+
+    - name: CortexBridgeSymfony
+      collectors:
+        - type: bool
+          must:
+            - type: directory
+              value: src/Bridge/Symfony/.*
+          must_not:
+            - type: directory
+              value: src/Bridge/Symfony/Bundle/.*
+
+    - name: CortexBridgeSymfonyBundle
+      collectors:
+        - type: directory
+          value: src/Bridge/Symfony/Bundle/.*
+
+    - name: CortexBridgeDoctrine
+      collectors:
+        - type: directory
+          value: src/Bridge/Doctrine/.*
+
+    # Symfony utilities (lightweight, no framework coupling)
+    - name: SymfonyUtils
+      collectors:
+        - type: classNameRegex
+          value: '#^Symfony\\Component\\(Uid|String|Finder)\\#'
+
+    # Symfony framework (everything else)
+    - name: Symfony
+      collectors:
+        - type: bool
+          must:
+            - type: classNameRegex
+              value: '#^Symfony\\#'
+          must_not:
+            - type: classNameRegex
+              value: '#^Symfony\\Component\\(Uid|String|Finder)\\#'
+
+    - name: Doctrine
+      collectors:
+        - type: classNameRegex
+          value: '#^Doctrine\\#'
+
+  ruleset:
+    # CortexCore: pur PHP + utilities Symfony legeres (Uid, String, Finder)
+    CortexCore:
+      - SymfonyUtils
+
+    # BridgeSymfony (hors Bundle): Symfony components
+    CortexBridgeSymfony:
+      - CortexCore
+      - SymfonyUtils
+      - Symfony
+
+    # BridgeSymfonyBundle: acces complet aux bridges et frameworks
+    CortexBridgeSymfonyBundle:
+      - CortexCore
+      - CortexBridgeSymfony
+      - CortexBridgeDoctrine
+      - SymfonyUtils
+      - Symfony
+      - Doctrine
+
+    # BridgeDoctrine: Doctrine + utilities Symfony
+    CortexBridgeDoctrine:
+      - CortexCore
+      - SymfonyUtils
+      - Doctrine

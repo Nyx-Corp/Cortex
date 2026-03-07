@@ -1,0 +1,11 @@
+includes:
+    - phpstan-baseline.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon
+
+parameters:
+    level: 6
+    paths:
+        - src
+    excludePaths:
+        - src/Bridge/Symfony/Bundle/Resources/maker
+        - src/Bridge/Symfony/Bundle/Maker
