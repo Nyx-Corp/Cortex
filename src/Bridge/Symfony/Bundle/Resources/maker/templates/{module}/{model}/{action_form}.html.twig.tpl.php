@@ -1,19 +1,19 @@
-{# template route : <?= $module ?>/<?= $model ?>/<?= $action ?> #}
+{# template route : <?php echo $module; ?>/<?php echo $model; ?>/<?php echo $action; ?> #}
 
-{% trans_default_domain '<?= $module ?>' %}
+{% trans_default_domain '<?php echo $module; ?>' %}
 
-{% set title = '<?= $model ?>.<?= $action ?>.title'|trans %}
+{% set title = '<?php echo $model; ?>.<?php echo $action; ?>.title'|trans %}
 
 {% set breadcrumbs = [{ 'label': title }]|merge(breadcrumbs|default([])) %}
 
-{% extends "<?= $module ?>/<?= $model ?>/_layout.html.twig" %}
+{% extends "<?php echo $module; ?>/<?php echo $model; ?>/_layout.html.twig" %}
 
 {% use '@_theme/components/forms.html.twig' %}
 
 {% form_theme form _self %}
 {#
     Block overrides priority for form theming :
-        > {% block _<?= $action ?>_<fieldName>_widget %}{% endblock %}
+        > {% block _<?php echo $action; ?>_<fieldName>_widget %}{% endblock %}
         > {% block <fieldType>_<fieldName>_widget %}{% endblock %}}
         > {% block <fieldName>_widget %}{% endblock %}
         > {% block <fieldType>_widget %}{% endblock %}
@@ -27,9 +27,9 @@
 
     <h1>{{ title }}</h1>
     <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-bold text-dark">{{ title }}</h1>
-        <a href="{{ path('<?= $module ?>/<?= $model ?>/create') }}"
-            class="inline-flex items-center gap-2 rounded-md bg-form-btn hover:bg-form-btn-hover text-white text-sm font-medium px-4 py-2 cursor-pointer">
+        <h1 class="text-3xl font-bold text-foreground">{{ title }}</h1>
+        <a href="{{ path('<?php echo $module; ?>/<?php echo $model; ?>/create') }}"
+            class="inline-flex items-center gap-2 rounded-md bg-primary hover:bg-primary/90 text-white text-sm font-medium px-4 py-2 cursor-pointer">
             <i data-lucide="plus" class="size-4"></i>
             {{ 'admin.action.create'|trans({}, 'admin') }}
         </a>

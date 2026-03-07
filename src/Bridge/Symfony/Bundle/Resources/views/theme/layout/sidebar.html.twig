@@ -1,4 +1,4 @@
-<button id="sidebar-toggle" class="absolute -end-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-layout-border bg-[var(--color-menu-bg)] p-1 text-white hover:bg-[var(--color-menu-bg-lighter)]">
+<button id="sidebar-toggle" class="absolute -end-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-border bg-sidebar p-1 text-sidebar-foreground hover:bg-sidebar-accent">
 	<i data-lucide="chevron-left" class="size-3 group-[.closed]/sidebar:hidden"></i>
 	<i data-lucide="chevron-right" class="size-3 hidden group-[.closed]/sidebar:block"></i>
 </button>
@@ -10,10 +10,10 @@
 
 {# Search button - triggers Cmd+K modal #}
 <div class="px-3 pt-1 pb-3">
-	<button id="search-trigger" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-400 bg-menu-bg-lighter hover:bg-menu-hover hover:text-white transition-colors group-[.closed]/sidebar:justify-center">
+	<button id="search-trigger" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-sidebar-muted bg-sidebar-accent hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors group-[.closed]/sidebar:justify-center">
 		<i data-lucide="search" class="size-4 shrink-0"></i>
 		<span class="group-[.closed]/sidebar:hidden flex-1 text-left">Rechercher...</span>
-		<kbd class="group-[.closed]/sidebar:hidden text-xs bg-menu-bg px-1.5 py-0.5 rounded text-gray-500">⌘K</kbd>
+		<kbd class="group-[.closed]/sidebar:hidden text-xs bg-sidebar px-1.5 py-0.5 rounded text-sidebar-muted">⌘K</kbd>
 	</button>
 </div>
 
@@ -28,7 +28,7 @@
 	{% endfor %}
 	</ul>
 	{% if menu_bottom|default([])|length > 0 %}
-	<ul class="flex flex-col gap-y-6 mt-auto py-4 border-t border-menu-border">
+	<ul class="flex flex-col gap-y-6 mt-auto py-4 border-t border-sidebar-border">
 	{% for section in menu_bottom %}
 		{{ render_block('menu_section', '@_theme/components/menu.html.twig', {
 			section: section,
@@ -41,22 +41,22 @@
 
 {# Club Switcher + Profile - Style Payfit #}
 {% block club_switcher %}
-<div class="border-t border-menu-border">
+<div class="border-t border-sidebar-border">
 	<div class="px-2 py-3 group/switcher relative z-50">
-		<div class="flex items-center gap-3 rounded-md px-3 py-2 cursor-pointer hover:bg-menu-hover transition-colors">
+		<div class="flex items-center gap-3 rounded-md px-3 py-2 cursor-pointer hover:bg-sidebar-accent transition-colors">
 			{# Club avatar/initials #}
-			<div class="size-9 shrink-0 rounded-lg bg-primary flex items-center justify-center text-white font-semibold text-sm">
+			<div class="size-9 shrink-0 rounded-lg bg-primary flex items-center justify-center text-sidebar-foreground font-semibold text-sm">
 				{# TODO: Dynamic club initials #}
 				CB
 			</div>
 			{# Club info - hidden when collapsed #}
 			<div class="flex-1 min-w-0 group-[.closed]/sidebar:hidden">
 				{# TODO: Dynamic club name #}
-				<p class="text-sm font-medium text-white truncate">Cercle de Bridge de Caluire</p>
+				<p class="text-sm font-medium text-sidebar-foreground truncate">Cercle de Bridge de Caluire</p>
 				{# TODO: Dynamic role #}
-				<p class="text-xs text-gray-400 truncate">Admin</p>
+				<p class="text-xs text-sidebar-muted truncate">Admin</p>
 			</div>
-			<i data-lucide="chevrons-up-down" class="size-4 text-gray-400 group-[.closed]/sidebar:hidden"></i>
+			<i data-lucide="chevrons-up-down" class="size-4 text-sidebar-muted group-[.closed]/sidebar:hidden"></i>
 		</div>
 
 		{# Dropdown menu - pb-2 creates invisible bridge to prevent hover loss #}
@@ -65,51 +65,51 @@
 				transition-all duration-150
 				w-[236px] left-2
 				group-hover/switcher:opacity-100 group-hover/switcher:scale-100 group-hover/switcher:pointer-events-auto">
-			<div class="rounded-lg bg-menu-bg-lighter border border-menu-border shadow-xl">
+			<div class="rounded-lg bg-sidebar-accent border border-sidebar-border shadow-xl">
 
 			{# Current club header #}
-			<div class="px-4 py-3 border-b border-menu-border">
-				<p class="text-sm font-medium text-white">Cercle de Bridge de Caluire</p>
-				<span class="inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs font-medium bg-primary text-white">
+			<div class="px-4 py-3 border-b border-sidebar-border">
+				<p class="text-sm font-medium text-sidebar-foreground">Cercle de Bridge de Caluire</p>
+				<span class="inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs font-medium bg-primary text-sidebar-foreground">
 					Admin
 				</span>
 			</div>
 
 			{# Menu items #}
 			<div class="py-2">
-				<a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-menu-hover transition-colors">
+				<a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
 					<i data-lucide="settings" class="size-4"></i>
 					<span>Mes paramètres</span>
 				</a>
-				<a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-menu-hover transition-colors">
+				<a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
 					<i data-lucide="help-circle" class="size-4"></i>
 					<span>Aide / Support</span>
 				</a>
 			</div>
 
 			{# Switch club section #}
-			<div class="border-t border-menu-border py-2">
-				<p class="px-4 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">Changer de club</p>
+			<div class="border-t border-sidebar-border py-2">
+				<p class="px-4 py-1 text-xs font-medium text-sidebar-muted uppercase tracking-wide">Changer de club</p>
 				{# TODO: Dynamic club list from user roles #}
-				<a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-menu-hover transition-colors">
-					<div class="size-7 rounded bg-menu-hover flex items-center justify-center text-xs font-medium">RN</div>
+				<a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
+					<div class="size-7 rounded bg-sidebar-accent flex items-center justify-center text-xs font-medium">RN</div>
 					<div class="flex-1 min-w-0">
 						<p class="truncate">Le Rouge et le Noir</p>
-						<p class="text-xs text-gray-500">Membre</p>
+						<p class="text-xs text-sidebar-muted">Membre</p>
 					</div>
 				</a>
-				<a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-menu-hover transition-colors">
-					<div class="size-7 rounded bg-menu-hover flex items-center justify-center text-xs font-medium">BL</div>
+				<a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
+					<div class="size-7 rounded bg-sidebar-accent flex items-center justify-center text-xs font-medium">BL</div>
 					<div class="flex-1 min-w-0">
 						<p class="truncate">Bridge Club Lyon</p>
-						<p class="text-xs text-gray-500">Admin</p>
+						<p class="text-xs text-sidebar-muted">Admin</p>
 					</div>
 				</a>
 			</div>
 
 			{# Logout #}
-			<div class="border-t border-menu-border py-2">
-				<a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-menu-hover transition-colors">
+			<div class="border-t border-sidebar-border py-2">
+				<a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
 					<i data-lucide="log-out" class="size-4"></i>
 					<span>Déconnexion</span>
 				</a>

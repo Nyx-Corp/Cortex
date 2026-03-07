@@ -1,9 +1,80 @@
-{% macro form_error(error, namespace, translations_domain) %}
-    <div role="alert" class="rounded-md border border-red-300 bg-red-50 my-8 px-4 py-2 text-sm/6 text-red-800">
-        <strong>{{ (namespace ~ '.error.label')|trans({}, translations_domain) }}</strong>
-        - {{ (namespace ~ '.error.' ~ error.messageKey)|trans(error.messageData, translations_domain) }}
-        {% if error.code is defined %}
-            <span class="mt-1 text-xs italic text-red-900 font-mono">(#{{ error.code }})</span>
-        {% endif %}
+{#
+    Alerts Component - Unified notification system under the bell
+
+    Features:
+    - Displays Symfony flash messages
+    - Supports window.toast API
+    - 3 levels: success (green), warning (orange), error (red)
+    - Auto-dismiss after 2s, reappear on hover
+    - Mark as read to dismiss immediately
+#}
+
+{# Build translated flash messages #}
+{# Format: {title, message?, params?, domain?, icon?} #}
+{% set default_domain = trans_domain|default('messages') %}
+{% set translated_flashes = {} %}
+{% for type, messages in app.flashes() %}
+    {% set translated_messages = [] %}
+    {% for msg in messages %}
+        {% set domain = msg.domain|default(default_domain) %}
+        {% set params = msg.params|default({}) %}
+        {% set translated_messages = translated_messages|merge([{
+            title: msg.title|trans(params, domain),
+            message: msg.message is defined ? msg.message|trans(params, domain) : null,
+            icon: msg.icon|default(null)
+        }]) %}
+    {% endfor %}
+    {% set translated_flashes = translated_flashes|merge({ (type): translated_messages }) %}
+{% endfor %}
+
+<div class="fixed top-4 right-4 z-80"
+     data-controller="alerts"
+     data-flash-messages="{{ translated_flashes|json_encode|e('html_attr') }}"
+     data-action="mouseenter->alerts#pause mouseleave->alerts#resume">
+
+    {# Bell button #}
+    <button type="button"
+            class="relative p-2 rounded-full bg-card border border-border shadow-sm hover:bg-muted transition-colors"
+            aria-label="Notifications">
+        <i data-lucide="bell" class="size-5 text-foreground"></i>
+
+        {# Badge counter #}
+        <span data-alerts-target="badge"
+              class="hidden absolute -top-1 -right-1 size-5 flex items-center justify-center text-xs font-medium bg-primary text-white rounded-full">
+            0
+        </span>
+    </button>
+
+    {# Alerts container - stacks below the bell #}
+    <div data-alerts-target="container"
+         class="absolute top-full right-0 pt-2 w-80 flex flex-col gap-2">
     </div>
-{% endmacro %}
+
+    {# Alert template #}
+    <template data-alerts-target="template">
+        <div data-alert-item
+             class="opacity-0 translate-x-4 transition-all duration-150
+                    flex items-start gap-3 px-4 py-3
+                    bg-card border border-border border-l-4 rounded shadow-lg">
+
+            {# Icon #}
+            <span data-alert-icon class="shrink-0 mt-0.5"></span>
+
+            {# Content #}
+            <div class="flex-1 min-w-0">
+                <p data-alert-title class="text-sm font-medium text-foreground"></p>
+                <p data-alert-message class="hidden mt-0.5 text-sm text-muted-foreground"></p>
+            </div>
+
+            {# Close button #}
+            <button type="button"
+                    data-action="click->alerts#dismiss"
+                    class="shrink-0 p-1 -m-1 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Fermer">
+                <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    </template>
+</div>

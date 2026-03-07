@@ -1,7 +1,58 @@
 /**
- * Cortex - Theme base styles
- * Import this in your main.css: @import '@cortex/css/theme.css';
+ * Cortex — Design tokens (shadcn/ui convention)
+ * https://ui.shadcn.com/themes
+ *
+ * 100% portable — no project-specific references.
+ * Projects override tokens in their own theme-brand.css.
  */
+@theme {
+  /* ===== Surfaces ===== */
+  --color-background:             var(--color-white);
+  --color-foreground:             var(--color-zinc-900);
+
+  --color-card:                   var(--color-white);
+  --color-card-foreground:        var(--color-zinc-900);
+
+  --color-popover:                var(--color-white);
+  --color-popover-foreground:     var(--color-zinc-900);
+
+  --color-muted:                  var(--color-zinc-100);
+  --color-muted-foreground:       var(--color-zinc-500);
+
+  --color-accent:                 var(--color-zinc-100);
+  --color-accent-foreground:      var(--color-zinc-900);
+
+  /* ===== Brand ===== */
+  --color-primary:                var(--color-zinc-800);
+  --color-primary-foreground:     var(--color-white);
+
+  --color-secondary:              var(--color-zinc-100);
+  --color-secondary-foreground:   var(--color-zinc-900);
+
+  /* ===== Borders & Inputs ===== */
+  --color-border:                 var(--color-zinc-200);
+  --color-input:                  var(--color-zinc-200);
+  --color-ring:                   var(--color-zinc-400);
+
+  /* ===== States ===== */
+  --color-destructive:            var(--color-red-800);
+  --color-destructive-foreground: var(--color-white);
+
+  --color-success:                var(--color-teal-800);
+  --color-success-foreground:     var(--color-white);
+
+  --color-warning:                var(--color-amber-600);
+  --color-warning-foreground:     var(--color-white);
+
+  /* ===== Sidebar ===== */
+  --color-sidebar:                var(--color-zinc-800);
+  --color-sidebar-foreground:     var(--color-white);
+  --color-sidebar-muted:          var(--color-zinc-600);
+  --color-sidebar-accent:         var(--color-zinc-700);
+  --color-sidebar-border:         var(--color-zinc-700);
+}
+
+/* ===== Base utilities ===== */
 
 /* Disable transitions on initial page load to prevent FOUC */
 .no-transition,

@@ -1,0 +1,45 @@
+admin:
+  action:
+    back: Back to list
+    cancel: Back
+    submit: Save
+    save: Save
+    edit: Edit
+    new: New
+    delete: Delete
+    create: Create
+    archive:
+      label: Archive
+      confirmation: Are you sure you want to archive this item?
+  list:
+    empty_text: No items found
+    filters: Filters
+    reset: Reset
+    results: results
+
+form:
+  select:
+    empty_value: Select…
+
+nav:
+  list:
+    title: List
+  create:
+    title: New
+  edit:
+    title: Edit
+
+list:
+  filters:
+    title: Filters
+    counter: '{first}-{last} of {total}'
+    submit: Filter
+    clear: Clear
+  pager:
+    display: Show
+    results: results
+  sorting:
+    asc: Sort by {field} ascending
+    desc: Sort by {field} descending
+  fields:
+    uuid: Uuid

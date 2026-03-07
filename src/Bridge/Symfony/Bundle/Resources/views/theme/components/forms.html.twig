@@ -25,7 +25,7 @@
 {%- endblock form_row -%}
 
 {% block form_label %}
-    {% set label_attr = {'class': 'text-sm/6 font-medium text-form-label'} | merge(label_attr|default({})) %}
+    {% set label_attr = {'class': 'text-sm/6 font-medium text-foreground'} | merge(label_attr|default({})) %}
     {% if label is not same as(false) %}
         {% if label is empty %}
             {% set label = name|humanize %}
@@ -39,7 +39,7 @@
 
 {% block form_widget_simple %}
     {% set attr = {
-        class: 'block appearance-none w-full rounded-md bg-form-bg px-3 py-1.5 text-base text-form outline-1 -outline-offset-1 outline-form-border placeholder:text-form-placeholder placeholder:italic focus:outline-2 focus:-outline-offset-2 focus:outline-form-border-focus sm:text-sm/6',
+        class: 'block appearance-none w-full rounded-md bg-card px-3 py-1.5 text-base text-foreground outline-1 -outline-offset-1 outline-input placeholder:text-muted-foreground placeholder:italic focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6',
         placeholder: placeholder|default(false)
     } | merge(attr|default({})) %}
     {{ parent() }}
@@ -48,7 +48,7 @@
 {% block email_widget %}
     <div class="relative">
         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <i data-lucide="mail" class="size-4 text-zinc-400"></i>
+            <i data-lucide="mail" class="size-4 text-muted-foreground"></i>
         </div>
         {% set type = 'email' %}
         {% set attr = attr|default({})|merge({class: '!pl-10 ' ~ (attr.class|default(''))}) %}
@@ -59,7 +59,7 @@
 {% block tel_widget %}
     <div class="relative">
         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <i data-lucide="phone" class="size-4 text-zinc-400"></i>
+            <i data-lucide="phone" class="size-4 text-muted-foreground"></i>
         </div>
         {% set type = 'tel' %}
         {% set attr = attr|default({})|merge({class: '!pl-10 ' ~ (attr.class|default(''))}) %}
@@ -69,7 +69,7 @@
 
 {%- block textarea_widget -%}
     {% set attr = {
-        class: 'block appearance-none w-full rounded-md bg-form-bg px-3 py-1.5 text-base text-form outline-1 -outline-offset-1 outline-form-border placeholder:text-form-placeholder placeholder:italic focus:outline-2 focus:-outline-offset-2 focus:outline-form-border-focus sm:text-sm/6 min-h-[6rem] resize-none',
+        class: 'block appearance-none w-full rounded-md bg-card px-3 py-1.5 text-base text-foreground outline-1 -outline-offset-1 outline-input placeholder:text-muted-foreground placeholder:italic focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6 min-h-[6rem] resize-none',
         placeholder: placeholder|default(false)
     } | merge(attr|default({})) %}
     {{ parent() }}
@@ -77,14 +77,14 @@
 
 {%- block choice_widget_expanded -%}
 
-    {% set label_attr = {'class': 'ml-2 mr-8 block text-sm/6 font-medium text-form-label'} | merge(label_attr|default({})) %}
+    {% set label_attr = {'class': 'ml-2 mr-8 block text-sm/6 font-medium text-foreground'} | merge(label_attr|default({})) %}
     
     <div class="flex items-center flex-wrap mt-3 gap-2 sm:flex-nowrap">
     {%- for child in form %}
         {{- form_widget(child, {
             attr: {
                 class: 'relative size-4 appearance-none rounded-full
-                border border-form-border bg-form-bg before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-dark-light checked:bg-dark-lighter focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-medium disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden'
+                border border-input bg-card before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-primary checked:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-medium disabled:border-input disabled:bg-muted disabled:before:bg-muted-foreground forced-colors:appearance-auto forced-colors:before:hidden'
             }
         }) -}}
         {{- form_label(child, null, {
@@ -97,20 +97,20 @@
 {% block choice_widget_collapsed %}
     <div class="mt-2 relative">
         {% set attr = {
-            'class': 'block w-full appearance-none rounded-md bg-form-bg pr-10 px-3 py-1.5 text-base text-form outline-1 -outline-offset-1 outline-form-border placeholder:text-form-placeholder placeholder:italic focus:outline-2 focus:-outline-offset-2 focus:outline-form-border-focus sm:text-sm/6'
+            'class': 'block w-full appearance-none rounded-md bg-card pr-10 px-3 py-1.5 text-base text-foreground outline-1 -outline-offset-1 outline-input placeholder:text-muted-foreground placeholder:italic focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6'
         } | merge(attr|default({})) %}
 
         {{ parent() }}
 
-        <i data-lucide="chevrons-up-down" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-form opacity-70"></i>
+        <i data-lucide="chevrons-up-down" class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground opacity-70"></i>
     </div>
 {% endblock %}
 
 {% block form_help %}
     {% if help is not empty %}
         <div class="relative group shrink-0">
-            <i data-lucide="info" class="size-3 text-form-placeholder cursor-help"></i>
-            <div class="absolute left-full top-0 ml-2 z-10 hidden group-hover:block min-w-50 max-w-xs text-xs text-dark-lighter bg-form-bg border border-form-border rounded-md shadow p-2 whitespace-normal">
+            <i data-lucide="info" class="size-3 text-muted-foreground cursor-help"></i>
+            <div class="absolute left-full top-0 ml-2 z-10 hidden group-hover:block min-w-50 max-w-xs text-xs text-muted-foreground bg-card border border-input rounded-md shadow p-2 whitespace-normal">
                 {{ help|trans(help_translation_parameters, translation_domain) }}
             </div>
         </div>

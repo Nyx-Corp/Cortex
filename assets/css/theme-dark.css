@@ -1,0 +1,40 @@
+/**
+ * Cortex — Dark mode overrides
+ * Active via .dark on <html>, persists in localStorage
+ */
+.dark {
+  --color-background:             var(--color-zinc-950);
+  --color-foreground:             var(--color-zinc-50);
+
+  --color-card:                   var(--color-zinc-900);
+  --color-card-foreground:        var(--color-zinc-50);
+
+  --color-popover:                var(--color-zinc-900);
+  --color-popover-foreground:     var(--color-zinc-50);
+
+  --color-muted:                  var(--color-zinc-800);
+  --color-muted-foreground:       var(--color-zinc-400);
+
+  --color-accent:                 var(--color-zinc-800);
+  --color-accent-foreground:      var(--color-zinc-50);
+
+  --color-primary-foreground:     var(--color-white);
+
+  --color-secondary:              var(--color-zinc-800);
+  --color-secondary-foreground:   var(--color-zinc-50);
+
+  --color-border:                 var(--color-zinc-800);
+  --color-input:                  var(--color-zinc-700);
+  --color-ring:                   var(--color-zinc-600);
+
+  --color-destructive:            var(--color-red-500);
+  --color-destructive-foreground: var(--color-white);
+
+  --color-success:                var(--color-teal-500);
+  --color-success-foreground:     var(--color-white);
+
+  --color-warning:                var(--color-amber-400);
+  --color-warning-foreground:     var(--color-zinc-900);
+
+  /* Sidebar unchanged — already dark */
+}

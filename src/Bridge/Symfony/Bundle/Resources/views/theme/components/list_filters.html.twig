@@ -2,7 +2,7 @@
 
 {% block text_widget %}
     {% set attr = attr|merge({ 
-        'class': 'block px-2.5 py-2.5 w-full text-sm text-dark bg-transparent rounded-s-lg border border-light-darker border-e-0 appearance-none focus:outline-none focus:ring-0 focus:border-form-border-focus peer transition-all',
+        'class': 'block px-2.5 py-2.5 w-full text-sm text-foreground bg-transparent rounded-s-lg border border-border border-e-0 appearance-none focus:outline-none focus:ring-0 focus:border-primary peer transition-all',
         'placeholder': ' '
     }) %}
     {{ block('form_widget_simple') }}
@@ -10,7 +10,7 @@
 
 {% block choice_widget %}
     {% set attr = attr|merge({ 
-        'class': 'block px-2.5 py-2.5 pr-8 w-full text-sm text-dark bg-transparent rounded-s-lg border border-light-darker border-e-0 appearance-none focus:outline-none focus:ring-0 focus:border-form-border-focus peer cursor-pointer transition-all',
+        'class': 'block px-2.5 py-2.5 pr-8 w-full text-sm text-foreground bg-transparent rounded-s-lg border border-border border-e-0 appearance-none focus:outline-none focus:ring-0 focus:border-primary peer cursor-pointer transition-all',
         'data-autosubmit': true
     }) %}
     <div class="relative w-full">
@@ -33,7 +33,7 @@
             {% endfor %}
         </select>
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-            <i data-lucide="chevron-down" class="size-3 text-dark-lighter"></i>
+            <i data-lucide="chevron-down" class="size-3 text-muted-foreground"></i>
         </div>
     </div>
 {% endblock %}

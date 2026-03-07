@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="{{ app.request.locale }}" class="h-full bg-white">
+<html lang="{{ app.request.locale }}" class="h-full bg-background">
 	<head>
+		<script>if(localStorage.theme==='dark'||(!localStorage.theme&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark')</script>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -21,7 +22,7 @@
 		{% block javascripts vite_entry_script_tags('app') %}
 	</head>
 
-	<body class="h-full min-h-0 bg-layout-bg text-layout-text">
+	<body class="h-full min-h-0 bg-background text-foreground">
 	{% block body %}
         <div id="container" class="group/sidebar h-screen max-h-screen overflow-hidden flex">
 			<script>
@@ -29,7 +30,7 @@
 					document.querySelector('#container').classList.add('closed');
 				}
 			</script>
-			<aside class="fixed inset-y-0 start-0 z-50 flex flex-col bg-menu-bg text-light border-r border-menu-border transition-all duration-300 w-60 group-[.closed]/sidebar:w-16 overflow-visible">
+			<aside class="fixed inset-y-0 start-0 z-50 flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 w-60 group-[.closed]/sidebar:w-16 overflow-visible">
 			{% block sidebar %}
 				{% embed '@_theme/layout/sidebar.html.twig' %}{% endembed %}
 			{% endblock %}
@@ -39,12 +40,12 @@
 				{% block background_decoration %}
 				{# Symboles des cartes en diagonale - fond décoratif #}
 				<div class="fixed top-[-5%] left-[calc(15rem-5%)] text-primary/5 text-[33rem] leading-none select-none pointer-events-none -rotate-[15deg] z-0">♦</div>
-				<div class="fixed top-[17%] left-[calc(15rem+17%)] text-black/5 text-[33rem] leading-none select-none pointer-events-none -rotate-[15deg] z-0">♣</div>
+				<div class="fixed top-[17%] left-[calc(15rem+17%)] text-foreground/5 text-[33rem] leading-none select-none pointer-events-none -rotate-[15deg] z-0">♣</div>
 				<div class="fixed top-[42%] left-[calc(15rem+42%)] text-primary/5 text-[33rem] leading-none select-none pointer-events-none -rotate-[15deg] z-0">♥</div>
-				<div class="fixed top-[62%] left-[calc(15rem+70%)] text-black/5 text-[33rem] leading-none select-none pointer-events-none rotate-[165deg] z-0">♠</div>
+				<div class="fixed top-[62%] left-[calc(15rem+70%)] text-foreground/5 text-[33rem] leading-none select-none pointer-events-none rotate-[165deg] z-0">♠</div>
 				{% endblock %}
 				<main class="flex flex-col h-0 flex-1 overflow-y-auto relative">
-					{% block notifications %}{% endblock %}
+					{% block notifications %}{{ include('@_theme/components/alerts.html.twig') }}{% endblock %}
 					{% block toasts %}{% endblock %}
 					{% block main '' %}
 				</main>

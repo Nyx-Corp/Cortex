@@ -14,7 +14,7 @@
     {% set premium = element.premium|default(false) %}
     {% set link = disabled ? '#' : (element.link is defined ? element.link : (element.route is defined ? path(element.route, element.routeParams|default({})) : '#')) %}
     <li>
-        <a href="{{ link }}" class="flex items-center gap-4 rounded-md p-2 text-sm font-medium group-[.closed]/sidebar:px-0 {{ element.extra_class|default('') }} {{ active ? 'text-white bg-menu-active' : '' }} {{ disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-menu-hover hover:text-white' }}"
+        <a href="{{ link }}" class="flex items-center gap-4 rounded-md p-2 text-sm font-medium group-[.closed]/sidebar:px-0 {{ element.extra_class|default('') }} {{ active ? 'text-sidebar-foreground bg-sidebar-accent' : '' }} {{ disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-sidebar-accent hover:text-sidebar-foreground' }}"
             {% if disabled %}aria-disabled="true"{% endif %}
         >
         {% if element.icon is defined and element.icon is not empty %}
@@ -26,11 +26,11 @@
                 <i data-lucide="crown" class="size-3"></i>
             </span>
         {% elseif element.wip|default(false) %}
-            <span class="ml-auto flex items-center gap-1 rounded-full bg-wip px-2 py-0.5 text-xs text-white font-semibold group-[.closed]/sidebar:hidden">
+            <span class="ml-auto flex items-center gap-1 rounded-full bg-wip px-2 py-0.5 text-xs text-sidebar-foreground font-semibold group-[.closed]/sidebar:hidden">
                 <i data-lucide="construction" class="size-3"></i>
             </span>
         {% elseif element.pill is defined %}
-            <span class="ml-auto rounded-full {{ element.pill.color|default('bg-green-500') }} px-2 text-xs text-white group-[.closed]/sidebar:hidden">
+            <span class="ml-auto rounded-full {{ element.pill.color|default('bg-success') }} px-2 text-xs text-sidebar-foreground group-[.closed]/sidebar:hidden">
                 {{ element.pill.value }}
             </span>
         {% endif %}
@@ -52,11 +52,11 @@
     {% if has_section_access %}
     <li class="{{ section.class|default('group-[.closed]/sidebar:-mt-5')|raw }}">
     {% if section.label is defined %}
-    	<h2 class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+    	<h2 class="text-xs font-semibold uppercase tracking-wide text-sidebar-muted">
 			<span class="block transition-all duration-300 pl-5 group-[.closed]/sidebar:hidden">
                 {{ section.label }}
             </span>
-			<span class="hidden group-[.closed]/sidebar:flex h-px w-10 bg-gray-600 mx-auto my-2"></span>
+			<span class="hidden group-[.closed]/sidebar:flex h-px w-10 bg-sidebar-muted mx-auto my-2"></span>
 		</h2>
     {% endif %}
         <ul role="list" class="flex flex-col mt-3 group-[.closed]/sidebar:mt-4 gap-y-1 group-[.closed]/sidebar:gap-y-2 mx-3 px-0">

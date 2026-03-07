@@ -1,7 +1,7 @@
 {# Notifications - Fixed top-right of content area #}
 <div class="fixed top-4 right-4 z-[80] group/notif">
-	<button type="button" class="relative p-2 rounded-full bg-white border border-layout-border shadow-sm hover:bg-light transition-colors" aria-label="Voir les notifications">
-		<i data-lucide="bell" class="size-5 text-dark"></i>
+	<button type="button" class="relative p-2 rounded-full bg-card border border-border shadow-sm hover:bg-muted transition-colors" aria-label="Voir les notifications">
+		<i data-lucide="bell" class="size-5 text-foreground"></i>
 		{# TODO: Dynamic unread count #}
 		<span class="absolute -top-1 -right-1 size-5 flex items-center justify-center text-xs font-medium bg-primary text-white rounded-full">
 			3
@@ -13,11 +13,11 @@
 			pointer-events-none opacity-0 scale-95 origin-top-right
 			transition-all duration-150
 			group-hover/notif:opacity-100 group-hover/notif:scale-100 group-hover/notif:pointer-events-auto">
-		<div class="rounded-lg bg-white border border-layout-border shadow-xl">
+		<div class="rounded-lg bg-card border border-border shadow-xl">
 
 		{# Header #}
-		<div class="flex items-center justify-between px-4 py-3 border-b border-layout-border">
-			<h3 class="text-sm font-semibold text-dark">Notifications</h3>
+		<div class="flex items-center justify-between px-4 py-3 border-b border-border">
+			<h3 class="text-sm font-semibold text-foreground">Notifications</h3>
 			<button type="button" class="text-xs text-primary hover:underline">Tout marquer lu</button>
 		</div>
 
@@ -26,44 +26,44 @@
 			{# TODO: Dynamic notifications from backend #}
 
 			{# Notification item - unread #}
-			<a href="#" class="flex gap-3 px-4 py-3 hover:bg-light transition-colors border-l-2 border-primary bg-primary/5">
+			<a href="#" class="flex gap-3 px-4 py-3 hover:bg-muted transition-colors border-l-2 border-primary bg-primary/5">
 				<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
 					<i data-lucide="trophy" class="size-4 text-primary"></i>
 				</div>
 				<div class="flex-1 min-w-0">
-					<p class="text-sm text-dark">Nouveaux résultats disponibles</p>
-					<p class="text-xs text-gray-500 mt-0.5">Tournoi du 25 janvier - 32 paires</p>
-					<p class="text-xs text-gray-400 mt-1">Il y a 5 min</p>
+					<p class="text-sm text-foreground">Nouveaux résultats disponibles</p>
+					<p class="text-xs text-muted-foreground mt-0.5">Tournoi du 25 janvier - 32 paires</p>
+					<p class="text-xs text-muted-foreground mt-1">Il y a 5 min</p>
 				</div>
 			</a>
 
 			{# Notification item - unread #}
-			<a href="#" class="flex gap-3 px-4 py-3 hover:bg-light transition-colors border-l-2 border-primary bg-primary/5">
-				<div class="size-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-					<i data-lucide="user-plus" class="size-4 text-blue-600"></i>
+			<a href="#" class="flex gap-3 px-4 py-3 hover:bg-muted transition-colors border-l-2 border-primary bg-primary/5">
+				<div class="size-8 rounded-full bg-info/10 flex items-center justify-center shrink-0">
+					<i data-lucide="user-plus" class="size-4 text-info"></i>
 				</div>
 				<div class="flex-1 min-w-0">
-					<p class="text-sm text-dark">Nouvelle demande d'adhésion</p>
-					<p class="text-xs text-gray-500 mt-0.5">Jean Dupont souhaite rejoindre le club</p>
-					<p class="text-xs text-gray-400 mt-1">Il y a 2 heures</p>
+					<p class="text-sm text-foreground">Nouvelle demande d'adhésion</p>
+					<p class="text-xs text-muted-foreground mt-0.5">Jean Dupont souhaite rejoindre le club</p>
+					<p class="text-xs text-muted-foreground mt-1">Il y a 2 heures</p>
 				</div>
 			</a>
 
 			{# Notification item - read #}
-			<a href="#" class="flex gap-3 px-4 py-3 hover:bg-light transition-colors border-l-2 border-transparent">
-				<div class="size-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-					<i data-lucide="check-circle" class="size-4 text-green-600"></i>
+			<a href="#" class="flex gap-3 px-4 py-3 hover:bg-muted transition-colors border-l-2 border-transparent">
+				<div class="size-8 rounded-full bg-success/10 flex items-center justify-center shrink-0">
+					<i data-lucide="check-circle" class="size-4 text-success"></i>
 				</div>
 				<div class="flex-1 min-w-0">
-					<p class="text-sm text-dark">Paiement reçu</p>
-					<p class="text-xs text-gray-500 mt-0.5">Cotisation de Marie Martin validée</p>
-					<p class="text-xs text-gray-400 mt-1">Hier</p>
+					<p class="text-sm text-foreground">Paiement reçu</p>
+					<p class="text-xs text-muted-foreground mt-0.5">Cotisation de Marie Martin validée</p>
+					<p class="text-xs text-muted-foreground mt-1">Hier</p>
 				</div>
 			</a>
 		</div>
 
 		{# Footer #}
-		<div class="px-4 py-2 border-t border-layout-border bg-light/50">
+		<div class="px-4 py-2 border-t border-border bg-muted/50">
 			<a href="#" class="text-xs text-primary hover:underline">Voir toutes les notifications</a>
 		</div>
 		</div>{# /inner dropdown content #}

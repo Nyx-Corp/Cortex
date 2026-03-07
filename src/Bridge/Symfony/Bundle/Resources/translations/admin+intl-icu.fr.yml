@@ -1,32 +1,45 @@
-nav:
-    list:
-        title: Liste
-    create:
-        title: Nouveau
-    edit:
-        title: Modifier
-
-action:
-    reset: Réinitialiser
-    create: Nouveau
-    edit: Éditer
-    back: Retour
+admin:
+  action:
+    back: Retour à la liste
+    cancel: Retour
     submit: Enregistrer
+    save: Enregistrer
+    edit: Modifier
+    new: Nouveau
+    delete: Supprimer
+    create: Créer
     archive:
-        label: Archiver
-        confirmation: Êtes-vous sûr de vouloir archiver cet élément ?
+      label: Archiver
+      confirmation: Êtes-vous sûr de vouloir archiver cet élément ?
+  list:
+    empty_text: Aucun élément trouvé
+    filters: Filtres
+    reset: Réinitialiser
+    results: résultats
+
+form:
+  select:
+    empty_value: Sélectionner…
+
+nav:
+  list:
+    title: Liste
+  create:
+    title: Nouveau
+  edit:
+    title: Modifier
 
 list:
-    filters:
-        title: Filtres
-        counter: '{first}-{last} sur {total}'
-        submit: Filtrer
-        clear: Effacer
-    pager:
-        display: Afficher
-        results: résultats
-    sorting:
-        asc: Tri par {field} ascendant
-        desc: Tri par {field} descendant
-    fields:
-        uuid: Uuid
+  filters:
+    title: Filtres
+    counter: '{first}-{last} sur {total}'
+    submit: Filtrer
+    clear: Effacer
+  pager:
+    display: Afficher
+    results: résultats
+  sorting:
+    asc: Tri par {field} ascendant
+    desc: Tri par {field} descendant
+  fields:
+    uuid: Uuid
