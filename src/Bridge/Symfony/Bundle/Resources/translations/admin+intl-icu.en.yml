@@ -8,14 +8,29 @@ admin:
     new: New
     delete: Delete
     create: Create
+    email: Send an email
     archive:
       label: Archive
       confirmation: Are you sure you want to archive this item?
+    restore:
+      label: Restore
+      confirmation: Restore this item?
   list:
     empty_text: No items found
-    filters: Filters
+    filters: Advanced filters
     reset: Reset
     results: results
+    search_placeholder: Filter the list...
+    search_syntax: Search syntax
+    search_syntax_field: Filter by field
+    search_syntax_quoted: Value with spaces
+    search_syntax_partial: Partial search
+    apply: Apply
+    export: Export
+    export_tooltip: Export the list
+    selected: selected
+    more_actions: More actions
+    show_archived: Show archived
 
 form:
   select:

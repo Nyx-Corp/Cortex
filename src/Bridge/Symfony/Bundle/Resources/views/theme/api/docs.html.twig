@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title|default('API Documentation') }}</title>
+    {% if versions|default([])|length > 1 %}
+    <style>
+        .version-selector {
+            position: fixed;
+            top: 12px;
+            right: 16px;
+            z-index: 100;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+        }
+        .version-selector select {
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+        }
+    </style>
+    {% endif %}
+</head>
+<body>
+    {% if versions|default([])|length > 1 %}
+    <div class="version-selector">
+        <label for="api-version">Version:</label>
+        <select id="api-version" onchange="window.location.href='?version=' + this.value">
+            {% for v in versions %}
+                <option value="{{ v }}"{% if v == current_version %} selected{% endif %}>v{{ v }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+    <div id="scalar-api-docs"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+    <script>
+        Scalar.createApiReference('#scalar-api-docs', {
+            url: '{{ spec_url }}',
+            theme: 'kepler',
+        })
+    </script>
+</body>
+</html>

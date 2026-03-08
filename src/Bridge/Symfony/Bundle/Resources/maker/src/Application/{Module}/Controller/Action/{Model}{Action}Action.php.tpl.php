@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Application/{Module}/Controller/Action/{Model}{Action}Action.php.tpl.php
@@ -6,12 +6,12 @@
  * @see src/Lib/Cortex/docs/bridge-symfony.md
  */
 
-namespace Application\<?= $Module ?>\Controller\Action<?= $subpath_namespace ?? '' ?>;
+namespace Application\<?php echo $Module; ?>\Controller\Action<?php echo $subpath_namespace ?? ''; ?>;
 
 use Cortex\Bridge\Symfony\Controller\ControllerInterface;
 use Cortex\Component\Exception\DomainException;
-use Domain\<?= $Domain ?>\Action\<?= $Model ?><?= $Action ?>;
-use Domain\<?= $Domain ?>\Model\<?= $Model ?>;
+use Domain\<?php echo $Domain; ?>\Action\<?php echo $Model; ?><?php echo $Action; ?>;
+use Domain\<?php echo $Domain; ?>\Model\<?php echo $Model; ?>;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -21,19 +21,19 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Run <?= $action ?> action on <?= $Model ?>s.
+ * Run <?php echo $action; ?> action on <?php echo $Model; ?>s.
  */
 #[Route(
-    path: '/<?= $model ?>/{uuid}/<?= $action ?>',
-    name: '<?= $model ?>/<?= $action ?>',
+    path: '/<?php echo $model; ?>/{uuid}/<?php echo $action; ?>',
+    name: '<?php echo $model; ?>/<?php echo $action; ?>',
     methods: ['GET', 'POST'],
     requirements: ['uuid' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'],
     options: ['query_filters' => true],
 )]
-class <?= $Model ?><?= $Action ?>Action implements ControllerInterface
+class <?php echo $Model; ?><?php echo $Action; ?>Action implements ControllerInterface
 {
     public function __construct(
-        private readonly <?= $Model ?><?= $Action ?>\Handler $handler,
+        private readonly <?php echo $Model; ?><?php echo $Action; ?>\Handler $handler,
         private UrlGeneratorInterface $urlGenerator,
         #[Autowire('%kernel.debug%')]
         private readonly bool $debug,
@@ -42,29 +42,28 @@ class <?= $Model ?><?= $Action ?>Action implements ControllerInterface
 
     /**
      * Handles Html response.
-     * Redirects on referer or "<?= $module ?>/<?= $model ?>/index" route by default.
+     * Redirects on referer or "<?php echo $module; ?>/<?php echo $model; ?>/index" route by default.
      */
-    private function handleHtmlRequest(<?= $Model ?> $<?= $model ?>, Request $request): Response
+    private function handleHtmlRequest(<?php echo $Model; ?> $<?php echo $model; ?>, Request $request): Response
     {
         /** @var \Symfony\Component\HttpFoundation\Session\Session|null $session */
         $session = $request->hasSession() ? $request->getSession() : null;
 
         try {
-            /** @var <?= $Model ?><?= $Action ?>\Response $response */
+            /** @var <?php echo $Model; ?><?php echo $Action; ?>\Response $response */
             $response = ($this->handler)(
-                new <?= $Model ?><?= $Action ?>\Command($<?= $model ?>)
+                new <?php echo $Model; ?><?php echo $Action; ?>\Command($<?php echo $model; ?>)
             );
 
             $session?->getFlashBag()->add('success', [
-                'title' => '<?= $model ?>.alert.<?= $action ?>.success.title',
-                'message' => '<?= $model ?>.alert.<?= $action ?>.success.details',
-                'params' => ['model' => (string) $<?= $model ?>],
-                'domain' => '<?= $domain ?>',
+                'title' => '<?php echo $model; ?>.<?php echo $action; ?>.success.title',
+                'message' => '<?php echo $model; ?>.<?php echo $action; ?>.success.message',
+                'params' => ['model' => (string) $<?php echo $model; ?>],
+                'domain' => '<?php echo $domain; ?>',
             ]);
         } catch (DomainException $e) {
             $session?->getFlashBag()->add('error', [
-                'title' => '<?= $model ?>.alert.<?= $action ?>.error.title',
-                'message' => '<?= $model ?>.alert.<?= $action ?>.error.'.$e->getMessage(),
+                'title' => '<?php echo $model; ?>.error.'.$e->getMessage(),
                 'domain' => $e->getDomain(),
             ]);
 
@@ -76,7 +75,7 @@ class <?= $Model ?><?= $Action ?>Action implements ControllerInterface
         return new RedirectResponse(
             $request->headers->get(
                 'referer',
-                $this->urlGenerator->generate('<?= $module ?>/<?= $model ?>/index')
+                $this->urlGenerator->generate('<?php echo $module; ?>/<?php echo $model; ?>/index')
             )
         );
     }
@@ -84,11 +83,11 @@ class <?= $Model ?><?= $Action ?>Action implements ControllerInterface
     /**
      * @return array<string, mixed>
      */
-    private function handleJsonRequest(<?= $Model ?> $<?= $model ?>, Request $request): array
+    private function handleJsonRequest(<?php echo $Model; ?> $<?php echo $model; ?>, Request $request): array
     {
-        /** @var <?= $Model ?><?= $Action ?>\Response $response */
+        /** @var <?php echo $Model; ?><?php echo $Action; ?>\Response $response */
         $response = ($this->handler)(
-            new <?= $Model ?><?= $Action ?>\Command($<?= $model ?>)
+            new <?php echo $Model; ?><?php echo $Action; ?>\Command($<?php echo $model; ?>)
         );
 
         return ['response' => $response];
@@ -97,7 +96,7 @@ class <?= $Model ?><?= $Action ?>Action implements ControllerInterface
     /**
      * @return array<string, mixed>|Response
      */
-    public function __invoke(<?= $Model ?> $model, Request $request): array|Response
+    public function __invoke(<?php echo $Model; ?> $model, Request $request): array|Response
     {
         $format = $request->attributes->get('_format', 'html');
         $method = sprintf('handle%sRequest', ucfirst($format));

@@ -14,6 +14,16 @@ export default class extends Controller {
     connect() {
         // Store initial form values for comparison
         this.initialValues = this.getFormValues()
+        this.disableSubmit()
+
+        // Auto-listen for changes on all form fields
+        this.element.addEventListener('input', this.boundMarkDirty = () => this.markDirty())
+        this.element.addEventListener('change', this.boundMarkDirty)
+    }
+
+    disconnect() {
+        this.element.removeEventListener('input', this.boundMarkDirty)
+        this.element.removeEventListener('change', this.boundMarkDirty)
     }
 
     /**
@@ -50,12 +60,8 @@ export default class extends Controller {
     enableSubmit() {
         if (this.hasSubmitTarget) {
             this.submitTarget.disabled = false
-            this.submitTarget.classList.remove('bg-muted', 'text-primary', 'border', 'border-primary', 'cursor-not-allowed')
+            this.submitTarget.classList.remove('border', 'border-primary', 'text-primary', 'hover:bg-primary', 'hover:text-white', 'cursor-not-allowed', 'opacity-50')
             this.submitTarget.classList.add('bg-primary', 'text-white', 'hover:bg-primary/90', 'cursor-pointer')
-        }
-
-        if (this.hasCancelTarget) {
-            this.cancelTarget.classList.remove('hidden')
         }
     }
 
@@ -65,12 +71,8 @@ export default class extends Controller {
     disableSubmit() {
         if (this.hasSubmitTarget) {
             this.submitTarget.disabled = true
-            this.submitTarget.classList.add('bg-muted', 'text-primary', 'border', 'border-primary', 'cursor-not-allowed')
-            this.submitTarget.classList.remove('bg-primary', 'text-white', 'hover:bg-primary/90', 'cursor-pointer')
-        }
-
-        if (this.hasCancelTarget) {
-            this.cancelTarget.classList.add('hidden')
+            this.submitTarget.classList.add('border', 'border-primary', 'text-primary', 'cursor-not-allowed', 'opacity-50')
+            this.submitTarget.classList.remove('bg-primary', 'text-white', 'hover:bg-primary/90', 'hover:bg-primary', 'hover:text-white', 'cursor-pointer')
         }
     }
 }

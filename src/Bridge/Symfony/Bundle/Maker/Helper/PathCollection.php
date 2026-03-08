@@ -47,13 +47,17 @@ class PathCollection extends FileCollection
     /**
      * @param array<string, string> $replacements
      */
-    private function generateDestPath(string $destPath, string $destPattern, array $replacements): string
+    private function generateDestPath(string $destPath, string $destPattern, array $replacements, ?\Closure $pathTransformer = null): string
     {
         $path = str_replace(
             array_keys($replacements),
             array_values($replacements),
             sprintf('%s/%s', $destPath, $destPattern)
         );
+
+        if ($pathTransformer) {
+            $path = $pathTransformer($path);
+        }
 
         return $this->transformDestPath($path);
     }
@@ -137,8 +141,9 @@ class PathCollection extends FileCollection
     /**
      * @param array<string, string>       $replacements
      * @param array<string, list<string>> $fileVariants
+     * @param \Closure|null               $pathTransformer Optional callable to transform output paths (e.g., for subpath support)
      */
-    public function mirror(string $destPath, array $replacements, array $fileVariants = []): self
+    public function mirror(string $destPath, array $replacements, array $fileVariants = [], ?\Closure $pathTransformer = null): self
     {
         return $this
             ->each(function (SplFileInfo $file) use ($fileVariants, $replacements) {
@@ -175,7 +180,8 @@ class PathCollection extends FileCollection
                 'dest_path' => $this->generateDestPath(
                     $destPath,
                     $fileInfo['dest_mirror_path'],
-                    $fileInfo['replacements']
+                    $fileInfo['replacements'],
+                    $pathTransformer
                 ),
             ])
             ->filter(fn (array $fileInfo) => !$this->filesystem->exists($fileInfo['dest_path']))

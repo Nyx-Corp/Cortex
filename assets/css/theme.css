@@ -34,6 +34,13 @@
   --color-input:                  var(--color-zinc-200);
   --color-ring:                   var(--color-zinc-400);
 
+  /* ===== Tooltip ===== */
+  --color-tooltip:                var(--color-zinc-800);
+  --color-tooltip-foreground:     var(--color-white);
+
+  /* ===== Table ===== */
+  --color-stripe:                 var(--color-zinc-50);
+
   /* ===== States ===== */
   --color-destructive:            var(--color-red-800);
   --color-destructive-foreground: var(--color-white);
@@ -43,6 +50,9 @@
 
   --color-warning:                var(--color-amber-600);
   --color-warning-foreground:     var(--color-white);
+
+  --color-info:                   var(--color-blue-600);
+  --color-info-foreground:        var(--color-white);
 
   /* ===== Sidebar ===== */
   --color-sidebar:                var(--color-zinc-800);

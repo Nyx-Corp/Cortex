@@ -34,6 +34,7 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
             'page_sizes' => [10, 20, 50, 100],
             'sortable_fields' => [],
             'filters_config' => [],
+            'display_fields' => [],
             'default_page_size' => 20,
         ]);
     }
@@ -218,8 +219,10 @@ class ModelQueryType extends AbstractType implements DataMapperInterface
         $filterConfigKeys = array_keys($options['filters_config'] ?? []);
         $sortableFields = $options['sortable_fields'] ?? [];
 
-        // Merge: sortable fields order first, then filter-only fields
-        $view->vars['fields'] = array_unique(array_merge($sortableFields, $filterConfigKeys));
+        $displayFields = $options['display_fields'] ?? [];
+
+        // Merge: sortable fields order first, then display-only fields, then filter-only fields
+        $view->vars['fields'] = array_unique(array_merge($sortableFields, $displayFields, $filterConfigKeys));
         $view->vars['filters'] = array_diff_key(
             $view->children,
             ['q' => true, 'page' => true, 'limit' => true, 'sort' => true]

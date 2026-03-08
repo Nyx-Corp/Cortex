@@ -6,6 +6,10 @@ services:
         bind:
             $dbalConnection: '@doctrine.dbal.default_connection'
 
+    _instanceof:
+        Cortex\Bridge\Symfony\Api\VersionTransformerInterface:
+            tags: ['cortex.api.version_transformer']
+
     # ControllerInterface tagging is handled by ControllerTaggingPass
 
     Cortex\Component\Model\Query\Factory\QueryFactory:
@@ -29,12 +33,44 @@ services:
         tags:
             - { name: routing.loader }
 
+    Cortex\Bridge\Symfony\Api\ApiRouteLoader:
+        tags:
+            - { name: routing.loader }
+
+    Cortex\Bridge\Symfony\Api\ApiController:
+        tags: ['controller.service_arguments']
+
+    Cortex\Bridge\Symfony\Api\VersionTransformerCollection:
+        arguments:
+            $transformers: !tagged_iterator cortex.api.version_transformer
+
+    Cortex\Bridge\Symfony\Api\OpenApiGenerator:
+        arguments:
+            $actionMetadata: []
+
+    Cortex\Bridge\Symfony\Api\OpenApiController:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            $debug: '%kernel.debug%'
+        tags: ['controller.service_arguments']
+
+    Cortex\Bridge\Symfony\Console\OpenApiDumpCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    Cortex\Bridge\Symfony\Form\CommandFormType:
+        arguments:
+            $fieldsConfig: []
+
     Cortex\Bridge\:
         resource: '../../../../../Bridge/'
         exclude:
             - '../../../../../Bridge/Symfony/Bundle'
             - '../../../../../Bridge/Symfony/Translation/'
             - '../../../../../Bridge/Symfony/Routing/'
+            - '../../../../../Bridge/Symfony/Console/'
+            - '../../../../../Bridge/Symfony/Api/'
+            - '../../../../../Bridge/Symfony/Security/ApiTokenProviderInterface.php'
 
     Cortex\Component\:
         resource: '../../../../../Component/'
@@ -43,3 +79,17 @@ services:
             - '../../../../../Component/Json/'
             - '../../../../../Component/Mapper/Relation.php'
             - '../../../../../Component/Model/ModelCollection.php'
+            - '../../../../../Component/Security/'
+
+    # Security: TokenHasher (pure PHP, no framework dependency)
+    Cortex\Component\Security\Service\TokenHasher: ~
+
+    # Security: SymfonyPasswordHasher implements the Cortex PasswordHasherInterface
+    Cortex\Component\Security\Service\PasswordHasherInterface:
+        class: Cortex\Bridge\Symfony\Security\SymfonyPasswordHasher
+
+    # Security: SecuredActionToolProvider decorates ActionToolProvider for MCP
+    Cortex\Bridge\Symfony\Security\SecuredActionToolProvider:
+        decorates: Cortex\Bridge\Symfony\Mcp\ActionToolProvider
+        arguments:
+            $inner: '@Cortex\Bridge\Symfony\Security\SecuredActionToolProvider.inner'

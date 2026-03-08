@@ -537,17 +537,21 @@ public function where(array $params): string
 **Comportements spéciaux :**
 - Arrays → `IN ()`
 - `null` → `IS NULL`
+- `Operator::IsNull` → `IS NULL`
+- `Operator::IsNotNull` → `IS NOT NULL`
 - Opérateurs préfixés (`>`, `<`, `~`, etc.)
 
 ```php
 $adapter->where([
-    'status' => 'active',       // = :status
-    'age' => '>18',             // > :age
-    'name' => '~Jean%',         // LIKE :name
-    'tags' => ['a', 'b', 'c'],  // IN (:tags)
-    'deleted_at' => null,       // IS NULL
+    'status' => 'active',                  // = :status
+    'age' => '>18',                        // > :age
+    'name' => '~Jean%',                    // LIKE :name
+    'tags' => ['a', 'b', 'c'],             // IN (:tags)
+    'deleted_at' => null,                  // IS NULL
+    'archived_at' => Operator::IsNotNull,  // IS NOT NULL
 ]);
-// " WHERE status = :status AND age > :age AND name LIKE :name AND tags IN (:tags) AND deleted_at IS NULL"
+// " WHERE status = :status AND age > :age AND name LIKE :name
+//   AND tags IN (:tags) AND deleted_at IS NULL AND archived_at IS NOT NULL"
 ```
 
 ### onModelQuery()
@@ -937,19 +941,12 @@ enum Operator: string
     case LessThanOrEqual = '<=';
     case Like = '~';            // → LIKE
     case NotLike = '!~';        // → NOT LIKE
-
-    public function toSql(): string
-    {
-        return match ($this) {
-            self::Like => 'LIKE',
-            self::NotLike => 'NOT LIKE',
-            default => $this->value,
-        };
-    }
+    case IsNull = 'IS_NULL';    // → IS NULL (unaire)
+    case IsNotNull = 'IS_NOT_NULL'; // → IS NOT NULL (unaire)
 }
 ```
 
-### Usage dans les filtres
+### Opérateurs préfixés (avec valeur)
 
 ```php
 $query->filterBy('age', '>18');           // WHERE age > :age
@@ -957,6 +954,18 @@ $query->filterBy('name', '~Jean%');       // WHERE name LIKE :name
 $query->filterBy('status', '!=inactive'); // WHERE status != :status
 $query->filterBy('count', '>=10');        // WHERE count >= :count
 ```
+
+### Opérateurs unaires (sans valeur)
+
+Les opérateurs `IsNull` / `IsNotNull` sont des opérateurs unaires : ils n'ont pas de valeur à binder.
+Ils sont exposés via des méthodes dédiées sur `ModelQuery` :
+
+```php
+$query->filterNull('deletedAt');      // WHERE deleted_at IS NULL
+$query->filterNotNull('archivedAt');  // WHERE archived_at IS NOT NULL
+```
+
+Les filtres null/notNull sont stockés séparément des filtres classiques et n'interfèrent pas avec le `modelToTableMapper`. Le mapping camelCase → snake_case des noms de champs est géré automatiquement par `DbalAdapter`.
 
 ---
 

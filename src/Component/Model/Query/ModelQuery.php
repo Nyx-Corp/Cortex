@@ -16,6 +16,8 @@ class ModelQuery
     public private(set) StructuredMap $tags;
     public private(set) ?int $limit = null;
     public private(set) ?string $uniqueField = null;
+    public private(set) array $nullFields = [];
+    public private(set) array $notNullFields = [];
 
     public function __construct(
         \Closure $resolver,
@@ -55,6 +57,20 @@ class ModelQuery
         foreach ($filters as $attribute => $value) {
             $this->filterBy($attribute, $value);
         }
+
+        return $this;
+    }
+
+    public function filterNull(string $field): self
+    {
+        $this->nullFields[] = $field;
+
+        return $this;
+    }
+
+    public function filterNotNull(string $field): self
+    {
+        $this->notNullFields[] = $field;
 
         return $this;
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\ValueObject;
 
 use Cortex\ValueObject\Email;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,9 +17,7 @@ class EmailTest extends TestCase
     // VALID EMAIL TESTS
     // =======================================================================
 
-    /**
-     * @dataProvider validEmailsProvider
-     */
+    #[DataProvider('validEmailsProvider')]
     public function testValidEmails(string $email): void
     {
         $emailObject = new Email($email);
@@ -26,7 +25,7 @@ class EmailTest extends TestCase
         $this->assertEquals($email, $emailObject->value);
     }
 
-    public function validEmailsProvider(): array
+    public static function validEmailsProvider(): array
     {
         return [
             'simple' => ['test@example.com'],
@@ -45,9 +44,7 @@ class EmailTest extends TestCase
     // INVALID EMAIL TESTS
     // =======================================================================
 
-    /**
-     * @dataProvider invalidEmailsProvider
-     */
+    #[DataProvider('invalidEmailsProvider')]
     public function testInvalidEmailsThrow(string $email): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -56,7 +53,7 @@ class EmailTest extends TestCase
         new Email($email);
     }
 
-    public function invalidEmailsProvider(): array
+    public static function invalidEmailsProvider(): array
     {
         return [
             'no at sign' => ['invalid-email'],

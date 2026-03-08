@@ -27,16 +27,16 @@ input[type="checkbox"]:focus {
     content: attr(data-tooltip);
     position: absolute;
     bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 0;
     margin-bottom: 6px;
     padding: 6px 10px;
-    background: var(--color-sidebar);
-    color: var(--color-sidebar-foreground);
+    background: var(--color-tooltip);
+    color: var(--color-tooltip-foreground);
     font-size: 12px;
     font-weight: 400;
     white-space: nowrap;
-    border: 1px solid var(--color-sidebar-border);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     opacity: 0;
     visibility: hidden;
     transition: opacity 150ms, visibility 150ms;
@@ -49,11 +49,10 @@ input[type="checkbox"]:focus {
     content: '';
     position: absolute;
     bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 8px;
     margin-bottom: 2px;
     border: 4px solid transparent;
-    border-top-color: var(--color-sidebar);
+    border-top-color: var(--color-tooltip);
     opacity: 0;
     visibility: hidden;
     transition: opacity 150ms, visibility 150ms;
@@ -81,7 +80,7 @@ input[type="checkbox"]:focus {
     margin-bottom: 0;
     margin-top: 2px;
     border-top-color: transparent;
-    border-bottom-color: var(--color-sidebar);
+    border-bottom-color: var(--color-tooltip);
 }
 
 /* Input with keyboard shortcut indicator */
@@ -102,9 +101,9 @@ input[type="checkbox"]:focus {
     pointer-events: none;
 }
 
-/* Filter form inputs — force primary focus color */
-.search-filters input:focus,
-.search-filters select:focus {
+/* Filter form inputs — force primary focus color (exclude search input) */
+.search-filters [data-search-filters-target="popover"] input:focus,
+.search-filters [data-search-filters-target="popover"] select:focus {
     outline: 2px solid var(--color-primary) !important;
     outline-offset: -2px;
 }

@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Application/{Module}/Controller/Action/{Model}EditAction.php.tpl.php
@@ -6,12 +6,12 @@
  * @see src/Lib/Cortex/docs/bridge-symfony.md
  */
 
-namespace Application\<?= $Module ?>\Controller\Action<?= $subpath_namespace ?? '' ?>;
+namespace Application\<?php echo $Module; ?>\Controller\Action<?php echo $subpath_namespace ?? ''; ?>;
 
-use Application\<?= $Module ?>\Form\<?= $Model ?>EditType;
+use Application\<?php echo $Module; ?>\Form\<?php echo $Model; ?>EditType;
 use Cortex\Bridge\Symfony\Controller\ControllerInterface;
 use Cortex\Component\Exception\DomainException;
-use Domain\<?= $Domain ?>\Model\<?= $Model ?>;
+use Domain\<?php echo $Domain; ?>\Model\<?php echo $Model; ?>;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -21,11 +21,11 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Handles <?= $Model ?> creation/edition form.
+ * Handles <?php echo $Model; ?> creation/edition form.
  */
-#[Route(name: '<?= $model ?>/create', path: '/<?= $model ?>/create', methods: ['GET', 'POST'])]
-#[Route(name: '<?= $model ?>/edit', path: '/<?= $model ?>/{uuid}/edit', methods: ['GET', 'POST'], requirements: ['uuid' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'])]
-class <?= $Model ?>EditAction implements ControllerInterface
+#[Route(name: '<?php echo $model; ?>/create', path: '/<?php echo $model; ?>/create', methods: ['GET', 'POST'])]
+#[Route(name: '<?php echo $model; ?>/edit', path: '/<?php echo $model; ?>/{uuid}/edit', methods: ['GET', 'POST'], requirements: ['uuid' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'])]
+class <?php echo $Model; ?>EditAction implements ControllerInterface
 {
     public function __construct(
         private FormFactoryInterface $formFactory,
@@ -38,7 +38,7 @@ class <?= $Model ?>EditAction implements ControllerInterface
     /**
      * @return array<string, mixed>|Response
      */
-    public function __invoke(Request $request, ?<?= $Model ?> $model): Response|array
+    public function __invoke(Request $request, ?<?php echo $Model; ?> $model): Response|array
     {
         $isNew = null === $model;
 
@@ -46,8 +46,8 @@ class <?= $Model ?>EditAction implements ControllerInterface
         $session = $request->hasSession() ? $request->getSession() : null;
 
         $form = $this->formFactory->createNamed(
-            name: '<?= $model ?>_edit',
-            type: <?= $Model ?>EditType::class,
+            name: '<?php echo $model; ?>_edit',
+            type: <?php echo $Model; ?>EditType::class,
             data: $model,
             options: [
                 'method' => 'POST',
@@ -60,37 +60,36 @@ class <?= $Model ?>EditAction implements ControllerInterface
             if ($form->isSubmitted()) {
                 if (!$form->isValid()) {
                     $session?->getFlashBag()->add('error', [
-                        'title' => '<?= $model ?>.alert.edit.error.title',
-                        'message' => '<?= $model ?>.alert.edit.error.details',
-                        'domain' => '<?= $domain ?>',
+                        'title' => '<?php echo $model; ?>.error.validation_failed',
+                        'domain' => '<?php echo $domain; ?>',
                     ]);
                 } else {
                     if ($isNew) {
+                        $<?php echo $model; ?> = $form->getData()-><?php echo $model; ?>;
                         $session?->getFlashBag()->add('success', [
-                            'title' => '<?= $model ?>.alert.create.success.title',
-                            'message' => '<?= $model ?>.alert.create.success.details',
-                            'params' => ['model' => (string) $form->getData()-><?= $model ?>],
-                            'domain' => '<?= $domain ?>',
+                            'title' => '<?php echo $model; ?>.create.success.title',
+                            'message' => '<?php echo $model; ?>.create.success.message',
+                            'params' => ['model' => (string) $<?php echo $model; ?>],
+                            'domain' => '<?php echo $domain; ?>',
                         ]);
 
                         return new RedirectResponse($this->urlGenerator->generate(
-                            name: '<?= $module ?>/<?= $model ?>/edit',
-                            parameters: ['uuid' => $form->getData()-><?= $model ?>->uuid]
+                            name: '<?php echo $module; ?>/<?php echo $model; ?>/edit',
+                            parameters: ['uuid' => $<?php echo $model; ?>->uuid]
                         ));
                     }
 
                     $session?->getFlashBag()->add('success', [
-                        'title' => '<?= $model ?>.alert.edit.success.title',
-                        'message' => '<?= $model ?>.alert.edit.success.details',
+                        'title' => '<?php echo $model; ?>.edit.success.title',
+                        'message' => '<?php echo $model; ?>.edit.success.message',
                         'params' => ['model' => (string) $model],
-                        'domain' => '<?= $domain ?>',
+                        'domain' => '<?php echo $domain; ?>',
                     ]);
                 }
             }
         } catch (DomainException $th) {
             $session?->getFlashBag()->add('error', [
-                'title' => '<?= $model ?>.alert.error.title',
-                'message' => '<?= $model ?>.alert.error.'.$th->getMessage(),
+                'title' => '<?php echo $model; ?>.error.'.$th->getMessage(),
                 'domain' => $th->getDomain(),
             ]);
 
@@ -100,7 +99,7 @@ class <?= $Model ?>EditAction implements ControllerInterface
         }
 
         return [
-            '<?= $model ?>' => $model,
+            '<?php echo $model; ?>' => $model,
             'form' => $form->createView(),
         ];
     }

@@ -1,0 +1,10 @@
+{#
+    Archive status indicator for archivable models.
+    Usage: {% include '@_theme/components/archive_status.html.twig' with {model: myModel} %}
+#}
+{% if model.archivedAt is defined and model.archivedAt is not null %}
+<span class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground bg-white border border-border">
+    <i data-lucide="archive" class="size-4 text-warning"></i>
+    Archivé le {{ model.archivedAt|date('d/m/Y') }}
+</span>
+{% endif %}

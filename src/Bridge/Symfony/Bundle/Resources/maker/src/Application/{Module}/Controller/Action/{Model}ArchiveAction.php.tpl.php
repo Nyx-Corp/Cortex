@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Application/{Module}/Controller/Action/{Model}ArchiveAction.php.tpl.php
@@ -6,61 +6,55 @@
  * @see src/Lib/Cortex/docs/bridge-symfony.md
  */
 
-namespace Application\<?= $Module ?>\Controller\Action<?= $subpath_namespace ?? '' ?>;
+namespace Application\<?php echo $Module; ?>\Controller\Action<?php echo $subpath_namespace ?? ''; ?>;
 
 use Cortex\Bridge\Symfony\Controller\ControllerInterface;
-use Domain\<?= $Domain ?>\Action\<?= $Model ?>Archive;
-use Domain\<?= $Domain ?>\Model\<?= $Model ?>;
+use Domain\<?php echo $Domain; ?>\Action\<?php echo $Model; ?>Archive;
+use Domain\<?php echo $Domain; ?>\Model\<?php echo $Model; ?>;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Run archive action on <?= $Model ?>s.
+ * Run archive action on <?php echo $Model; ?>s.
+ *
+ * Route derived by convention: GET /{<?php echo $model; ?>}/{uuid}/archive → {<?php echo $model; ?>}/archive
  */
-#[Route(
-    path: '/<?= $model ?>/{uuid}/archive',
-    name: '<?= $model ?>/archive',
-    methods: ['GET'],
-    requirements: ['uuid' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'],
-    options: ['query_filters' => true],
-)]
-class <?= $Model ?>ArchiveAction implements ControllerInterface
+class <?php echo $Model; ?>ArchiveAction implements ControllerInterface
 {
     public function __construct(
-        private readonly <?= $Model ?>Archive\Handler $handler,
+        private readonly <?php echo $Model; ?>Archive\Handler $handler,
         private UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
     /**
      * Handles Html response.
-     * Redirects on referer or "<?= $module ?>/<?= $model ?>/index" route by default.
+     * Redirects on referer or "<?php echo $module; ?>/<?php echo $model; ?>/index" route by default.
      */
-    private function handleHtmlRequest(<?= $Model ?> $<?= $model ?>, Request $request): Response
+    private function handleHtmlRequest(<?php echo $Model; ?> $<?php echo $model; ?>, Request $request): Response
     {
         /** @var \Symfony\Component\HttpFoundation\Session\Session|null $session */
         $session = $request->hasSession() ? $request->getSession() : null;
 
-        /** @var <?= $Model ?>Archive\Response $response */
+        /** @var <?php echo $Model; ?>Archive\Response $response */
         $response = ($this->handler)(
-            new <?= $Model ?>Archive\Command($<?= $model ?>)
+            new <?php echo $Model; ?>Archive\Command($<?php echo $model; ?>)
         );
 
         $session?->getFlashBag()->add('success', [
-            'title' => '<?= $model ?>.alert.archive.success.title',
-            'message' => '<?= $model ?>.alert.archive.success.details',
-            'params' => ['model' => (string) $<?= $model ?>],
-            'domain' => '<?= $domain ?>',
+            'title' => '<?php echo $model; ?>.archive.success.title',
+            'message' => '<?php echo $model; ?>.archive.success.message',
+            'params' => ['model' => (string) $<?php echo $model; ?>],
+            'domain' => '<?php echo $domain; ?>',
         ]);
 
         return new RedirectResponse(
             $request->headers->get(
                 'referer',
-                $this->urlGenerator->generate('<?= $module ?>/<?= $model ?>/index')
+                $this->urlGenerator->generate('<?php echo $module; ?>/<?php echo $model; ?>/index')
             )
         );
     }
@@ -68,11 +62,11 @@ class <?= $Model ?>ArchiveAction implements ControllerInterface
     /**
      * @return array<string, mixed>
      */
-    private function handleJsonRequest(<?= $Model ?> $<?= $model ?>, Request $request): array
+    private function handleJsonRequest(<?php echo $Model; ?> $<?php echo $model; ?>, Request $request): array
     {
-        /** @var <?= $Model ?>Archive\Response $response */
+        /** @var <?php echo $Model; ?>Archive\Response $response */
         $response = ($this->handler)(
-            new <?= $Model ?>Archive\Command($<?= $model ?>)
+            new <?php echo $Model; ?>Archive\Command($<?php echo $model; ?>)
         );
 
         return ['response' => $response];
@@ -81,7 +75,7 @@ class <?= $Model ?>ArchiveAction implements ControllerInterface
     /**
      * @return array<string, mixed>|Response
      */
-    public function __invoke(<?= $Model ?> $model, Request $request): array|Response
+    public function __invoke(<?php echo $Model; ?> $model, Request $request): array|Response
     {
         $format = $request->attributes->get('_format', 'html');
         $method = sprintf('handle%sRequest', ucfirst($format));

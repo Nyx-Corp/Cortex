@@ -13,10 +13,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CommandMapperExtension extends AbstractTypeExtension
 {
     /**
-     * Returns the list of extended types.
-     *
-     * @return array The list of extended types
+     * @param array<class-string, class-string> $actionAttributeMapping formTypeClass => commandClass
      */
+    public function __construct(
+        private ActionHandlerCollection $handlerCollection,
+        private readonly array $actionAttributeMapping = [],
+    ) {
+    }
+
     public static function getExtendedTypes(): iterable
     {
         return [
@@ -24,18 +28,6 @@ class CommandMapperExtension extends AbstractTypeExtension
         ];
     }
 
-    public function __construct(
-        private ActionHandlerCollection $handlerCollection,
-    ) {
-    }
-
-    /**
-     * Configures the options for the form type.
-     *
-     * This method can be overridden to add custom options or modify existing ones.
-     *
-     * @param OptionsResolver $resolver The resolver for the options
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -53,7 +45,7 @@ class CommandMapperExtension extends AbstractTypeExtension
         $builder
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
                 $form = $event->getForm();
-                $commandClass = $form->getConfig()->getOption('command_class');
+                $commandClass = $this->resolveCommandClass($form);
                 if (!$commandClass) {
                     return;
                 }
@@ -67,7 +59,7 @@ class CommandMapperExtension extends AbstractTypeExtension
             })
             ->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
                 $form = $event->getForm();
-                $commandClass = $form->getConfig()->getOption('command_class');
+                $commandClass = $this->resolveCommandClass($form);
                 if (!$commandClass) {
                     return;
                 }
@@ -91,5 +83,20 @@ class CommandMapperExtension extends AbstractTypeExtension
                 $event->setData($result);
             })
         ;
+    }
+
+    private function resolveCommandClass(\Symfony\Component\Form\FormInterface $form): ?string
+    {
+        // 1. Explicit option (legacy + primary)
+        $commandClass = $form->getConfig()->getOption('command_class');
+        if ($commandClass) {
+            return $commandClass;
+        }
+
+        // 2. #[Action] attribute mapping (injected by compiler pass)
+        $formType = $form->getConfig()->getType()->getInnerType();
+        $formTypeClass = get_class($formType);
+
+        return $this->actionAttributeMapping[$formTypeClass] ?? null;
     }
 }

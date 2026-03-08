@@ -4,6 +4,10 @@ namespace Cortex\Bridge\Symfony\Model\Query;
 
 use Cortex\Bridge\Symfony\Form\ModelQueryType;
 use Cortex\Component\Model\Query\ModelQuery;
+use Cortex\Component\Model\Query\Pager;
+use Cortex\Component\Model\Query\SortDirection;
+use Cortex\Component\Model\Query\Sorter;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -21,7 +25,7 @@ class ModelQueryDecorator extends ModelQuery
     private ?FormInterface $form = null;
 
     private array $filtersConfig = [];
-    private array $activeFilters = [];
+    private bool $archivable = false;
 
     public function build(FormFactoryInterface $formFactory, Request $request): self
     {
@@ -40,12 +44,17 @@ class ModelQueryDecorator extends ModelQuery
      *
      * Filter types: text, enum, boolean, date
      * For enum: add 'choices' => [['value' => 'x', 'label' => 'X'], ...]
+     *
+     * Set archivable to true for models using the Archivable trait:
+     * automatically filters out archived records and adds a toggle in the filter popover.
      */
-    public function decorate(array $sortables, \Closure|array|null $filters = null): self
+    public function decorate(array $sortables, \Closure|array|null $filters = null, array $fields = [], bool $archivable = false): self
     {
         if (!$this->request) {
             throw new \BadMethodCallException('ModelQuery cannot be decorated without building it first, using build() method.');
         }
+
+        $this->archivable = $archivable;
 
         // Store filters config if array
         if (is_array($filters)) {
@@ -59,12 +68,23 @@ class ModelQueryDecorator extends ModelQuery
             [
                 'sortable_fields' => $sortables,
                 'filters_config' => is_array($filters) ? $filters : [],
+                'display_fields' => $fields,
             ]
         );
 
         // Legacy closure support
         if ($filters instanceof \Closure) {
             $filters($this->formBuilder);
+        }
+
+        // Archivable: add toggle checkbox to filter form
+        if ($archivable) {
+            $this->formBuilder->add('archived', CheckboxType::class, [
+                'required' => false,
+                'mapped' => false,
+                'label' => 'admin.list.show_archived',
+                'translation_domain' => 'admin',
+            ]);
         }
 
         return $this;
@@ -96,14 +116,25 @@ class ModelQueryDecorator extends ModelQuery
         if ($this->formBuilder) {
             $this->form = $this->formBuilder->getForm();
 
-            // Only handle form submission if there's no q parameter
-            // When q is present, filters come from parseQueryString and form is just for display
             if (empty($qParam)) {
+                // No q parameter: handle full form submission (filters + sort + pager)
                 $this->form->handleRequest($this->request);
                 if ($this->form->isSubmitted() && !$this->form->isValid()) {
                     throw new BadRequestException(implode(' ; ', array_map(fn (FormError $error) => sprintf('%s : %s', $error->getOrigin()->getName(), $error->getMessage()), iterator_to_array($this->form->getErrors(true, true)))));
                 }
+
+            } else {
+                // q parameter present: filters come from parseQueryString,
+                // but sort and pager still need to be read from request
+                $this->applySortAndPagerFromRequest();
             }
+        }
+
+        // Archivable: toggle between active and archived records
+        if ($this->archivable) {
+            $this->isShowingArchived()
+                ? $this->filterNotNull('archivedAt')
+                : $this->filterNull('archivedAt');
         }
 
         return parent::resolve();
@@ -126,67 +157,56 @@ class ModelQueryDecorator extends ModelQuery
             $field = $match[1];
             $value = $match[2] ?: $match[3];
 
-            // Check if this is a valid filter field
             if ($this->filters->hasDeclaredKey($field) || isset($this->filtersConfig[$field])) {
                 $this->filterBy($field, $value);
-
-                // Build active filter for display
-                $label = $this->filtersConfig[$field]['label'] ?? ucfirst($field);
-                $this->activeFilters[] = [
-                    'field' => $field,
-                    'label' => $label,
-                    'value' => $value,
-                    'display' => $this->formatFilterDisplay($field, $value),
-                ];
             }
         }
     }
 
     /**
-     * Format filter value for display in chips.
+     * Check if the archived toggle is active (from form submission or q parameter).
      */
-    private function formatFilterDisplay(string $field, string $value): string
+    private function isShowingArchived(): bool
     {
-        $config = $this->filtersConfig[$field] ?? null;
-
-        if (!$config) {
-            return $value;
+        // From form submission: checkbox sends "1" when checked
+        if ($this->form?->has('archived') && $this->form->get('archived')->getData()) {
+            return true;
         }
 
-        $type = $config['type'] ?? '';
-
-        // For enum/choice, find the label
-        if ('enum' === $type && isset($config['choices'])) {
-            foreach ($config['choices'] as $choice) {
-                if (is_array($choice) && ($choice['value'] ?? '') === $value) {
-                    return $choice['label'] ?? $value;
-                }
-            }
+        // From request param (when form is not submitted, e.g. direct URL)
+        if ($this->request?->query->get('archived') === '1') {
+            return true;
         }
 
-        // For checkboxes (comma-separated values), find labels for each value
-        if ('checkboxes' === $type && isset($config['choices'])) {
-            $values = explode(',', $value);
-            $labels = [];
-            foreach ($values as $v) {
-                $v = trim($v);
-                foreach ($config['choices'] as $choice) {
-                    if (is_array($choice) && ($choice['value'] ?? '') === $v) {
-                        $labels[] = $choice['label'] ?? $v;
-                        break;
-                    }
-                }
-            }
-
-            return $labels ? implode(', ', $labels) : $value;
+        // From q parameter: "archived:yes", "archived:1", "archived:true"
+        $qParam = $this->request?->query->get('q', '');
+        if ($qParam && preg_match('/archived:(\S+)/i', $qParam, $matches)) {
+            return in_array(strtolower($matches[1]), ['1', 'yes', 'true', 'oui'], true);
         }
 
-        // For boolean
-        if ('boolean' === $type) {
-            return 'true' === $value || '1' === $value ? 'Oui' : 'Non';
-        }
+        return false;
+    }
 
-        return $value;
+    /**
+     * Apply sort and pager from request query params (used when q parameter bypasses form handling).
+     */
+    private function applySortAndPagerFromRequest(): void
+    {
+        $query = $this->request->query;
+
+        // Pager
+        $page = (int) $query->get('page', 1);
+        $limit = (int) $query->get('limit', 20);
+        $this->paginate(new Pager($page, $limit));
+
+        // Sort
+        $sortString = $query->get('sort', '');
+        if ($sortString && preg_match('/^(.+)_(asc|desc)$/i', $sortString, $matches)) {
+            $this->sort(new Sorter(
+                $matches[1],
+                SortDirection::fromString(strtolower($matches[2]))
+            ));
+        }
     }
 
     public function getDecorator(): FormView
@@ -197,9 +217,10 @@ class ModelQueryDecorator extends ModelQuery
 
         $view = $this->form->createView();
 
-        // Add filters config and active filters to view vars
         $view->vars['filters_config'] = $this->filtersConfig;
-        $view->vars['active_filters'] = $this->activeFilters;
+        $view->vars['pager'] = $this->pager;
+        $view->vars['archivable'] = $this->archivable;
+        $view->vars['showing_archived'] = $this->archivable && $this->isShowingArchived();
 
         return $view;
     }

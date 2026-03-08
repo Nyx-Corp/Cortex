@@ -1,0 +1,43 @@
+{% set pager = form.vars.pager|default(null) %}
+{
+    "data": [
+        {% for item in collection %}
+        { {% block item_fields %}{% endblock %} }{% if not loop.last %},{% endif %}
+
+        {% endfor %}
+    ],
+    {% if pager %}
+    "meta": {
+        "page": {{ pager.page }},
+        "perPage": {{ pager.nbPerPage }},
+        "total": {{ pager.nbRecords }}
+    },
+    "_links": {
+        "self": "{{ app.request.pathInfo }}?page={{ pager.page }}"
+        {% if pager.page < (pager.nbRecords / pager.nbPerPage)|round(0, 'ceil') %}
+        ,"next": "{{ app.request.pathInfo }}?page={{ pager.page + 1 }}"
+        {% endif %}
+        {% if pager.page > 1 %}
+        ,"prev": "{{ app.request.pathInfo }}?page={{ pager.page - 1 }}"
+        {% endif %}
+    },
+    {% endif %}
+    "filters": {
+        {% for name, config in form.vars.filters_config|default({}) %}
+        "{{ name }}": {
+            "type": "{{ config.type|default('text') }}",
+            "label": "{{ config.label|default(name)|trans }}"
+            {% if config.choices is defined %}
+            ,"choices": {{ config.choices|json_encode(constant('JSON_UNESCAPED_UNICODE'))|raw }}
+            {% endif %}
+        }{% if not loop.last %},{% endif %}
+
+        {% endfor %}
+    }
+    {% if app.request.attributes.get('_api_quota') %}
+    ,"quota": {
+        "remaining": {{ app.request.attributes.get('_api_quota').remaining }},
+        "limit": {{ app.request.attributes.get('_api_quota').limit }}
+    }
+    {% endif %}
+}
