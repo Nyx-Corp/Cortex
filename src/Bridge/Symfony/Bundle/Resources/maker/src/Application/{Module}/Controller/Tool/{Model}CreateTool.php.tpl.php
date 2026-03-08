@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Application/{Module}/Controller/Tool/{Model}CreateTool.php.tpl.php
@@ -6,15 +6,15 @@
  * @see src/Lib/Cortex/docs/bridge-symfony.md
  */
 
-namespace Application\<?= $Module ?>\Controller\Tool;
+namespace Application\<?php echo $Module; ?>\Controller\Tool;
 
-use Domain\<?= $Domain ?>\Action\<?= $Model ?>Edit\Command;
-use Domain\<?= $Domain ?>\Action\<?= $Model ?>Edit\Handler;
+use Domain\<?php echo $Domain; ?>\Action\<?php echo $Model; ?>Edit\Command;
+use Domain\<?php echo $Domain; ?>\Action\<?php echo $Model; ?>Edit\Handler;
 use Mcp\Capability\Attribute\McpTool;
 use Mcp\Capability\Attribute\Schema;
 
-#[McpTool(name: '<?= $tool_name_create ?>', description: 'Create a new <?= $Model ?>')]
-class <?= $Model ?>CreateTool
+#[McpTool(name: '<?php echo $tool_name_create; ?>', description: 'Create a new <?php echo $Model; ?>')]
+class <?php echo $Model; ?>CreateTool
 {
     public function __construct(
         private readonly Handler $handler,
@@ -35,7 +35,7 @@ class <?= $Model ?>CreateTool
 
             return [
                 'success' => true,
-                'uuid' => (string) $response-><?= $model ?>->uuid,
+                'uuid' => (string) $response-><?php echo $model; ?>->uuid,
                 'created' => true,
             ];
         } catch (\Throwable $e) {

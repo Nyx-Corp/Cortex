@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Application/{Module}/Controller/Tool/{Model}ListTool.php.tpl.php
@@ -6,18 +6,18 @@
  * @see src/Lib/Cortex/docs/bridge-symfony.md
  */
 
-namespace Application\<?= $Module ?>\Controller\Tool;
+namespace Application\<?php echo $Module; ?>\Controller\Tool;
 
 use Cortex\Component\Model\Query\Pager;
-use Domain\<?= $Domain ?>\Factory\<?= $Model ?>Factory;
+use Domain\<?php echo $Domain; ?>\Factory\<?php echo $Model; ?>Factory;
 use Mcp\Capability\Attribute\McpTool;
 use Mcp\Capability\Attribute\Schema;
 
-#[McpTool(name: '<?= $tool_name_list ?>', description: 'List <?= $Model ?> with optional filters')]
-class <?= $Model ?>ListTool
+#[McpTool(name: '<?php echo $tool_name_list; ?>', description: 'List <?php echo $Model; ?> with optional filters')]
+class <?php echo $Model; ?>ListTool
 {
     public function __construct(
-        private readonly <?= $Model ?>Factory $factory,
+        private readonly <?php echo $Model; ?>Factory $factory,
     ) {
     }
 
@@ -45,8 +45,8 @@ class <?= $Model ?>ListTool
 
             return [
                 'success' => true,
-                'items' => array_map(fn ($<?= $model ?>) => [
-                    'uuid' => (string) $<?= $model ?>->uuid,
+                'items' => array_map(fn ($<?php echo $model; ?>) => [
+                    'uuid' => (string) $<?php echo $model; ?>->uuid,
                     // TODO: Add model fields
                 ], $collection->toArray()),
                 'paging' => [

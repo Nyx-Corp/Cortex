@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Domain/{Domain}/Model/{Model}Collection.php.tpl.php
@@ -6,18 +6,18 @@
  * @see src/Lib/Cortex/docs/async-collection.md
  */
 
-namespace Domain\<?= $Domain ?>\Model;
+namespace Domain\<?php echo $Domain; ?>\Model;
 
 use Cortex\Component\Model\ModelCollection;
 use Cortex\ValueObject\RegisteredClass;
 
 /**
- * @extends ModelCollection<<?= $Model ?>>
+ * @extends ModelCollection<<?php echo $Model; ?>>
  */
-class <?= $Model ?>Collection extends ModelCollection
+class <?php echo $Model; ?>Collection extends ModelCollection
 {
     protected static function expectedType(): ?RegisteredClass
     {
-        return new RegisteredClass(<?= $Model ?>::class);
+        return new RegisteredClass(<?php echo $Model; ?>::class);
     }
 }

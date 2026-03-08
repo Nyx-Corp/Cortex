@@ -249,7 +249,7 @@ class CallbackMapperTest extends TestCase
 
     public function testCallbackWithObjectMethod(): void
     {
-        $helper = new class {
+        $helper = new class () {
             public function transform(string $value): string
             {
                 return strtoupper($value);

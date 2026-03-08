@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Infrastructure/Doctrine/{Domain}/Dbal{Model}Mapper.php.tpl.php
@@ -6,7 +6,7 @@
  * @see src/Lib/Cortex/docs/bridge-doctrine.md
  */
 
-namespace Infrastructure\Doctrine\<?= $Domain ?>;
+namespace Infrastructure\Doctrine\<?php echo $Domain; ?>;
 
 use Cortex\Bridge\Doctrine\DbalBridge;
 use Cortex\Bridge\Doctrine\DbalMappingConfiguration;
@@ -17,11 +17,11 @@ use Cortex\Component\Mapper\Strategy;
 use Cortex\Component\Mapper\Value;
 use Cortex\Component\Model\ModelMiddleware;
 use Cortex\Component\Model\Scope;
-use Domain\<?= $Domain ?>\Model\<?= $Model ?>;
+use Domain\<?php echo $Domain; ?>\Model\<?php echo $Model; ?>;
 use Symfony\Component\Uid\Uuid;
 
-#[Middleware(<?= $Model ?>::class, on: Scope::All, handler: 'onDbal', priority: 2)]
-class Dbal<?= $Model ?>Mapper implements ModelMiddleware
+#[Middleware(<?php echo $Model; ?>::class, on: Scope::All, handler: 'onDbal', priority: 2)]
+class Dbal<?php echo $Model; ?>Mapper implements ModelMiddleware
 {
     use DbalModelAdapterTrait;
 
@@ -29,7 +29,7 @@ class Dbal<?= $Model ?>Mapper implements ModelMiddleware
         DbalBridge $dbalBridge,
     ) {
         $this->dbal = $dbalBridge->createAdapter(new DbalMappingConfiguration(
-            table: '<?= $domain ?>_<?= $table ?>',
+            table: '<?php echo $domain; ?>_<?php echo $table; ?>',
             primaryKey: 'uuid',
             modelToTableMapper: new ArrayMapper([
                 // 'column_name' => 'modelProperty',

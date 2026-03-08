@@ -112,7 +112,7 @@ class DbalMappingConfiguration
         JoinDefinition $join,
         string $parentTable,
         int $currentDepth,
-        array $visited
+        array $visited,
     ): string {
         if ($currentDepth > $this->joinDepth) {
             return '';
@@ -181,7 +181,7 @@ class DbalMappingConfiguration
         JoinDefinition $join,
         int $currentDepth,
         array $visited,
-        array &$fields
+        array &$fields,
     ): void {
         if ($currentDepth > $this->joinDepth) {
             return;

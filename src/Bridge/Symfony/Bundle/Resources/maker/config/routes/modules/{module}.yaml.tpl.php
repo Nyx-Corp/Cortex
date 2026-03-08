@@ -1,3 +1,3 @@
 actions:
-    resource: ../../../src/Application/<?= $Module ?>/Controller/Action/
+    resource: ../../../src/Application/<?php echo $Module; ?>/Controller/Action/
     type: attribute

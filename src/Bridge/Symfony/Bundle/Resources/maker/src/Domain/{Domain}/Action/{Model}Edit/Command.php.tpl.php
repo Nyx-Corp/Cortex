@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Domain/{Domain}/Action/{Model}Edit/Command.php.tpl.php
@@ -6,9 +6,9 @@
  * @see src/Lib/Cortex/docs/events.md
  */
 
-namespace Domain\<?= $Domain ?>\Action\<?= $Model ?>Edit;
+namespace Domain\<?php echo $Domain; ?>\Action\<?php echo $Model; ?>Edit;
 
-use Domain\<?= $Domain ?>\Model\<?= $Model ?>;
+use Domain\<?php echo $Domain; ?>\Model\<?php echo $Model; ?>;
 use Symfony\Component\Uid\Uuid;
 
 class Command
