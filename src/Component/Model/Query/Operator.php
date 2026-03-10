@@ -12,13 +12,25 @@ enum Operator: string
     case LessThanOrEqual = '<=';
     case Like = '~';
     case NotLike = '!~';
+    case IsNull = 'IS_NULL';
+    case IsNotNull = 'IS_NOT_NULL';
 
     public function toSql(): string
     {
         return match ($this) {
             self::Like => 'LIKE',
             self::NotLike => 'NOT LIKE',
+            self::IsNull => 'IS NULL',
+            self::IsNotNull => 'IS NOT NULL',
             default => $this->value,
+        };
+    }
+
+    public function isUnary(): bool
+    {
+        return match ($this) {
+            self::IsNull, self::IsNotNull => true,
+            default => false,
         };
     }
 
@@ -28,7 +40,7 @@ enum Operator: string
             '|',
             array_map(
                 static fn (Operator $op) => preg_quote($op->value),
-                self::cases()
+                array_filter(self::cases(), static fn (Operator $op) => !$op->isUnary())
             )
         );
     }

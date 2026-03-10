@@ -39,17 +39,28 @@ final class CrudMaker extends CortexMaker
             'src/Application/{Module}/Controller/Action/{Model}ListAction.php.tpl.php',
             'templates/{module}/{model}/index.html.twig.tpl.php',
 
-            'src/Application/{Module}/Controller/Action/{Model}EditAction.php.tpl.php',
-            'src/Application/{Module}/Form/{Model}EditType.php.tpl.php',
-            'src/Domain/{Domain}/Action/{Model}Edit/Command.php.tpl.php',
-            'src/Domain/{Domain}/Action/{Model}Edit/Event.php.tpl.php',
-            'src/Domain/{Domain}/Action/{Model}Edit/Exception.php.tpl.php',
-            'src/Domain/{Domain}/Action/{Model}Edit/Handler.php.tpl.php',
-            'src/Domain/{Domain}/Action/{Model}Edit/Response.php.tpl.php',
-            'templates/{module}/{model}/_form.html.twig.tpl.php',
-            'templates/{module}/{model}/edit.html.twig.tpl.php',
+            // Create
+            'src/Application/{Module}/Controller/Action/{Model}CreateAction.php.tpl.php',
+            'src/Application/{Module}/Form/{Model}CreateType.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Create/Command.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Create/Event.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Create/Exception.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Create/Handler.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Create/Response.php.tpl.php',
             'templates/{module}/{model}/create.html.twig.tpl.php',
 
+            // Update
+            'src/Application/{Module}/Controller/Action/{Model}UpdateAction.php.tpl.php',
+            'src/Application/{Module}/Form/{Model}UpdateType.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Update/Command.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Update/Event.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Update/Exception.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Update/Handler.php.tpl.php',
+            'src/Domain/{Domain}/Action/{Model}Update/Response.php.tpl.php',
+            'templates/{module}/{model}/_form.html.twig.tpl.php',
+            'templates/{module}/{model}/edit.html.twig.tpl.php',
+
+            // Archive
             'src/Application/{Module}/Controller/Action/{Model}ArchiveAction.php.tpl.php',
             'src/Domain/{Domain}/Action/{Model}Archive/Command.php.tpl.php',
             'src/Domain/{Domain}/Action/{Model}Archive/Event.php.tpl.php',
@@ -96,6 +107,23 @@ final class CrudMaker extends CortexMaker
         $subpath = $subpathUnicode->snake()->toString();
         $subpath_namespace = '' !== $Subpath ? '\\'.$Subpath : '';
 
+        // Path transformer for subpath: inserts subpath folder in controller and template paths
+        $pathTransformer = '' !== $Subpath
+            ? fn (string $path) => str_contains($path, 'Controller/Action/')
+                ? preg_replace(
+                    '#(Controller/Action/)([^/]+Action\.php)#',
+                    '$1'.$Subpath.'/$2',
+                    $path
+                )
+                : (str_contains($path, 'templates/')
+                    ? preg_replace(
+                        '#(templates/[^/]+/)([^/]+/)#',
+                        '$1'.strtolower($Subpath).'/$2',
+                        $path
+                    )
+                    : $path)
+            : null;
+
         $this->pathCollection
             ->filter(fn (SplFileInfo $file) => in_array(
                 $file->getRelativePathname(),
@@ -134,6 +162,7 @@ final class CrudMaker extends CortexMaker
                         $modelUnicode->snake()->replace('_', '-')->toString()
                     ),
                 ],
+                pathTransformer: $pathTransformer,
             )
             ->generate(fn (string $generatedFilepath) => $io->text(sprintf(
                 '  ✓ <info>created</info> <comment>%s</comment>',

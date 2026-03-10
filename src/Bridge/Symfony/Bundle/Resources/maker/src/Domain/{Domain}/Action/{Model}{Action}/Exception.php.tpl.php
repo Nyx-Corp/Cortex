@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Domain/{Domain}/Action/{Model}{Action}/Exception.php.tpl.php
@@ -6,10 +6,10 @@
  * @see src/Lib/Cortex/docs/events.md
  */
 
-namespace Domain\<?= $Domain ?>\Action\<?= $Model ?><?= $Action ?>;
+namespace Domain\<?php echo $Domain; ?>\Action\<?php echo $Model; ?><?php echo $Action; ?>;
 
-use Domain\<?= $Domain ?>\Error\<?= $Model ?>Exception;
+use Domain\<?php echo $Domain; ?>\Error\<?php echo $Model; ?>Exception;
 
-class Exception extends <?= $Model ?>Exception
+class Exception extends <?php echo $Model; ?>Exception
 {
 }

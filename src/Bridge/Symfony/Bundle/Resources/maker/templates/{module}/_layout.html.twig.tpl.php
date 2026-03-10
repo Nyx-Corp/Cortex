@@ -3,5 +3,5 @@
 {% import '@_theme/components/breadcrumbs.html.twig' as breadcrumbs %}
 {% block breadcrumb %}
     {{ parent() }}
-    {{ breadcrumbs.item('breadcrumb.<?= $module ?>'|trans({}, 'messages'), 'folder') }}
+    {{ breadcrumbs.item('breadcrumb.<?php echo $module; ?>'|trans({}, 'messages'), 'folder') }}
 {% endblock %}

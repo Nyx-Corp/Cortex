@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/migrations/Version{datetime}.php.tpl.php
@@ -13,11 +13,11 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class Version<?= $datetime ?> extends AbstractMigration
+final class Version<?php echo $datetime; ?> extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Creates table <?= $table ?>.';
+        return 'Creates table <?php echo $table; ?>.';
     }
 
     /**
@@ -50,7 +50,7 @@ final class Version<?= $datetime ?> extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql(<<<SQL
-            CREATE TABLE <?= $table ?> (
+            CREATE TABLE <?php echo $table; ?> (
                 uuid CHAR(36) NOT NULL,
 
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -64,6 +64,6 @@ final class Version<?= $datetime ?> extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $schema->dropTable('<?= $table ?>');
+        $schema->dropTable('<?php echo $table; ?>');
     }
 }

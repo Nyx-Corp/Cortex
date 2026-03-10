@@ -14,11 +14,13 @@
 
 import { createIcons, icons } from 'lucide'
 import { Application } from '@hotwired/stimulus'
+import hotkeys from './hotkeys.js'
 import { AlertsController } from './controllers/alerts/index.js'
 import { SearchFiltersController } from './controllers/search-filters/index.js'
 import { PopoverController } from './controllers/popover/index.js'
 import { FormDirtyController } from './controllers/form-dirty/index.js'
 import { ThemeToggleController } from './controllers/theme-toggle/index.js'
+import { ShortcutsController } from './controllers/shortcuts/index.js'
 
 /**
  * Initialize the admin application
@@ -36,6 +38,7 @@ export function initAdmin(options = {}) {
     stimulus.register('popover', PopoverController)
     stimulus.register('form-dirty', FormDirtyController)
     stimulus.register('theme-toggle', ThemeToggleController)
+    stimulus.register('shortcuts', ShortcutsController)
 
     // Register project-specific controllers
     if (options.controllers) {
@@ -55,7 +58,6 @@ export function initAdmin(options = {}) {
         initAutosubmit()
         initDropdowns()
         initBatchSelection()
-        initShortcuts()
 
         // Project-specific initialization
         options.onReady?.()
@@ -115,19 +117,17 @@ function initSearchModal() {
     backdrop?.addEventListener('click', closeModal)
 
     // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-        // Cmd+K or Ctrl+K opens modal
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault()
-            if (modal.classList.contains('hidden')) {
-                openModal()
-            } else {
-                closeModal()
-            }
+    hotkeys('command+k, ctrl+k', (e) => {
+        e.preventDefault()
+        if (modal.classList.contains('hidden')) {
+            openModal()
+        } else {
+            closeModal()
         }
+    })
 
-        // Escape closes modal
-        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+    hotkeys('escape', () => {
+        if (!modal.classList.contains('hidden')) {
             closeModal()
         }
     })
@@ -202,10 +202,8 @@ function initDropdowns() {
         })
 
         // Close on Escape
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && isOpen) {
-                close()
-            }
+        hotkeys('escape', () => {
+            if (isOpen) close()
         })
     })
 }
@@ -301,10 +299,8 @@ function initBatchSelection() {
     })
 
     // Close on Escape
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isMenuOpen) {
-            closeMenu()
-        }
+    hotkeys('escape', () => {
+        if (isMenuOpen) closeMenu()
     })
 
     // Select all toggle
@@ -340,21 +336,3 @@ function initBatchSelection() {
     updateBatchState(false)
 }
 
-/**
- * Generic keyboard shortcuts
- */
-function initShortcuts() {
-    document.addEventListener('keydown', (e) => {
-        // Ignore if typing in input/textarea
-        if (e.target.matches('input, textarea, select, [contenteditable]')) return
-
-        // N = New (follow data-shortcut="n" link)
-        if (e.key === 'n' && !e.metaKey && !e.ctrlKey && !e.altKey) {
-            const newLink = document.querySelector('[data-shortcut="n"]')
-            if (newLink) {
-                e.preventDefault()
-                newLink.click()
-            }
-        }
-    })
-}

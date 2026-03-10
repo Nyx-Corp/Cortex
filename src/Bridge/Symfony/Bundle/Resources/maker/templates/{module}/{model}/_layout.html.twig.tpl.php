@@ -1,11 +1,11 @@
-{# Override <?= $model ?>_icon to customize the icon for this model #}
-{% set <?= $model ?>_icon = <?= $model ?>_icon|default('file') %}
-{% set active_menu = '<?= $model ?>.title'|trans({}, '<?= $module ?>') %}
+{# Override <?php echo $model; ?>_icon to customize the icon for this model #}
+{% set <?php echo $model; ?>_icon = <?php echo $model; ?>_icon|default('file') %}
+{% set active_menu = '<?php echo $model; ?>.title'|trans({}, '<?php echo $module; ?>') %}
 
-{% extends "<?= $module ?>/_layout.html.twig" %}
+{% extends "<?php echo $module; ?>/_layout.html.twig" %}
 
 {% import '@_theme/components/breadcrumbs.html.twig' as breadcrumbs %}
 {% block breadcrumb %}
     {{ parent() }}
-    {{ breadcrumbs.item(active_menu, <?= $model ?>_icon, path('<?= $module ?>/<?= $model ?>/index')) }}
+    {{ breadcrumbs.item(active_menu, <?php echo $model; ?>_icon, path('<?php echo $module; ?>/<?php echo $model; ?>/index')) }}
 {% endblock %}

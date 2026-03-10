@@ -141,13 +141,16 @@ class DbalAdapter
                 if (is_null($value)) {
                     return sprintf('%s IS NULL', $column);
                 }
+                if ($value instanceof Operator && $value->isUnary()) {
+                    return sprintf('%s %s', $column, $value->toSql());
+                }
 
                 // Handle BackedEnum - use its value for operator detection
                 $stringValue = $value instanceof \BackedEnum ? (string) $value->value : $value;
 
                 $operator = is_string($stringValue) ? array_find(
                     Operator::cases(),
-                    static fn (Operator $op) => str_starts_with($stringValue, $op->value)
+                    static fn (Operator $op) => !$op->isUnary() && str_starts_with($stringValue, $op->value)
                 ) : null;
                 $operator ??= Operator::Equal;
 
@@ -300,7 +303,7 @@ class DbalAdapter
     public function onModelQuery(Middleware $chain, ModelQuery $query): \Generator
     {
         // Check preloader for single-UUID lookup
-        $uuidFilter = $query->filters->get('uuid');
+        $uuidFilter = $query->filters->has('uuid') ? $query->filters->get('uuid') : null;
         if ($uuidFilter && $this->preloader && $this->configuration->modelClass) {
             if ($this->preloader->has($this->configuration->modelClass, $uuidFilter)) {
                 $cachedData = $this->preloader->get($this->configuration->modelClass, $uuidFilter);
@@ -329,8 +332,19 @@ class DbalAdapter
         // Process filters for join-qualified fields (e.g., "organisation.name" -> "org.name")
         $filters = $this->resolveJoinFilters($filters);
 
+        // Null/NotNull field conditions (bypass modelToTableMapper value handling)
+        foreach ($query->nullFields as $field) {
+            $filters[$this->mapFieldName($field)] = null;
+        }
+        foreach ($query->notNullFields as $field) {
+            $filters[$this->mapFieldName($field)] = Operator::IsNotNull;
+        }
+
         // Normalize filter keys for parameter binding (dots to underscores)
-        $queryParams = $this->normalizeParamKeys($filters);
+        // Remove nulls and unary operators — they generate SQL without bind placeholders
+        $queryParams = $this->normalizeParamKeys(
+            array_filter($filters, static fn ($v) => null !== $v && !($v instanceof Operator && $v->isUnary()))
+        );
 
         $limit = $query->limit ?? 0;
 
@@ -459,7 +473,7 @@ class DbalAdapter
         array $dataLine,
         ?array $joins = null,
         int $depth = 1,
-        array $visited = []
+        array $visited = [],
     ): void {
         if (!$this->preloader) {
             return;
@@ -532,7 +546,7 @@ class DbalAdapter
         array $dataLine,
         ?array $joins = null,
         int $depth = 1,
-        array $visited = []
+        array $visited = [],
     ): array {
         $joins ??= $this->configuration->joins;
 
@@ -653,6 +667,16 @@ class DbalAdapter
         }
 
         return $normalized;
+    }
+
+    /**
+     * Map a model field name to its table column name via modelToTableMapper.
+     */
+    private function mapFieldName(string $field): string
+    {
+        $mapped = $this->configuration->modelToTableMapper?->map([$field => '']);
+
+        return $mapped ? array_key_first($mapped) : $field;
     }
 
     /**

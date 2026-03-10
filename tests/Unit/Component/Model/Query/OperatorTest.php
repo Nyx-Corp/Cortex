@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\Component\Model\Query;
 
 use Cortex\Component\Model\Query\Operator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -56,6 +57,16 @@ class OperatorTest extends TestCase
         $this->assertEquals('!~', Operator::NotLike->value);
     }
 
+    public function testIsNullValue(): void
+    {
+        $this->assertEquals('IS_NULL', Operator::IsNull->value);
+    }
+
+    public function testIsNotNullValue(): void
+    {
+        $this->assertEquals('IS_NOT_NULL', Operator::IsNotNull->value);
+    }
+
     // =======================================================================
     // toSql() TESTS
     // =======================================================================
@@ -100,6 +111,35 @@ class OperatorTest extends TestCase
         $this->assertEquals('NOT LIKE', Operator::NotLike->toSql());
     }
 
+    public function testToSqlIsNull(): void
+    {
+        $this->assertEquals('IS NULL', Operator::IsNull->toSql());
+    }
+
+    public function testToSqlIsNotNull(): void
+    {
+        $this->assertEquals('IS NOT NULL', Operator::IsNotNull->toSql());
+    }
+
+    // =======================================================================
+    // isUnary() TESTS
+    // =======================================================================
+
+    public function testIsUnaryForNullOperators(): void
+    {
+        $this->assertTrue(Operator::IsNull->isUnary());
+        $this->assertTrue(Operator::IsNotNull->isUnary());
+    }
+
+    public function testIsUnaryForRegularOperators(): void
+    {
+        $this->assertFalse(Operator::Equal->isUnary());
+        $this->assertFalse(Operator::NotEqual->isUnary());
+        $this->assertFalse(Operator::GreaterThan->isUnary());
+        $this->assertFalse(Operator::Like->isUnary());
+        $this->assertFalse(Operator::NotLike->isUnary());
+    }
+
     // =======================================================================
     // pattern() TESTS
     // =======================================================================
@@ -108,7 +148,7 @@ class OperatorTest extends TestCase
     {
         $pattern = Operator::pattern();
 
-        // Should match all operators
+        // Should match all prefix operators
         $this->assertMatchesRegularExpression("/^($pattern)/", '=value');
         $this->assertMatchesRegularExpression("/^($pattern)/", '!=value');
         $this->assertMatchesRegularExpression("/^($pattern)/", '>value');
@@ -123,24 +163,30 @@ class OperatorTest extends TestCase
     {
         $pattern = Operator::pattern();
 
-        // Plain strings without operators don't match
         $this->assertDoesNotMatchRegularExpression("/^($pattern)/", 'value');
         $this->assertDoesNotMatchRegularExpression("/^($pattern)/", 'test123');
+    }
+
+    public function testPatternExcludesUnaryOperators(): void
+    {
+        $pattern = Operator::pattern();
+
+        // Unary operators are not prefix operators — they should not be in the pattern
+        $this->assertDoesNotMatchRegularExpression("/^($pattern)/", 'IS_NULL');
+        $this->assertDoesNotMatchRegularExpression("/^($pattern)/", 'IS_NOT_NULL');
     }
 
     // =======================================================================
     // hasOperator() TESTS
     // =======================================================================
 
-    /**
-     * @dataProvider validOperatorValuesProvider
-     */
+    #[DataProvider('validOperatorValuesProvider')]
     public function testHasOperatorWithValidValues(string $value): void
     {
         $this->assertTrue(Operator::hasOperator($value));
     }
 
-    public function validOperatorValuesProvider(): array
+    public static function validOperatorValuesProvider(): array
     {
         return [
             'equal' => ['=test'],
@@ -156,15 +202,13 @@ class OperatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidOperatorValuesProvider
-     */
+    #[DataProvider('invalidOperatorValuesProvider')]
     public function testHasOperatorWithInvalidValues(mixed $value): void
     {
         $this->assertFalse(Operator::hasOperator($value));
     }
 
-    public function invalidOperatorValuesProvider(): array
+    public static function invalidOperatorValuesProvider(): array
     {
         return [
             'plain string' => ['test'],
@@ -179,6 +223,8 @@ class OperatorTest extends TestCase
             'object' => [new \stdClass()],
             'operator at end' => ['test='],
             'operator in middle' => ['test=value'],
+            'IS_NULL string' => ['IS_NULL'],
+            'IS_NOT_NULL string' => ['IS_NOT_NULL'],
         ];
     }
 

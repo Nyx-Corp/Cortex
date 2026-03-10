@@ -39,14 +39,16 @@ Cortex/
 │
 ├── assets/
 │   ├── js/
-│   │   ├── admin.js                # Admin entry point
+│   │   ├── admin.js                # Admin entry point (initAdmin)
 │   │   ├── index.js                # Public exports
+│   │   ├── hotkeys.js              # Keyboard shortcuts (wraps hotkeys-js)
 │   │   ├── utils.js                # DOM utilities
 │   │   ├── controllers/            # Stimulus controllers
 │   │   │   ├── alerts/             # Toast notifications (store + triggers)
 │   │   │   ├── search-filters/     # Filtres de recherche
 │   │   │   ├── popover/            # Popovers
 │   │   │   ├── form-dirty/         # Détection formulaire modifié
+│   │   │   ├── shortcuts/          # Raccourcis clavier déclaratifs
 │   │   │   └── theme-toggle/       # Dark/light mode
 │   │   └── components/
 │   │       ├── tab_namespace.js    # Tabs avec namespace
@@ -116,13 +118,65 @@ make:cortex:action {Module} {Domain} {Model} {Action}  # Action métier
 ### JavaScript (via Vite)
 
 ```js
-import { TabNamespace, PopFadeSpinner } from '@cortex/js';
+import { TabNamespace, PopFadeSpinner, hotkeys } from '@cortex/js';
 import '@cortex/css/theme.css';
 
 // Stimulus controllers
 import AlertsController from '@cortex/js/controllers/alerts';
 application.register('alerts', AlertsController);
 ```
+
+#### Keyboard Shortcuts (`hotkeys-js`)
+
+Cortex intègre [hotkeys-js](https://github.com/jaywcjlove/hotkeys-js) via un wrapper (`hotkeys.js`) qui configure un filtre intelligent :
+- **Single-char shortcuts** (`n`, `f`, etc.) — bloqués dans les `<input>`, `<textarea>`, `<select>`
+- **Escape** — passe partout (inputs inclus)
+- **Modifier combos** (`ctrl+k`, `command+s`, etc.) — passent partout
+
+#### Raccourcis déclaratifs (`shortcuts` controller)
+
+Le controller Stimulus `shortcuts` (attaché au `<body>` par `admin.html.twig`) scanne les éléments `[data-shortcut]` et bind automatiquement :
+
+```html
+<!-- Click automatique sur lien/bouton -->
+<a href="/new" data-shortcut="n">Nouveau</a>
+<button data-shortcut="f">Filtres</button>
+
+<!-- Focus automatique sur input -->
+<input data-shortcut="/" placeholder="Rechercher...">
+```
+
+Pas besoin de JS — le binding est automatique via Stimulus.
+
+#### API impérative
+
+Pour les comportements complexes (modales, escape, combos) :
+
+```js
+import hotkeys from '@cortex/js/hotkeys.js'
+
+hotkeys('command+k, ctrl+k', (e) => {
+    e.preventDefault()
+    toggleSearchModal()
+})
+
+hotkeys('escape', () => {
+    closePopover()
+    document.activeElement?.blur()
+})
+
+// Cleanup (dans disconnect() d'un Stimulus controller)
+hotkeys.unbind('command+k, ctrl+k')
+```
+
+#### Raccourcis par défaut (`initAdmin()`)
+
+| Raccourci | Déclaratif | Action |
+|-----------|------------|--------|
+| `N` | `data-shortcut="n"` | Click le lien Nouveau |
+| `F` | `data-shortcut="f"` | Toggle le popover filtres |
+| `Escape` | JS | Fermer popovers, modales, blur |
+| `Cmd+K` / `Ctrl+K` | JS | Ouvrir la modale de recherche |
 
 ### PHP
 
@@ -165,12 +219,15 @@ make cortex-status # Affiche l'état du subtree
 | Document | Description |
 |----------|-------------|
 | [Architecture](docs/index.md) | Vue d'ensemble, flux de données, concepts clés |
+| [Routing](docs/routing.md) | Resource routing (convention over configuration) |
+| [Templates JSON](docs/templates-json.md) | API JSON via Twig (`list.json.twig`, `response.json.twig`) |
 | [ArrayMapper](docs/array-mapper.md) | Transformation bidirectionnelle DB ↔ Model |
 | [AsyncCollection](docs/async-collection.md) | Collections lazy avec context propagation |
 | [Bridge/Doctrine](docs/bridge-doctrine.md) | Persistence DBAL, JOINs, preloading N+1 |
 | [Bridge/Symfony](docs/bridge-symfony.md) | ValueResolver, Forms, Controllers, Twig |
 | [Action Events](docs/events.md) | Système d'événements PSR-14 pour les Actions |
 | [Makers](docs/makers.md) | Générateurs de code DDD |
+| [UPGRADE 2.1](UPGRADE-2.1.md) | Guide de migration v2.0 → v2.1 |
 
 ## Licence
 

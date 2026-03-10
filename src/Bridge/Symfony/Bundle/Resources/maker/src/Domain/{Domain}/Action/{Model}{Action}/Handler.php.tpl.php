@@ -1,25 +1,25 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
-namespace Domain\<?= $Domain ?>\Action\<?= $Model ?><?= $Action ?>;
+namespace Domain\<?php echo $Domain; ?>\Action\<?php echo $Model; ?><?php echo $Action; ?>;
 
 use Cortex\Component\Action\ActionHandler;
 use Cortex\Component\Event\EmitsActionEvents;
 use Cortex\Component\Event\EventDispatcherAwareInterface;
-use Domain\<?= $Domain ?>\Persistence\<?= $Model ?>Store;
+use Domain\<?php echo $Domain; ?>\Persistence\<?php echo $Model; ?>Store;
 
 class Handler implements ActionHandler, EventDispatcherAwareInterface
 {
     use EmitsActionEvents;
 
     public function __construct(
-        private <?= $Model ?>Store $store,
+        private <?php echo $Model; ?>Store $store,
     ) {
     }
 
     public function __invoke(Command $command): Response
     {
-        /** @var \Domain\<?= $Domain ?>\Model\<?= $Model ?> $model */
-        $model = $command-><?= $model ?>;
+        /** @var \Domain\<?php echo $Domain; ?>\Model\<?php echo $Model; ?> $model */
+        $model = $command-><?php echo $model; ?>;
 
         // do things
 

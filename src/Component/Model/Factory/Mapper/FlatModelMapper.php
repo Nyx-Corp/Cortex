@@ -93,7 +93,7 @@ class FlatModelMapper implements ModelMapper
             } catch (\ReflectionException) {
                 continue;
             }
-            if ($prop->isPublic() && !$prop->isReadOnly() && !$prop->isPrivateSet() && !$prop->isProtectedSet()) {
+            if ($prop->isPublic() && !$prop->isReadOnly() && !$prop->isVirtual() && !$prop->isPrivateSet() && !$prop->isProtectedSet()) {
                 return $name;
             }
         }

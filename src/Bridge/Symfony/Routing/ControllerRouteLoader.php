@@ -12,9 +12,15 @@ use Symfony\Component\Routing\RouteCollection;
  * Auto-discovers routes from all controllers implementing ControllerInterface.
  *
  * Controllers are injected by ControllerTaggingPass compiler pass.
- * Route names are auto-generated from namespace + class name:
- *   - Application\Contact\Controller\Action\Admin\ContactListAction → admin/contact/index
- *   - Application\Admin\Controller\Action\DashboardIndexAction → dashboard/index
+ * Routes are derived by convention from class names, or from #[Route] attributes as override.
+ *
+ * Convention:
+ *   {Model}ListAction    → GET /{models}                       (name: {model}/index)
+ *   {Model}CreateAction  → GET|POST /{model}/create            (name: {model}/create)
+ *   {Model}UpdateAction  → GET|POST /{model}/{uuid}/edit       (name: {model}/edit)
+ *   {Model}EditAction    → GET|POST /{model}/{uuid}/edit       (name: {model}/edit)
+ *   {Model}ArchiveAction → GET /{model}/{uuid}/archive         (name: {model}/archive)
+ *   {Model}{Custom}Action → GET|POST /{model}/{uuid}/{custom}  (name: {model}/{custom})
  *
  * Usage in routes.yaml:
  *     admin:
@@ -23,7 +29,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class ControllerRouteLoader extends Loader
 {
-    private bool $loaded = false;
+    private array $loadedResources = [];
 
     /**
      * @param array<class-string<ControllerInterface>> $controllers
@@ -37,11 +43,11 @@ class ControllerRouteLoader extends Loader
 
     public function load(mixed $resource, ?string $type = null): RouteCollection
     {
-        if ($this->loaded) {
-            throw new \RuntimeException('Cortex routes already loaded.');
+        if (in_array($resource, $this->loadedResources, true)) {
+            throw new \RuntimeException(sprintf('Cortex routes for resource "%s" already loaded.', $resource));
         }
 
-        $this->loaded = true;
+        $this->loadedResources[] = $resource;
         $collection = new RouteCollection();
 
         foreach ($this->controllers as $controllerClass) {
@@ -81,18 +87,85 @@ class ControllerRouteLoader extends Loader
 
     private function addRoutesFromController(RouteCollection $collection, \ReflectionClass $reflection): void
     {
-        $classAttributes = $reflection->getAttributes(RouteAttribute::class);
-
-        foreach ($classAttributes as $attribute) {
-            $this->addRoute($collection, $reflection, $attribute->newInstance());
-        }
-
-        if ($reflection->hasMethod('__invoke')) {
-            $invokeMethod = $reflection->getMethod('__invoke');
-            foreach ($invokeMethod->getAttributes(RouteAttribute::class) as $attribute) {
+        // 1. If #[Route] attribute on class → use it (explicit override)
+        // IS_INSTANCEOF also catches legacy Annotation\Route (extends Attribute\Route)
+        $classAttributes = $reflection->getAttributes(RouteAttribute::class, \ReflectionAttribute::IS_INSTANCEOF);
+        if (!empty($classAttributes)) {
+            foreach ($classAttributes as $attribute) {
                 $this->addRoute($collection, $reflection, $attribute->newInstance());
             }
+
+            return;
         }
+
+        // 2. If #[Route] attribute on __invoke → use it (explicit override)
+        if ($reflection->hasMethod('__invoke')) {
+            $invokeAttrs = $reflection->getMethod('__invoke')->getAttributes(RouteAttribute::class, \ReflectionAttribute::IS_INSTANCEOF);
+            if (!empty($invokeAttrs)) {
+                foreach ($invokeAttrs as $attribute) {
+                    $this->addRoute($collection, $reflection, $attribute->newInstance());
+                }
+
+                return;
+            }
+        }
+
+        // 3. No explicit #[Route] → derive from convention
+        $conventionRoute = $this->deriveRouteFromConvention($reflection);
+        if ($conventionRoute) {
+            $this->addRoute($collection, $reflection, $conventionRoute);
+        }
+    }
+
+    /**
+     * Derives a route from class name convention.
+     *
+     * Known action suffixes (List, Create, Update, Edit, Archive) are matched first
+     * to support multi-word model names. Custom actions fallback to regex split.
+     */
+    private function deriveRouteFromConvention(\ReflectionClass $reflection): ?RouteAttribute
+    {
+        $className = $reflection->getShortName();
+        $name = preg_replace('/Action$/', '', $className);
+
+        $knownActions = ['List', 'Create', 'Update', 'Edit', 'Archive'];
+        $model = null;
+        $action = null;
+
+        foreach ($knownActions as $knownAction) {
+            if (str_ends_with($name, $knownAction) && \strlen($name) > \strlen($knownAction)) {
+                $model = substr($name, 0, -\strlen($knownAction));
+                $action = $knownAction;
+                break;
+            }
+        }
+
+        // Fallback: first PascalCase word is model, rest is action
+        if (!$model && preg_match('/^([A-Z][a-z]+)([A-Z].*)$/', $name, $matches)) {
+            $model = $matches[1];
+            $action = $matches[2];
+        }
+
+        if (!$model || !$action) {
+            return null;
+        }
+
+        $modelKebab = $this->toKebab($model);
+        $actionKebab = $this->toKebab($action);
+
+        [$path, $methods, $routeName] = match (strtolower($action)) {
+            'list' => ['/'.$modelKebab.'s', ['GET'], $modelKebab.'/index'],
+            'create' => ['/'.$modelKebab.'/create', ['GET', 'POST'], $modelKebab.'/create'],
+            'update', 'edit' => ['/'.$modelKebab.'/{uuid}/edit', ['GET', 'POST'], $modelKebab.'/edit'],
+            'archive' => ['/'.$modelKebab.'/{uuid}/archive', ['GET'], $modelKebab.'/archive'],
+            default => ['/'.$modelKebab.'/{uuid}/'.$actionKebab, ['GET', 'POST'], $modelKebab.'/'.$actionKebab],
+        };
+
+        return new RouteAttribute(
+            path: $path,
+            name: $routeName,
+            methods: $methods,
+        );
     }
 
     private function addRoute(RouteCollection $collection, \ReflectionClass $reflection, RouteAttribute $routeAttr): void
@@ -168,6 +241,11 @@ class ControllerRouteLoader extends Loader
         }
 
         return $prefix.strtolower($name);
+    }
+
+    private function toKebab(string $input): string
+    {
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $input));
     }
 
     public function supports(mixed $resource, ?string $type = null): bool

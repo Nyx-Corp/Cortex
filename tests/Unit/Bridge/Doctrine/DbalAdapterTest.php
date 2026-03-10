@@ -1015,6 +1015,53 @@ class DbalAdapterTest extends TestCase
     }
 
     // =======================================================================
+    // WHERE() WITH UNARY OPERATORS
+    // =======================================================================
+
+    public function testWhereWithOperatorIsNotNull(): void
+    {
+        $config = new DbalMappingConfiguration(table: 'test_table');
+        $adapter = new DbalAdapter($this->connection, $config);
+
+        $result = $adapter->where(['archived_at' => \Cortex\Component\Model\Query\Operator::IsNotNull]);
+
+        $this->assertSame(' WHERE archived_at IS NOT NULL', $result);
+    }
+
+    public function testWhereWithOperatorIsNull(): void
+    {
+        $config = new DbalMappingConfiguration(table: 'test_table');
+        $adapter = new DbalAdapter($this->connection, $config);
+
+        $result = $adapter->where(['archived_at' => \Cortex\Component\Model\Query\Operator::IsNull]);
+
+        $this->assertSame(' WHERE archived_at IS NULL', $result);
+    }
+
+    public function testWhereWithMixedNullAndRegularFilters(): void
+    {
+        $config = new DbalMappingConfiguration(table: 'test_table');
+        $adapter = new DbalAdapter($this->connection, $config);
+
+        $result = $adapter->where([
+            'status' => 'active',
+            'archived_at' => \Cortex\Component\Model\Query\Operator::IsNotNull,
+        ]);
+
+        $this->assertSame(' WHERE status = :status AND archived_at IS NOT NULL', $result);
+    }
+
+    public function testWhereWithNullValueStillGeneratesIsNull(): void
+    {
+        $config = new DbalMappingConfiguration(table: 'test_table');
+        $adapter = new DbalAdapter($this->connection, $config);
+
+        $result = $adapter->where(['deleted_at' => null]);
+
+        $this->assertSame(' WHERE deleted_at IS NULL', $result);
+    }
+
+    // =======================================================================
     // HELPER METHODS
     // =======================================================================
 

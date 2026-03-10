@@ -86,16 +86,33 @@ class ControllerSubscriber implements EventSubscriberInterface
         if ($module) {
             $templateChain[] = sprintf('%s/%s', $module, $template);
             $templateChain[] = sprintf('%s/%s.%s.twig', $module, $template, $format);
+
+            // Subpath fallback: if template contains a subpath (admin/product/edit),
+            // also try without it (product/edit) to allow shared templates
+            if (preg_match('#^(\w+)/(.+)$#', $template, $m)) {
+                $templateChain[] = sprintf('%s/%s', $module, $m[2]);
+                $templateChain[] = sprintf('%s/%s.%s.twig', $module, $m[2], $format);
+            }
         }
 
         foreach ($templateChain as $templatePath) {
             if ($templatePath && $this->templateEngine->getLoader()->exists($templatePath)) {
-                $event->setResponse(
-                    new Response($this->templateEngine->render(
-                        $templatePath,
-                        $event->getControllerResult()
-                    ))
+                $content = $this->templateEngine->render(
+                    $templatePath,
+                    $event->getControllerResult()
                 );
+
+                $response = new Response($content);
+
+                // Set Content-Type based on format
+                if ('html' !== $format) {
+                    $mimeType = $request->getMimeType($format);
+                    if ($mimeType) {
+                        $response->headers->set('Content-Type', $mimeType);
+                    }
+                }
+
+                $event->setResponse($response);
 
                 return;
             }

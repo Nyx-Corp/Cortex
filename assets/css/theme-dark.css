@@ -2,6 +2,8 @@
  * Cortex — Dark mode overrides
  * Active via .dark on <html>, persists in localStorage
  */
+@custom-variant dark (&:where(.dark, .dark *));
+
 .dark {
   --color-background:             var(--color-zinc-950);
   --color-foreground:             var(--color-zinc-50);
@@ -35,6 +37,14 @@
 
   --color-warning:                var(--color-amber-400);
   --color-warning-foreground:     var(--color-zinc-900);
+
+  --color-info:                   var(--color-blue-400);
+  --color-info-foreground:        var(--color-zinc-900);
+
+  --color-tooltip:                var(--color-zinc-700);
+  --color-tooltip-foreground:     var(--color-zinc-50);
+
+  --color-stripe:                 var(--color-zinc-900);
 
   /* Sidebar unchanged — already dark */
 }

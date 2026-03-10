@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Application/{Module}/Controller/Action/{Model}{Action}FormAction.php.tpl.php
@@ -6,13 +6,13 @@
  * @see src/Lib/Cortex/docs/bridge-symfony.md
  */
 
-namespace Application\<?= $Module ?>\Controller\Action<?= $subpath_namespace ?? '' ?>;
+namespace Application\<?php echo $Module; ?>\Controller\Action<?php echo $subpath_namespace ?? ''; ?>;
 
-use Application\<?= $Module ?>\Form\<?= $Model ?><?= $Action ?>Type;
+use Application\<?php echo $Module; ?>\Form\<?php echo $Model; ?><?php echo $Action; ?>Type;
 use Cortex\Bridge\Symfony\Controller\ControllerInterface;
 use Cortex\Component\Exception\DomainException;
-use Domain\<?= $Domain ?>\Action\<?= $Model ?><?= $Action ?>;
-use Domain\<?= $Domain ?>\Model\<?= $Model ?>;
+use Domain\<?php echo $Domain; ?>\Action\<?php echo $Model; ?><?php echo $Action; ?>;
+use Domain\<?php echo $Domain; ?>\Model\<?php echo $Model; ?>;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -22,11 +22,11 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Handles "<?= $Action ?>" action for module <?= $module ?>.
+ * Handles "<?php echo $Action; ?>" action for module <?php echo $module; ?>.
  *
- * @see Domain\<?= $Domain ?>\Action\<?= $Action ?>\Handler
+ * @see Domain\<?php echo $Domain; ?>\Action\<?php echo $Action; ?>\Handler
  */
-class <?= $Model ?><?= $Action ?>FormAction implements ControllerInterface
+class <?php echo $Model; ?><?php echo $Action; ?>FormAction implements ControllerInterface
 {
     public function __construct(
         private FormFactoryInterface $formFactory,
@@ -40,27 +40,27 @@ class <?= $Model ?><?= $Action ?>FormAction implements ControllerInterface
      * @return array<string, mixed>|Response
      */
     #[Route(
-        path: '/<?= $model ?>/<?= $action ?>/{uuid}',
-        name: '<?= $model ?>/<?= $action ?>',
+        path: '/<?php echo $model; ?>/<?php echo $action; ?>/{uuid}',
+        name: '<?php echo $model; ?>/<?php echo $action; ?>',
         methods: ['GET', 'POST'],
         requirements: ['uuid' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'],
     )]
-    public function __invoke(Request $request, <?= $Model ?> $<?= $model ?>): Response|array
+    public function __invoke(Request $request, <?php echo $Model; ?> $<?php echo $model; ?>): Response|array
     {
         /** @var \Symfony\Component\HttpFoundation\Session\Session|null $session */
         $session = $request->hasSession() ? $request->getSession() : null;
 
         $form = $this->formFactory->createNamed(
-            name: '<?= $_action ?? $action ?>',
-            type: <?= $Model ?><?= $Action ?>Type::class,
+            name: '<?php echo $_action ?? $action; ?>',
+            type: <?php echo $Model; ?><?php echo $Action; ?>Type::class,
             data: [
-                // 'label' => $<?= $model ?>->label,
+                // 'label' => $<?php echo $model; ?>->label,
             ],
             options: [
-                'data_class' => <?= $Action ?>\Command::class,
+                'data_class' => <?php echo $Action; ?>\Command::class,
                 'action' => $this->urlGenerator->generate(
-                    route: '<?= $module ?>/<?= $model ?>/<?= $action ?>',
-                    parameters: ['uuid' => $<?= $model ?>->uuid]
+                    route: '<?php echo $module; ?>/<?php echo $model; ?>/<?php echo $action; ?>',
+                    parameters: ['uuid' => $<?php echo $model; ?>->uuid]
                 ),
                 'method' => 'POST',
             ]
@@ -72,29 +72,31 @@ class <?= $Model ?><?= $Action ?>FormAction implements ControllerInterface
             if ($form->isSubmitted()) {
                 if (!$form->isValid()) {
                     $session?->getFlashBag()->add('error', [
-                        'message' => '<?= $action ?>.error.validation_failed',
-                        'domain' => '<?= $module ?>',
+                        'title' => '<?php echo $action; ?>.error.validation_failed',
+                        'domain' => '<?php echo $module; ?>',
                     ]);
                 } else {
                     $session?->getFlashBag()->add('success', [
-                        'message' => '<?= $action ?>.success',
-                        'domain' => '<?= $module ?>',
+                        'title' => '<?php echo $action; ?>.success.title',
+                        'message' => '<?php echo $action; ?>.success.message',
+                        'params' => ['model' => (string) $<?php echo $model; ?>],
+                        'domain' => '<?php echo $module; ?>',
                     ]);
 
-                    /** @var Domain\<?= $Domain ?>\Action\<?= $Action ?>\Response $response */
+                    /** @var Domain\<?php echo $Domain; ?>\Action\<?php echo $Action; ?>\Response $response */
                     $response = $form->getData();
 
                     // do stuff here
 
                     // return new RedirectResponse($this->urlGenerator->generate(
-                    //     route: '<?= $module ?>/<?= $model ?>/....',
-                    //     parameters: ['uuid' => $response-><?= $model ?>->uuid]
+                    //     route: '<?php echo $module; ?>/<?php echo $model; ?>/....',
+                    //     parameters: ['uuid' => $response-><?php echo $model; ?>->uuid]
                     // ));
                 }
             }
         } catch (DomainException $th) {
             $session?->getFlashBag()->add('error', [
-                'message' => '<?= $action ?>.error.'.$th->getMessage(),
+                'title' => '<?php echo $action; ?>.error.'.$th->getMessage(),
                 'domain' => $th->getDomain(),
             ]);
 
@@ -104,7 +106,7 @@ class <?= $Model ?><?= $Action ?>FormAction implements ControllerInterface
         }
 
         return [
-            '<?= $model ?>' => $model,
+            '<?php echo $model; ?>' => $model,
             'form' => $form->createView(),
         ];
     }

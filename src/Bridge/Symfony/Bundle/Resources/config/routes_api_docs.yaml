@@ -1,0 +1,11 @@
+cortex_api_docs:
+    path: /docs/api
+    controller: Cortex\Bridge\Symfony\Api\OpenApiController::docs
+    methods: [GET]
+
+cortex_api_spec:
+    path: /docs/api/v{version}/openapi.yaml
+    controller: Cortex\Bridge\Symfony\Api\OpenApiController::spec
+    methods: [GET]
+    requirements:
+        version: '\d+'

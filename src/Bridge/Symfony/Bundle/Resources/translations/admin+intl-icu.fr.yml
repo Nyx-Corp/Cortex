@@ -8,14 +8,29 @@ admin:
     new: Nouveau
     delete: Supprimer
     create: Créer
+    email: Envoyer un email
     archive:
       label: Archiver
       confirmation: Êtes-vous sûr de vouloir archiver cet élément ?
+    restore:
+      label: Restaurer
+      confirmation: Restaurer cet élément ?
   list:
     empty_text: Aucun élément trouvé
-    filters: Filtres
+    filters: Filtres avancés
     reset: Réinitialiser
     results: résultats
+    search_placeholder: Filtrer la liste...
+    search_syntax: Syntaxe de recherche
+    search_syntax_field: Filtre par champ
+    search_syntax_quoted: Valeur avec espaces
+    search_syntax_partial: Recherche partielle
+    apply: Appliquer
+    export: Exporter
+    export_tooltip: Exporter la liste
+    selected: sélectionné(s)
+    more_actions: Plus d'actions
+    show_archived: Afficher les archivés
 
 form:
   select:

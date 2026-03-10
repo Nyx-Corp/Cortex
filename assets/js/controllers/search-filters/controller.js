@@ -9,6 +9,7 @@
  */
 
 import { Controller } from '@hotwired/stimulus'
+import hotkeys from '../../hotkeys.js'
 
 export default class extends Controller {
     static targets = ['input', 'popover', 'toggleBtn', 'field']
@@ -21,9 +22,11 @@ export default class extends Controller {
             this.syncQueryToFields()
         }
 
-        // Listen for keyboard shortcuts at document level
-        this.boundKeyHandler = this.handleGlobalKey.bind(this)
-        document.addEventListener('keydown', this.boundKeyHandler)
+        // Escape handling (behavioral, not element-bound)
+        hotkeys('escape', () => {
+            if (this.isOpen) this.close()
+            this.inputTarget.blur()
+        })
 
         // Close on click outside
         this.boundClickOutside = this.handleClickOutside.bind(this)
@@ -38,7 +41,7 @@ export default class extends Controller {
     }
 
     disconnect() {
-        document.removeEventListener('keydown', this.boundKeyHandler)
+        // Note: escape is shared across features, don't unbind globally
         document.removeEventListener('click', this.boundClickOutside)
 
         if (this.form && this.boundRemoveFilter) {
@@ -179,15 +182,12 @@ export default class extends Controller {
     // ==================
 
     /**
-     * Apply filters from popover form
-     * data-action="click->search-filters#applyFilters"
+     * Apply filters from popover form — submits form directly with filter fields.
      */
     applyFilters(event) {
         event?.preventDefault()
-
-        this.inputTarget.value = this.buildQuery()
         this.close()
-        this.submit()
+        this.submitForm()
     }
 
     /**
@@ -209,25 +209,39 @@ export default class extends Controller {
     }
 
     /**
-     * Remove a single filter by field name
-     * data-action="click->search-filters#removeFilter"
-     * data-filter-field="fieldName"
+     * Remove a single filter by field name.
+     * Clears the matching form field(s) and resubmits.
      */
     removeFilter(event) {
         event?.preventDefault()
 
         const fieldToRemove = event.currentTarget.dataset.filterField
+        if (!fieldToRemove) return
+
+        // Clear q parameter if it contains this field
         const filters = this.parseQuery(this.inputTarget.value)
-        delete filters[fieldToRemove]
+        if (filters[fieldToRemove]) {
+            delete filters[fieldToRemove]
+            const parts = Object.entries(filters).map(([k, v]) => {
+                if (v.includes(' ')) v = `"${v}"`
+                return `${k}:${v}`
+            })
+            this.inputTarget.value = parts.join(' ')
+        }
 
-        // Rebuild query
-        const parts = Object.entries(filters).map(([k, v]) => {
-            if (v.includes(' ')) v = `"${v}"`
-            return `${k}:${v}`
-        })
+        // Clear matching form field(s)
+        const form = this.element.closest('form')
+        if (form) {
+            form.querySelectorAll(`[name="${fieldToRemove}"], [name^="${fieldToRemove}["]`).forEach(field => {
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    field.checked = false
+                } else {
+                    field.value = ''
+                }
+            })
+        }
 
-        this.inputTarget.value = parts.join(' ')
-        this.submit()
+        this.submitForm()
     }
 
     /**
@@ -241,19 +255,28 @@ export default class extends Controller {
 
     /**
      * Handle Enter key in filter fields
-     * data-action="keydown.enter->search-filters#applyOnEnter"
      */
     applyOnEnter(event) {
         event.preventDefault()
-        this.applyFilters()
+        this.applyFilters(event)
     }
 
     /**
-     * Submit the form
+     * Submit via q parameter: disables filter fields so only q is sent.
      */
     submit() {
-        // Disable filter fields so they don't get submitted (only q param)
         this.fieldTargets.forEach(field => field.disabled = true)
+
+        const form = this.element.closest('form')
+        form?.submit()
+    }
+
+    /**
+     * Submit the form directly with all fields.
+     */
+    submitForm() {
+        // Clear q so filters are submitted as individual params
+        this.inputTarget.value = ''
 
         const form = this.element.closest('form')
         form?.submit()
@@ -262,25 +285,6 @@ export default class extends Controller {
     // ==================
     // Event Handlers
     // ==================
-
-    /**
-     * Handle global keyboard shortcuts
-     */
-    handleGlobalKey(event) {
-        // Escape closes popover
-        if (event.key === 'Escape' && this.isOpen) {
-            this.close()
-            return
-        }
-
-        // F opens filters (only if not in input)
-        if (event.key === 'f' && !event.metaKey && !event.ctrlKey && !event.altKey) {
-            if (!event.target.matches('input, textarea, select, [contenteditable]')) {
-                event.preventDefault()
-                this.toggle()
-            }
-        }
-    }
 
     /**
      * Handle clicks outside popover
@@ -292,26 +296,13 @@ export default class extends Controller {
     }
 
     /**
-     * Handle remove filter clicks (delegated from form level)
-     * Looks for elements with data-action containing "removeFilter"
+     * Handle remove filter clicks (delegated from form level).
+     * Delegates to removeFilter().
      */
     handleRemoveFilterClick(event) {
         const btn = event.target.closest('[data-action*="removeFilter"]')
         if (!btn) return
 
-        event.preventDefault()
-
-        const fieldToRemove = btn.dataset.filterField
-        const filters = this.parseQuery(this.inputTarget.value)
-        delete filters[fieldToRemove]
-
-        // Rebuild query
-        const parts = Object.entries(filters).map(([k, v]) => {
-            if (v.includes(' ')) v = `"${v}"`
-            return `${k}:${v}`
-        })
-
-        this.inputTarget.value = parts.join(' ')
-        this.submit()
+        this.removeFilter({ preventDefault: () => event.preventDefault(), currentTarget: btn })
     }
 }

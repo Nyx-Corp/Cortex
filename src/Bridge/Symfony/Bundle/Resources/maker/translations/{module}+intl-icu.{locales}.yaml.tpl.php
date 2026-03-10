@@ -1,1 +1,1 @@
-# <?= $module ?> translations
+# <?php echo $module; ?> translations

@@ -1,4 +1,4 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
 /**
  * @generated from src/Lib/Cortex/src/Bridge/Symfony/Bundle/Resources/maker/src/Domain/{Domain}/Model/{Model}.php.tpl.php
@@ -6,13 +6,13 @@
  * @see src/Lib/Cortex/docs/index.md
  */
 
-namespace Domain\<?= $Domain ?>\Model;
+namespace Domain\<?php echo $Domain; ?>\Model;
 
 use Cortex\Component\Model\Archivable;
 use Cortex\Component\Model\Uuidentifiable;
 use Symfony\Component\Uid\Uuid;
 
-class <?= $Model ?> implements \Stringable
+class <?php echo $Model; ?> implements \Stringable
 {
     use Uuidentifiable;
     use Archivable;

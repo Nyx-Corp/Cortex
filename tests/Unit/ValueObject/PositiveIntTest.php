@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\ValueObject;
 
 use Cortex\ValueObject\PositiveInt;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,9 +17,7 @@ class PositiveIntTest extends TestCase
     // VALID VALUES TESTS
     // =======================================================================
 
-    /**
-     * @dataProvider validValuesProvider
-     */
+    #[DataProvider('validValuesProvider')]
     public function testValidValues(int $value): void
     {
         $positiveInt = new PositiveInt($value);
@@ -26,7 +25,7 @@ class PositiveIntTest extends TestCase
         $this->assertEquals($value, $positiveInt->value);
     }
 
-    public function validValuesProvider(): array
+    public static function validValuesProvider(): array
     {
         return [
             'zero' => [0],
@@ -41,9 +40,7 @@ class PositiveIntTest extends TestCase
     // INVALID VALUES TESTS
     // =======================================================================
 
-    /**
-     * @dataProvider invalidValuesProvider
-     */
+    #[DataProvider('invalidValuesProvider')]
     public function testInvalidValuesThrow(int $value): void
     {
         // Note: The implementation has a bug where $this->value is used before being set
@@ -53,7 +50,7 @@ class PositiveIntTest extends TestCase
         new PositiveInt($value);
     }
 
-    public function invalidValuesProvider(): array
+    public static function invalidValuesProvider(): array
     {
         return [
             'minus one' => [-1],
