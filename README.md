@@ -93,6 +93,10 @@ Intégration Symfony complète : ValueResolver (injection automatique de collect
 
 Objets valeur réutilisables : `Email`, `HashedPassword`, `PositiveInt`, `RegisteredClass`, `SecurityToken`.
 
+### Security (extracted → [Gandalf](https://github.com/Nyx-Corp/Gandalf))
+
+The Security component (Account, Token, TokenHasher, password hashing, rate limiting) has been extracted to the **Gandalf** library. See [Gandalf README](../../Gandalf/README.md).
+
 ### Makers
 
 Générateurs de code pour l'architecture DDD :

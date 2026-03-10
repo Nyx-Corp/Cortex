@@ -25,7 +25,7 @@ class MiddlewareTest extends TestCase
 
     public function testConstructWithCallableArray(): void
     {
-        $handler = new class () {
+        $handler = new class {
             public function handle(Middleware $c): \Generator
             {
                 yield 'result';
@@ -40,7 +40,7 @@ class MiddlewareTest extends TestCase
 
     public function testConstructWithInvokableObject(): void
     {
-        $handler = new class () {
+        $handler = new class {
             public function __invoke(Middleware $c): \Generator
             {
                 yield 'invoked';

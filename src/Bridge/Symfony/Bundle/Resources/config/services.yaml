@@ -70,7 +70,6 @@ services:
             - '../../../../../Bridge/Symfony/Routing/'
             - '../../../../../Bridge/Symfony/Console/'
             - '../../../../../Bridge/Symfony/Api/'
-            - '../../../../../Bridge/Symfony/Security/ApiTokenProviderInterface.php'
 
     Cortex\Component\:
         resource: '../../../../../Component/'
@@ -79,17 +78,3 @@ services:
             - '../../../../../Component/Json/'
             - '../../../../../Component/Mapper/Relation.php'
             - '../../../../../Component/Model/ModelCollection.php'
-            - '../../../../../Component/Security/'
-
-    # Security: TokenHasher (pure PHP, no framework dependency)
-    Cortex\Component\Security\Service\TokenHasher: ~
-
-    # Security: SymfonyPasswordHasher implements the Cortex PasswordHasherInterface
-    Cortex\Component\Security\Service\PasswordHasherInterface:
-        class: Cortex\Bridge\Symfony\Security\SymfonyPasswordHasher
-
-    # Security: SecuredActionToolProvider decorates ActionToolProvider for MCP
-    Cortex\Bridge\Symfony\Security\SecuredActionToolProvider:
-        decorates: Cortex\Bridge\Symfony\Mcp\ActionToolProvider
-        arguments:
-            $inner: '@Cortex\Bridge\Symfony\Security\SecuredActionToolProvider.inner'

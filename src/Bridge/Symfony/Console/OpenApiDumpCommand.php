@@ -43,7 +43,7 @@ class OpenApiDumpCommand extends Command
             $outputDir = $this->projectDir.'/'.$outputDir;
         }
 
-        $versions = $targetVersion !== null
+        $versions = null !== $targetVersion
             ? [(int) $targetVersion]
             : $this->activeVersions;
 

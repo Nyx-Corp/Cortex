@@ -170,7 +170,7 @@ class OpenApiGenerator
         $formType = $meta['formType'];
         $formOptions = ['csrf_protection' => false];
 
-        if ($formType === CommandFormType::class) {
+        if (CommandFormType::class === $formType) {
             $formOptions['command_class'] = $commandClass;
         }
 

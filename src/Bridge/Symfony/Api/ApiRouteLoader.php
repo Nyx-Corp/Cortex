@@ -76,6 +76,6 @@ class ApiRouteLoader extends Loader
 
     public function supports(mixed $resource, ?string $type = null): bool
     {
-        return $type === 'cortex_api';
+        return 'cortex_api' === $type;
     }
 }

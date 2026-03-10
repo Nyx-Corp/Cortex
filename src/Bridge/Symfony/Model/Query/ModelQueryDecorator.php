@@ -122,7 +122,6 @@ class ModelQueryDecorator extends ModelQuery
                 if ($this->form->isSubmitted() && !$this->form->isValid()) {
                     throw new BadRequestException(implode(' ; ', array_map(fn (FormError $error) => sprintf('%s : %s', $error->getOrigin()->getName(), $error->getMessage()), iterator_to_array($this->form->getErrors(true, true)))));
                 }
-
             } else {
                 // q parameter present: filters come from parseQueryString,
                 // but sort and pager still need to be read from request
@@ -174,7 +173,7 @@ class ModelQueryDecorator extends ModelQuery
         }
 
         // From request param (when form is not submitted, e.g. direct URL)
-        if ($this->request?->query->get('archived') === '1') {
+        if ('1' === $this->request?->query->get('archived')) {
             return true;
         }
 

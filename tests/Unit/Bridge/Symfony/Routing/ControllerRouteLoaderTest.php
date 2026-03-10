@@ -7,7 +7,6 @@ declare(strict_types=1);
 // ============================================================================
 
 namespace CortexTest\Application\Catalog\Controller\Action {
-
     use Cortex\Bridge\Symfony\Controller\ControllerInterface;
 
     class ProductListAction implements ControllerInterface
@@ -61,7 +60,6 @@ namespace CortexTest\Application\Catalog\Controller\Action {
 }
 
 namespace CortexTest\Application\Admin\Controller\Action {
-
     use Cortex\Bridge\Symfony\Controller\ControllerInterface;
 
     class AccountListAction implements ControllerInterface
@@ -73,7 +71,6 @@ namespace CortexTest\Application\Admin\Controller\Action {
 }
 
 namespace CortexTest\Application\Catalog\Controller\Action\Api {
-
     use Cortex\Bridge\Symfony\Controller\ControllerInterface;
 
     class ProductListAction implements ControllerInterface
@@ -85,7 +82,6 @@ namespace CortexTest\Application\Catalog\Controller\Action\Api {
 }
 
 namespace CortexTest\Application\Catalog\Controller\Action\WithRoute {
-
     use Cortex\Bridge\Symfony\Controller\ControllerInterface;
     use Symfony\Component\Routing\Attribute\Route;
 
@@ -103,7 +99,6 @@ namespace CortexTest\Application\Catalog\Controller\Action\WithRoute {
 // ============================================================================
 
 namespace Cortex\Tests\Unit\Bridge\Symfony\Routing {
-
     use Cortex\Bridge\Symfony\Routing\ControllerRouteLoader;
     use CortexTest\Application\Admin\Controller\Action\AccountListAction;
     use CortexTest\Application\Catalog\Controller\Action\Api\ProductListAction as ApiProductListAction;

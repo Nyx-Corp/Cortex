@@ -97,7 +97,7 @@ class ActionHandlerCompilerPass implements CompilerPassInterface
         foreach ($actionMetadata as $commandClass => &$meta) {
             // Check if command has a dedicated FormType via #[Action] attribute
             $formTypeFromAttribute = array_search($commandClass, $actionAttributeMapping, true);
-            if ($formTypeFromAttribute !== false) {
+            if (false !== $formTypeFromAttribute) {
                 $meta['formType'] = $formTypeFromAttribute;
             } else {
                 $meta['formType'] = CommandFormType::class;
@@ -140,8 +140,9 @@ class ActionHandlerCompilerPass implements CompilerPassInterface
                 ->setArgument('$actionMetadata', $actionMetadata);
         }
 
-        if ($container->hasDefinition(\Cortex\Bridge\Symfony\Security\SecuredActionToolProvider::class)) {
-            $container->getDefinition(\Cortex\Bridge\Symfony\Security\SecuredActionToolProvider::class)
+        // SecuredActionToolProvider lives in Gandalf (external) — use string to avoid hard dependency
+        if ($container->hasDefinition('Gandalf\\Bridge\\Symfony\\Security\\SecuredActionToolProvider')) {
+            $container->getDefinition('Gandalf\\Bridge\\Symfony\\Security\\SecuredActionToolProvider')
                 ->setArgument('$actionMetadata', $actionMetadata);
         }
 
@@ -319,7 +320,7 @@ class ActionHandlerCompilerPass implements CompilerPassInterface
         if (isset(self::FIELD_TYPE_MAP[$typeName])) {
             $options = ['required' => !$param->isOptional()];
 
-            if ($typeName === 'bool') {
+            if ('bool' === $typeName) {
                 $options['false_values'] = ['0', 'false', ''];
             }
 
@@ -338,7 +339,7 @@ class ActionHandlerCompilerPass implements CompilerPassInterface
         }
 
         // DateTimeInterface
-        if ($typeName === \DateTimeInterface::class || $typeName === \DateTimeImmutable::class || $typeName === \DateTime::class) {
+        if (\DateTimeInterface::class === $typeName || \DateTimeImmutable::class === $typeName || \DateTime::class === $typeName) {
             return [
                 'type' => FormType\DateTimeType::class,
                 'options' => [
@@ -359,7 +360,7 @@ class ActionHandlerCompilerPass implements CompilerPassInterface
         }
 
         // Uuid
-        if ($typeName === \Symfony\Component\Uid\Uuid::class) {
+        if (\Symfony\Component\Uid\Uuid::class === $typeName) {
             return [
                 'type' => FormType\TextType::class,
                 'options' => ['required' => !$param->isOptional()],
@@ -367,7 +368,7 @@ class ActionHandlerCompilerPass implements CompilerPassInterface
         }
 
         // array → TextType with json hint
-        if ($typeName === 'array') {
+        if ('array' === $typeName) {
             return [
                 'type' => FormType\TextType::class,
                 'options' => ['required' => !$param->isOptional()],

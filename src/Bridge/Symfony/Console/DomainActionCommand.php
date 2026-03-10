@@ -77,7 +77,7 @@ class DomainActionCommand extends Command
         if ($constructor) {
             foreach ($constructor->getParameters() as $param) {
                 $value = $input->getOption($param->getName());
-                if ($value !== null) {
+                if (null !== $value) {
                     $data[$param->getName()] = $value;
                 }
             }
@@ -85,7 +85,7 @@ class DomainActionCommand extends Command
 
         // Submit through form system
         $formOptions = ['csrf_protection' => false];
-        if ($this->formType === \Cortex\Bridge\Symfony\Form\CommandFormType::class) {
+        if (\Cortex\Bridge\Symfony\Form\CommandFormType::class === $this->formType) {
             $formOptions['command_class'] = $this->commandClass;
         }
 
@@ -108,7 +108,7 @@ class DomainActionCommand extends Command
         $result = $form->getData();
         $format = $input->getOption('format');
 
-        if ($format === 'json') {
+        if ('json' === $format) {
             $output->writeln(json_encode(
                 $this->serializeResult($result),
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE

@@ -34,7 +34,7 @@ class ApiController
         $content = $request->getContent();
         if (!empty($content)) {
             $decoded = json_decode($content, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
+            if (JSON_ERROR_NONE !== json_last_error()) {
                 return new JsonResponse(['error' => 'Invalid JSON body.'], Response::HTTP_BAD_REQUEST);
             }
             $data = $decoded;
@@ -51,7 +51,7 @@ class ApiController
         $data = $this->transformers->transformRequest($commandClass, $data, $version);
 
         $formOptions = ['csrf_protection' => false];
-        if ($formType === CommandFormType::class) {
+        if (CommandFormType::class === $formType) {
             $formOptions['command_class'] = $commandClass;
         }
 
@@ -101,7 +101,7 @@ class ApiController
         if ($deprecated) {
             $response->headers->set('Deprecation', 'true');
             if ($sunset) {
-                $response->headers->set('Sunset', (new \DateTimeImmutable($sunset))->format(\DateTimeInterface::RFC7231));
+                $response->headers->set('Sunset', new \DateTimeImmutable($sunset)->format(\DateTimeInterface::RFC7231));
             }
         }
 

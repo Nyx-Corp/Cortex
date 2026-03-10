@@ -286,7 +286,7 @@ class ArrayMapperTest extends TestCase
     {
         $mapper = new ArrayMapper(['organisation' => Relation::toUuid('organisation_uuid')]);
 
-        $organisation = new class () {
+        $organisation = new class {
             public string $uuid = '550e8400-e29b-41d4-a716-446655440000';
         };
 
@@ -343,7 +343,7 @@ class ArrayMapperTest extends TestCase
     public function testStringableConverted(): void
     {
         $mapper = new ArrayMapper();
-        $stringable = new class () implements \Stringable {
+        $stringable = new class implements \Stringable {
             public function __toString(): string
             {
                 return 'stringified';
@@ -366,7 +366,7 @@ class ArrayMapperTest extends TestCase
     public function testJsonSerializableConverted(): void
     {
         $mapper = new ArrayMapper();
-        $jsonable = new class () implements \JsonSerializable {
+        $jsonable = new class implements \JsonSerializable {
             public function jsonSerialize(): array
             {
                 return ['key' => 'value'];
@@ -547,7 +547,7 @@ class ArrayMapperTest extends TestCase
     public function testNonMappableObjectThrows(): void
     {
         $mapper = new ArrayMapper();
-        $unmappable = new class () {
+        $unmappable = new class {
             private string $private = 'hidden';
         };
 

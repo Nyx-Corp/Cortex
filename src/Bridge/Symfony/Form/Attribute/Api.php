@@ -19,6 +19,6 @@ class Api
 
     public function isDeprecatedIn(int $version): bool
     {
-        return $this->deprecated !== null && $version >= $this->deprecated;
+        return null !== $this->deprecated && $version >= $this->deprecated;
     }
 }
