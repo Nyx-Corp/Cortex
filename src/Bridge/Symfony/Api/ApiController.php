@@ -101,7 +101,7 @@ class ApiController
         if ($deprecated) {
             $response->headers->set('Deprecation', 'true');
             if ($sunset) {
-                $response->headers->set('Sunset', new \DateTimeImmutable($sunset)->format(\DateTimeInterface::RFC7231));
+                $response->headers->set('Sunset', new \DateTimeImmutable($sunset)->format('D, d M Y H:i:s \G\M\T'));
             }
         }
 
