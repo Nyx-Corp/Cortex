@@ -4,7 +4,7 @@
 
 Micro-framework DDD (Domain-Driven Design) pour Symfony. La "Fondation" de NyxCorp.
 
-**Stack** : PHP 8.4, Symfony 7.4, Doctrine DBAL 3
+**Stack** : PHP 8.5, Symfony 7.4, Doctrine DBAL 4
 
 ## Architecture
 
@@ -203,20 +203,15 @@ composer install
 ```bash
 vendor/bin/phpunit                          # Tests unitaires
 vendor/bin/phpstan analyse --no-progress    # Analyse statique (level 6)
-vendor/bin/php-cs-fixer fix --dry-run       # Code style (@Symfony + PHP 8.4)
+vendor/bin/php-cs-fixer fix --dry-run       # Code style (@Symfony + PHP 8.5)
 vendor/bin/deptrac --no-progress            # Architecture (layers DDD)
 ```
 
 ### Intégré dans un projet
 
-Cortex est embarqué via `git subtree` dans les projets NyxCorp :
+Cortex est embarqué via `git subtree` dans les projets NyxCorp (`src/Lib/Cortex/`).
 
-```bash
-# Depuis le projet hôte
-make cortex-push   # Push les modifications vers ce repo
-make cortex-pull   # Pull les mises à jour depuis ce repo
-make cortex-status # Affiche l'état du subtree
-```
+Un hook `pre-push` synchronise automatiquement les modifications vers ce repo à chaque `git push origin`. Aucune commande manuelle nécessaire.
 
 ## Documentation
 
