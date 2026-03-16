@@ -624,6 +624,52 @@ class DbalAdapterTest extends TestCase
     }
 
     // =======================================================================
+    // PRELOADER WITH ARRAY UUID FILTER
+    // =======================================================================
+
+    /**
+     * When filtering by uuid with an array (batch query), the preloader
+     * must be skipped — it only handles single string identifiers.
+     *
+     * Before the fix, this would throw a TypeError:
+     * InMemoryDbalPreloader::has(): Argument #2 ($identifier) must be of type string, array given
+     */
+    public function testPreloaderSkippedWhenUuidFilterIsArray(): void
+    {
+        $config = new DbalMappingConfiguration(
+            table: 'club_club',
+            modelClass: TestClub::class,
+            primaryKey: 'uuid',
+        );
+
+        // Preloader::has() should NEVER be called with an array UUID filter
+        $this->preloader->expects($this->never())->method('has');
+        $this->preloader->expects($this->never())->method('get');
+
+        // Mock DB to return empty results (we only care about preloader not being called)
+        $mockResult = $this->createMock(Result::class);
+        $mockResult->method('fetchAssociative')->willReturn(false);
+
+        $this->connection->method('executeQuery')->willReturn($mockResult);
+
+        $adapter = new DbalAdapter($this->connection, $config, $this->preloader);
+
+        // Filter by an array of UUIDs — this is the batch query case
+        $modelQuery = $this->createModelQuery()
+            ->filterBy('uuid', ['club-1', 'club-2'])
+            ->limit(0)
+            ->paginate(null);
+
+        $chain = $this->createLastMiddleware();
+
+        // Should not throw — preloader is bypassed for array filters
+        $results = iterator_to_array($adapter->onModelQuery($chain, $modelQuery));
+
+        // No results expected (mock returns false), but no TypeError either
+        $this->assertCount(0, $results);
+    }
+
+    // =======================================================================
     // NESTED JOINS TESTS
     // =======================================================================
 

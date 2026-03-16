@@ -224,29 +224,60 @@ final readonly class JoinDefinition
 
 ### Découverte automatique des colonnes
 
-Les colonnes sont découvertes depuis le `ModelPrototype` de la factory :
+Les colonnes sont découvertes depuis les paramètres du constructeur du modèle via réflection. Pour chaque paramètre :
+
+1. **Collections exclues** : les propriétés de type `AsyncCollection` (et sous-classes comme `ModelCollection`) sont **ignorées** — elles représentent des relations many-to-many gérées via table pivot, pas des colonnes SQL
+2. **Override explicite** : `columnOverrides[$key]` prend la priorité si défini
+3. **Détection de relation** : si le type est une classe (modèle), le suffixe `_uuid` est ajouté (convention FK)
+4. **Conversion snake_case** : `camelCase` → `snake_case`
+
+#### Types exclus de la détection « relation »
+
+Les types suivants sont considérés comme des **valeurs** (pas des FK) :
+- Types primitifs (`string`, `int`, `bool`, `array`, etc.)
+- Enums
+- `DateTimeInterface`
+- `Symfony\Component\Uid\AbstractUid` (Uuid, Ulid)
+- `Cortex\ValueObject\ValueObject`
+- `Cortex\Component\Collection\StructuredMap`
+- `Stringable`
+
+#### Types exclus de la découverte de colonnes
+
+Les types suivants sont **complètement exclus** du SELECT (pas de colonne générée) :
+- `Cortex\Component\Collection\AsyncCollection` et toutes ses sous-classes (`ModelCollection`, collections custom)
+
+> Ces propriétés doivent être hydratées manuellement dans le middleware `onDbal()`, typiquement via une requête secondaire sur une table pivot.
+
+#### Exemple
 
 ```php
-// Les paramètres du constructeur du modèle → colonnes snake_case
-$this->columns = array_map(
-    static fn(string $key) => $columnOverrides[$key] ?? u($key)->snake()->toString(),
-    $factory->modelPrototype->constructors->declaredKeys()
-);
+class Team {
+    public function __construct(
+        public Uuid $uuid,
+        public string $name,
+        public Player $captain,           // → captain_uuid (relation)
+        public ?PlayerCollection $members, // → EXCLU (collection)
+        public int $maxSize = 2,          // → max_size (valeur)
+    ) {}
+}
 ```
 
-**Exemple** : Si `Organisation` a un constructeur :
+Colonnes découvertes : `['uuid', 'name', 'captain_uuid', 'max_size']`
+
+`members` n'apparaît ni dans le SELECT, ni dans les JOINs. L'hydratation se fait dans `onDbal()` :
+
 ```php
-public function __construct(
-    public Uuid $uuid,
-    public string $name,
-    public OrganisationType $type,
-    public ?Organisation $parent,
-)
+public function onDbal(Middleware $chain, $command): \Generator
+{
+    // ... après le query principal
+    $rows = $connection->fetchAllAssociative(
+        'SELECT team_uuid, player_uuid FROM pivot_table WHERE team_uuid IN (?)',
+        $teamUuids
+    );
+    // ... hydrater la PlayerCollection depuis les résultats
+}
 ```
-
-Les colonnes découvertes seront : `['uuid', 'name', 'type', 'parent']`
-
-Avec override `['parent' => 'parent_uuid']` : `['uuid', 'name', 'type', 'parent_uuid']`
 
 ### Méthodes
 
@@ -567,8 +598,9 @@ public function onModelQuery(Middleware $chain, ModelQuery $query): \Generator
 ```php
 public function onModelQuery(Middleware $chain, ModelQuery $query): \Generator
 {
-    // 1. Check preloader pour single-UUID lookup
-    if ($uuidFilter && $this->preloader->has($modelClass, $uuid)) {
+    // 1. Check preloader pour single-UUID lookup (string uniquement)
+    // Les filtres array (batch queries) bypassen le preloader
+    if ($uuidFilter && is_string($uuidFilter) && $this->preloader->has($modelClass, $uuid)) {
         yield $uuid => ['_default' => cachedData];
         $this->preloader->remove($modelClass, $uuid);
         return;

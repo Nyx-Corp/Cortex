@@ -303,8 +303,9 @@ class DbalAdapter
     public function onModelQuery(Middleware $chain, ModelQuery $query): \Generator
     {
         // Check preloader for single-UUID lookup
+        // Preloader only handles single-UUID lookups (string), not batch queries (array)
         $uuidFilter = $query->filters->has('uuid') ? $query->filters->get('uuid') : null;
-        if ($uuidFilter && $this->preloader && $this->configuration->modelClass) {
+        if ($uuidFilter && is_string($uuidFilter) && $this->preloader && $this->configuration->modelClass) {
             if ($this->preloader->has($this->configuration->modelClass, $uuidFilter)) {
                 $cachedData = $this->preloader->get($this->configuration->modelClass, $uuidFilter);
                 $mappedData = $this->configuration->tableToModelMapper?->map($cachedData) ?? $cachedData;

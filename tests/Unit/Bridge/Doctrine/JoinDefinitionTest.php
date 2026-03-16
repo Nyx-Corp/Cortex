@@ -6,7 +6,9 @@ namespace Cortex\Tests\Unit\Bridge\Doctrine;
 
 use Cortex\Bridge\Doctrine\DbalMappingConfiguration;
 use Cortex\Bridge\Doctrine\JoinDefinition;
+use Cortex\Component\Collection\AsyncCollection;
 use Cortex\Component\Model\Factory\ModelFactory;
+use Cortex\Component\Model\ModelCollection;
 use Cortex\Component\Model\Query\Factory\QueryFactory;
 use Cortex\Component\Model\Query\ModelQuery;
 use PHPUnit\Framework\TestCase;
@@ -28,6 +30,43 @@ class TestClubModel
         public string $uuid,
         public string $name,
         public ?TestOrg $organisation = null,
+    ) {
+    }
+}
+
+// Test fixtures for collection type exclusion
+class TestTeamWithMembers
+{
+    public function __construct(
+        public string $uuid,
+        public string $name,
+        public ?TestOrg $captain = null,
+        public ?ModelCollection $members = null,
+        public int $maxSize = 2,
+    ) {
+    }
+}
+
+class TestModelWithAsyncCollection
+{
+    public function __construct(
+        public string $uuid,
+        public ?AsyncCollection $items = null,
+    ) {
+    }
+}
+
+class TestCustomCollection extends ModelCollection
+{
+}
+
+class TestModelWithCustomCollection
+{
+    public function __construct(
+        public string $uuid,
+        public string $name,
+        public ?TestOrg $owner = null,
+        public ?TestCustomCollection $tags = null,
     ) {
     }
 }
@@ -537,5 +576,163 @@ class JoinDefinitionTest extends TestCase
             'ON mixed_club.organisation_uuid = mixed_club_mixed_org.uuid',
             $joinClauses
         );
+    }
+
+    // =======================================================================
+    // COLLECTION TYPE EXCLUSION TESTS
+    // =======================================================================
+
+    /**
+     * ModelCollection properties must be excluded from JOIN columns.
+     * They represent many-to-many relations via pivot tables, not FK columns.
+     */
+    public function testCollectionPropertyExcludedFromColumns(): void
+    {
+        $factory = $this->createMockFactory(TestTeamWithMembers::class);
+        $config = new DbalMappingConfiguration(
+            table: 'tournament_team',
+            modelClass: TestTeamWithMembers::class,
+        );
+
+        $join = new JoinDefinition(
+            factory: $factory,
+            joinConfig: $config,
+            alias: 'collection_test',
+        );
+
+        $columns = $join->getColumns();
+
+        // 'members' (ModelCollection) must NOT appear as a column
+        $this->assertNotContains('members', $columns, 'ModelCollection property should not generate a column');
+        $this->assertNotContains('members_uuid', $columns, 'ModelCollection property should not generate a _uuid column');
+
+        // Other properties should still be present
+        $this->assertContains('uuid', $columns);
+        $this->assertContains('name', $columns);
+        $this->assertContains('captain_uuid', $columns, 'Model relation should still get _uuid suffix');
+        $this->assertContains('max_size', $columns);
+    }
+
+    /**
+     * AsyncCollection properties must also be excluded.
+     */
+    public function testAsyncCollectionPropertyExcludedFromColumns(): void
+    {
+        $factory = $this->createMockFactory(TestModelWithAsyncCollection::class);
+        $config = new DbalMappingConfiguration(
+            table: 'test_model',
+            modelClass: TestModelWithAsyncCollection::class,
+        );
+
+        $join = new JoinDefinition(
+            factory: $factory,
+            joinConfig: $config,
+            alias: 'async_test',
+        );
+
+        $columns = $join->getColumns();
+
+        $this->assertNotContains('items', $columns, 'AsyncCollection property should not generate a column');
+        $this->assertNotContains('items_uuid', $columns, 'AsyncCollection property should not generate a _uuid column');
+        $this->assertContains('uuid', $columns);
+    }
+
+    /**
+     * Custom collection subclasses (extending ModelCollection) must also be excluded.
+     */
+    public function testCustomCollectionSubclassExcludedFromColumns(): void
+    {
+        $factory = $this->createMockFactory(TestModelWithCustomCollection::class);
+        $config = new DbalMappingConfiguration(
+            table: 'test_model',
+            modelClass: TestModelWithCustomCollection::class,
+        );
+
+        $join = new JoinDefinition(
+            factory: $factory,
+            joinConfig: $config,
+            alias: 'custom_col_test',
+        );
+
+        $columns = $join->getColumns();
+
+        $this->assertNotContains('tags', $columns, 'Custom collection subclass should not generate a column');
+        $this->assertNotContains('tags_uuid', $columns, 'Custom collection subclass should not generate a _uuid column');
+
+        // Non-collection properties should still be present
+        $this->assertContains('uuid', $columns);
+        $this->assertContains('name', $columns);
+        $this->assertContains('owner_uuid', $columns, 'Model relation should still get _uuid suffix');
+    }
+
+    /**
+     * SELECT fields must not include collection columns.
+     */
+    public function testSelectFieldsExcludeCollectionProperties(): void
+    {
+        $factory = $this->createMockFactory(TestTeamWithMembers::class);
+        $config = new DbalMappingConfiguration(
+            table: 'tournament_team',
+            modelClass: TestTeamWithMembers::class,
+        );
+
+        $join = new JoinDefinition(
+            factory: $factory,
+            joinConfig: $config,
+            alias: 'select_test',
+        );
+
+        $selectFields = $join->getSelectFields();
+
+        $this->assertStringNotContainsString('members', $selectFields, 'SELECT should not include collection columns');
+        $this->assertStringContainsString('select_test.uuid AS select_test_uuid', $selectFields);
+        $this->assertStringContainsString('select_test.captain_uuid AS select_test_captain_uuid', $selectFields);
+    }
+
+    /**
+     * Collection exclusion works correctly in nested JOINs (depth > 1).
+     */
+    public function testCollectionExcludedInNestedJoins(): void
+    {
+        $orgFactory = $this->createMockFactory(TestOrg::class);
+        $orgConfig = new DbalMappingConfiguration(
+            table: 'contact_organisation',
+            modelClass: TestOrg::class,
+        );
+
+        $teamFactory = $this->createMockFactory(TestTeamWithMembers::class);
+        $teamConfig = new DbalMappingConfiguration(
+            table: 'tournament_team',
+            modelClass: TestTeamWithMembers::class,
+            joins: [
+                'captain' => new JoinDefinition(
+                    factory: $orgFactory,
+                    joinConfig: $orgConfig,
+                    alias: 'nested_captain',
+                ),
+            ],
+        );
+
+        $mainConfig = new DbalMappingConfiguration(
+            table: 'tournament_game_table',
+            joinDepth: 2,
+            joins: [
+                'teamNS' => new JoinDefinition(
+                    factory: $teamFactory,
+                    joinConfig: $teamConfig,
+                    localKey: 'team_ns_uuid',
+                    alias: 'ns',
+                ),
+            ],
+        );
+
+        $selectFields = $mainConfig->buildJoinSelectFields();
+
+        // Team columns should NOT include members
+        $this->assertStringNotContainsString('members', $selectFields, 'Nested JOIN SELECT should not include collection columns');
+
+        // Team columns SHOULD include other fields
+        $this->assertStringContainsString('ns.uuid AS ns_uuid', $selectFields);
+        $this->assertStringContainsString('ns.captain_uuid AS ns_captain_uuid', $selectFields);
     }
 }

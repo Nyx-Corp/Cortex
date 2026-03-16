@@ -68,29 +68,36 @@ final class JoinDefinition
         $modelClass = (string) $factory->modelPrototype->modelClass;
         $parameterTypes = $this->getConstructorParameterTypes($modelClass);
 
-        $this->columns = array_map(
-            function (string $key) use ($parameterTypes): string {
-                // Explicit override takes precedence
-                if (isset($this->columnOverrides[$key])) {
-                    return $this->columnOverrides[$key];
-                }
+        $columns = [];
+        foreach ($factory->modelPrototype->constructors->declaredKeys() as $key) {
+            // Skip collection types — they are not persisted as columns
+            if (isset($parameterTypes[$key]['type']) && $this->isCollectionType($parameterTypes[$key]['type'])) {
+                continue;
+            }
 
-                $snakeKey = u($key)->snake()->toString();
+            // Explicit override takes precedence
+            if (isset($this->columnOverrides[$key])) {
+                $columns[] = $this->columnOverrides[$key];
+                continue;
+            }
 
-                // If this property is a relation (class type or in joinConfig.joins), use FK convention
-                if (isset($this->joinConfig->joins[$key])) {
-                    return $snakeKey.'_uuid';
-                }
+            $snakeKey = u($key)->snake()->toString();
 
-                // Check if the property type is a class (indicates a relation)
-                if (isset($parameterTypes[$key]) && $parameterTypes[$key]['isClass']) {
-                    return $snakeKey.'_uuid';
-                }
+            // If this property is a relation (class type or in joinConfig.joins), use FK convention
+            if (isset($this->joinConfig->joins[$key])) {
+                $columns[] = $snakeKey.'_uuid';
+                continue;
+            }
 
-                return $snakeKey;
-            },
-            $factory->modelPrototype->constructors->declaredKeys()
-        );
+            // Check if the property type is a class (indicates a relation)
+            if (isset($parameterTypes[$key]) && $parameterTypes[$key]['isClass']) {
+                $columns[] = $snakeKey.'_uuid';
+                continue;
+            }
+
+            $columns[] = $snakeKey;
+        }
+        $this->columns = $columns;
     }
 
     /**
@@ -345,6 +352,23 @@ final class JoinDefinition
         }
 
         return $types;
+    }
+
+    /**
+     * Check if a type name represents a collection (not persisted as a column).
+     *
+     * Collections (AsyncCollection, ModelCollection and custom subclasses)
+     * represent many-to-many relations via pivot tables. They must be excluded
+     * from JOIN column discovery entirely — they have no corresponding SQL column.
+     * Hydration is handled manually in the mapper's onDbal() method.
+     */
+    private function isCollectionType(string $typeName): bool
+    {
+        if (!class_exists($typeName) && !interface_exists($typeName)) {
+            return false;
+        }
+
+        return is_a($typeName, \Cortex\Component\Collection\AsyncCollection::class, true);
     }
 
     /**
