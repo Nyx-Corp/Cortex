@@ -129,10 +129,15 @@ class ActionHandlerCompilerPass implements CompilerPassInterface
             $activeVersions = [1];
         }
 
-        // 9. Inject metadata into ApiRouteLoader and ActionToolProvider
+        // 9. Inject metadata and pathPrefix into ApiRouteLoader and ActionToolProvider
+        $pathPrefix = $container->hasParameter('cortex.api.path_prefix')
+            ? $container->getParameter('cortex.api.path_prefix')
+            : null;
+
         if ($container->hasDefinition(\Cortex\Bridge\Symfony\Api\ApiRouteLoader::class)) {
             $container->getDefinition(\Cortex\Bridge\Symfony\Api\ApiRouteLoader::class)
-                ->setArgument('$actionMetadata', $actionMetadata);
+                ->setArgument('$actionMetadata', $actionMetadata)
+                ->setArgument('$pathPrefix', $pathPrefix);
         }
 
         if ($container->hasDefinition(\Cortex\Bridge\Symfony\Mcp\ActionToolProvider::class)) {
@@ -143,7 +148,8 @@ class ActionHandlerCompilerPass implements CompilerPassInterface
         // SecuredActionToolProvider lives in Gandalf (external) — use string to avoid hard dependency
         if ($container->hasDefinition('Gandalf\\Bridge\\Symfony\\Security\\SecuredActionToolProvider')) {
             $container->getDefinition('Gandalf\\Bridge\\Symfony\\Security\\SecuredActionToolProvider')
-                ->setArgument('$actionMetadata', $actionMetadata);
+                ->setArgument('$actionMetadata', $actionMetadata)
+                ->setArgument('$pathPrefix', $pathPrefix);
         }
 
         if ($container->hasDefinition(\Cortex\Bridge\Symfony\Api\OpenApiGenerator::class)) {

@@ -9,6 +9,8 @@ services:
     _instanceof:
         Cortex\Bridge\Symfony\Api\VersionTransformerInterface:
             tags: ['cortex.api.version_transformer']
+        Mcp\Capability\Registry\Loader\LoaderInterface:
+            tags: ['mcp.loader']
 
     # ControllerInterface tagging is handled by ControllerTaggingPass
 
@@ -43,6 +45,10 @@ services:
     Cortex\Bridge\Symfony\Api\VersionTransformerCollection:
         arguments:
             $transformers: !tagged_iterator cortex.api.version_transformer
+
+    Cortex\Bridge\Symfony\Api\ApiRateLimitWarningSubscriber:
+        tags:
+            - { name: cortex.api.rate_limit_guard }
 
     Cortex\Bridge\Symfony\Api\OpenApiGenerator:
         arguments:

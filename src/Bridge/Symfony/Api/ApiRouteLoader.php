@@ -10,9 +10,15 @@ class ApiRouteLoader extends Loader
 {
     private bool $loaded = false;
 
+    /**
+     * @param ?string $pathPrefix Custom path prefix (e.g. '/p'). When set, routes use
+     *                            this prefix without version segment. When null, defaults
+     *                            to '/api/v{version}'.
+     */
     public function __construct(
         private readonly array $actionMetadata,
         private readonly array $activeVersions = [1],
+        private readonly ?string $pathPrefix = null,
     ) {
         parent::__construct();
     }
@@ -35,7 +41,9 @@ class ApiRouteLoader extends Loader
                 $domain = strtolower($meta['domain']);
                 $model = strtolower($meta['model']);
                 $action = strtolower($meta['action']);
-                $routeName = sprintf('cortex_api_v%d_%s_%s_%s', $version, $domain, $model, $action);
+                $routeName = null !== $this->pathPrefix
+                    ? sprintf('cortex_api_%s_%s_%s', $domain, $model, $action)
+                    : sprintf('cortex_api_v%d_%s_%s_%s', $version, $domain, $model, $action);
 
                 $defaults = [
                     '_controller' => ApiController::class,
@@ -59,11 +67,12 @@ class ApiRouteLoader extends Loader
                     default => ['POST'],
                 };
 
+                $base = $this->pathPrefix ?? sprintf('/api/v%d', $version);
                 $path = match ($action) {
-                    'create' => sprintf('/api/v%d/%s/%s', $version, $domain, $model),
-                    'update' => sprintf('/api/v%d/%s/%s/{uuid}', $version, $domain, $model),
-                    'archive' => sprintf('/api/v%d/%s/%s/{uuid}', $version, $domain, $model),
-                    default => sprintf('/api/v%d/%s/%s/{uuid}/%s', $version, $domain, $model, $action),
+                    'create' => sprintf('%s/%s/%s', $base, $domain, $model),
+                    'update' => sprintf('%s/%s/%s/{uuid}', $base, $domain, $model),
+                    'archive' => sprintf('%s/%s/%s/{uuid}', $base, $domain, $model),
+                    default => sprintf('%s/%s/%s/{uuid}/%s', $base, $domain, $model, $action),
                 };
 
                 $route = new Route($path, $defaults, [], [], '', [], $methods);

@@ -100,7 +100,7 @@ class ActionToolProvider
                 'description' => $description,
                 'inputSchema' => [
                     'type' => 'object',
-                    'properties' => $properties,
+                    'properties' => (object) $properties,
                     'required' => $required,
                 ],
             ];
@@ -135,6 +135,7 @@ class ActionToolProvider
             }
 
             $form = $this->formFactory->create($formType, null, $formOptions);
+            $args = $this->castArgsForForm($form, $args);
             $form->submit($args);
 
             if (!$form->isValid()) {
@@ -150,6 +151,42 @@ class ActionToolProvider
         }
 
         return ['error' => sprintf('Unknown tool "%s".', $name)];
+    }
+
+    /**
+     * Cast MCP arguments to match Symfony form expectations.
+     *
+     * Checkboxes expect "1"/null, integers expect int values.
+     */
+    private function castArgsForForm(\Symfony\Component\Form\FormInterface $form, array $args): array
+    {
+        foreach ($form->all() as $fieldName => $child) {
+            if (!\array_key_exists($fieldName, $args)) {
+                continue;
+            }
+
+            $innerType = $child->getConfig()->getType()->getInnerType();
+
+            // CheckboxType: true → "1", false → null (Symfony checkbox convention)
+            if ($innerType instanceof \Symfony\Component\Form\Extension\Core\Type\CheckboxType) {
+                $val = $args[$fieldName];
+                if (true === $val || '1' === $val || 'true' === $val) {
+                    $args[$fieldName] = '1';
+                } else {
+                    unset($args[$fieldName]);
+                }
+                continue;
+            }
+
+            // IntegerType / NumberType: cast to int/float
+            if ($innerType instanceof \Symfony\Component\Form\Extension\Core\Type\IntegerType) {
+                $args[$fieldName] = (int) $args[$fieldName];
+            } elseif ($innerType instanceof \Symfony\Component\Form\Extension\Core\Type\NumberType) {
+                $args[$fieldName] = (float) $args[$fieldName];
+            }
+        }
+
+        return $args;
     }
 
     private function formTypeToJsonSchema(array $blockPrefixes): string
