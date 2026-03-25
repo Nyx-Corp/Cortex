@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-    static targets = ['icon']
+    static targets = ['icon', 'btn']
 
     connect() {
         this.#apply(this.#preference())
@@ -19,9 +19,14 @@ export default class extends Controller {
     }
 
     #apply(theme) {
-        document.documentElement.classList.toggle('dark', theme === 'dark')
+        const isDark = theme === 'dark'
+        document.documentElement.classList.toggle('dark', isDark)
+        if (this.hasBtnTarget) {
+            this.btnTarget.classList.toggle('!bg-white/10', isDark)
+            this.btnTarget.classList.toggle('!text-sidebar-foreground', isDark)
+        }
         if (this.hasIconTarget) {
-            this.iconTarget.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon')
+            this.iconTarget.setAttribute('data-lucide', isDark ? 'sun' : 'moon')
             window.createIcons?.()
         }
     }
