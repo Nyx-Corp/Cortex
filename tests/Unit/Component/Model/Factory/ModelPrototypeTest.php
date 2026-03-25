@@ -7,11 +7,10 @@ namespace Cortex\Tests\Unit\Component\Model\Factory;
 use Cortex\Component\Collection\StructuredMap;
 use Cortex\Component\Model\Factory\ModelPrototype;
 use Cortex\ValueObject\RegisteredClass;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Component\Model\Factory\ModelPrototype
- */
+#[CoversClass(ModelPrototype::class)]
 class ModelPrototypeTest extends TestCase
 {
     // =======================================================================

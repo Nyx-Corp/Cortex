@@ -7,11 +7,10 @@ namespace Cortex\Tests\Unit\Component\Model\Factory\Mapper;
 use Cortex\Component\Model\Factory\Mapper\FlatModelMapper;
 use Cortex\Component\Model\Factory\ModelPrototype;
 use Cortex\ValueObject\RegisteredClass;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Component\Model\Factory\Mapper\FlatModelMapper
- */
+#[CoversClass(FlatModelMapper::class)]
 class FlatModelMapperTest extends TestCase
 {
     // =======================================================================

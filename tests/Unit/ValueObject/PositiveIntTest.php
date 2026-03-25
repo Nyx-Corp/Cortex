@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\ValueObject;
 
 use Cortex\ValueObject\PositiveInt;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\ValueObject\PositiveInt
- */
+#[CoversClass(PositiveInt::class)]
 class PositiveIntTest extends TestCase
 {
     // =======================================================================
     // VALID VALUES TESTS
     // =======================================================================
 
-    /** @dataProvider validValuesProvider */
+    #[DataProvider('validValuesProvider')]
     public function testValidValues(int $value): void
     {
         $positiveInt = new PositiveInt($value);
@@ -39,7 +39,7 @@ class PositiveIntTest extends TestCase
     // INVALID VALUES TESTS
     // =======================================================================
 
-    /** @dataProvider invalidValuesProvider */
+    #[DataProvider('invalidValuesProvider')]
     public function testInvalidValuesThrow(int $value): void
     {
         // Note: The implementation has a bug where $this->value is used before being set

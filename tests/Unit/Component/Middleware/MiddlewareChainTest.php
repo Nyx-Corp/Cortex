@@ -7,11 +7,10 @@ namespace Cortex\Tests\Unit\Component\Middleware;
 use Cortex\Component\Collection\AsyncCollection;
 use Cortex\Component\Middleware\Middleware;
 use Cortex\Component\Middleware\MiddlewareChain;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Component\Middleware\MiddlewareChain
- */
+#[CoversClass(MiddlewareChain::class)]
 class MiddlewareChainTest extends TestCase
 {
     // =======================================================================

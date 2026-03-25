@@ -110,11 +110,10 @@ namespace Cortex\Tests\Unit\Bridge\Symfony\Routing {
     use CortexTest\Application\Catalog\Controller\Action\ProductUpdateAction;
     use CortexTest\Application\Catalog\Controller\Action\ShootingArticlesListAction;
     use CortexTest\Application\Catalog\Controller\Action\WithRoute\ExplicitRouteAction;
+    use PHPUnit\Framework\Attributes\CoversClass;
     use PHPUnit\Framework\TestCase;
 
-    /**
-     * @covers \Cortex\Bridge\Symfony\Routing\ControllerRouteLoader
-     */
+    #[CoversClass(ControllerRouteLoader::class)]
     class ControllerRouteLoaderTest extends TestCase
     {
         // =======================================================================

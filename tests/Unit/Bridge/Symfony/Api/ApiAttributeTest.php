@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\Bridge\Symfony\Api;
 
 use Cortex\Bridge\Symfony\Form\Attribute\Api;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Bridge\Symfony\Form\Attribute\Api
- */
+#[CoversClass(Api::class)]
 class ApiAttributeTest extends TestCase
 {
     // =======================================================================
@@ -45,7 +45,7 @@ class ApiAttributeTest extends TestCase
     // isAvailableIn() TESTS
     // =======================================================================
 
-    /** @dataProvider availabilityProvider */
+    #[DataProvider('availabilityProvider')]
     public function testIsAvailableIn(int $since, int $version, bool $expected): void
     {
         $api = new Api(since: $since);
@@ -76,7 +76,7 @@ class ApiAttributeTest extends TestCase
         $this->assertFalse($api->isDeprecatedIn(100));
     }
 
-    /** @dataProvider deprecationProvider */
+    #[DataProvider('deprecationProvider')]
     public function testIsDeprecatedIn(int $deprecated, int $version, bool $expected): void
     {
         $api = new Api(since: 1, deprecated: $deprecated);

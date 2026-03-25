@@ -8,11 +8,10 @@ use Cortex\Component\Mapper\ArrayMapper;
 use Cortex\Component\Mapper\Relation;
 use Cortex\Component\Mapper\Strategy;
 use Cortex\Component\Mapper\Value;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Component\Mapper\ArrayMapper
- */
+#[CoversClass(ArrayMapper::class)]
 class ArrayMapperTest extends TestCase
 {
     // =======================================================================

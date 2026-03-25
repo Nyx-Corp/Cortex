@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\Component\Model\Query;
 
 use Cortex\Component\Model\Query\Operator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Component\Model\Query\Operator
- */
+#[CoversClass(Operator::class)]
 class OperatorTest extends TestCase
 {
     // =======================================================================
@@ -179,7 +179,7 @@ class OperatorTest extends TestCase
     // hasOperator() TESTS
     // =======================================================================
 
-    /** @dataProvider validOperatorValuesProvider */
+    #[DataProvider('validOperatorValuesProvider')]
     public function testHasOperatorWithValidValues(string $value): void
     {
         $this->assertTrue(Operator::hasOperator($value));
@@ -201,7 +201,7 @@ class OperatorTest extends TestCase
         ];
     }
 
-    /** @dataProvider invalidOperatorValuesProvider */
+    #[DataProvider('invalidOperatorValuesProvider')]
     public function testHasOperatorWithInvalidValues(mixed $value): void
     {
         $this->assertFalse(Operator::hasOperator($value));

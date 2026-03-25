@@ -11,6 +11,7 @@ use Cortex\Component\Model\Factory\ModelFactory;
 use Cortex\Component\Model\ModelCollection;
 use Cortex\Component\Model\Query\Factory\QueryFactory;
 use Cortex\Component\Model\Query\ModelQuery;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 // Test fixtures - reuse from DbalAdapterTest
@@ -71,9 +72,7 @@ class TestModelWithCustomCollection
     }
 }
 
-/**
- * @covers \Cortex\Bridge\Doctrine\JoinDefinition
- */
+#[CoversClass(JoinDefinition::class)]
 class JoinDefinitionTest extends TestCase
 {
     private function createMockFactory(string $modelClass): ModelFactory

@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\Component\Collection;
 
 use Cortex\Component\Collection\AsyncCollection;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Component\Collection\AsyncCollection
- */
+#[CoversClass(AsyncCollection::class)]
 class AsyncCollectionTest extends TestCase
 {
     // =======================================================================

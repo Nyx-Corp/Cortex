@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\Bridge\Symfony\Api;
 
 use Cortex\Bridge\Symfony\Api\OpenApiGenerator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @covers \Cortex\Bridge\Symfony\Api\OpenApiGenerator
- */
+#[CoversClass(OpenApiGenerator::class)]
 class OpenApiGeneratorTest extends TestCase
 {
     // =======================================================================

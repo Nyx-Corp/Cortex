@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\ValueObject;
 
 use Cortex\ValueObject\RegisteredClass;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\ValueObject\RegisteredClass
- */
+#[CoversClass(RegisteredClass::class)]
 class RegisteredClassTest extends TestCase
 {
     // =======================================================================

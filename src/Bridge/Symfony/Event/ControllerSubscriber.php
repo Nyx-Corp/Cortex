@@ -60,7 +60,7 @@ class ControllerSubscriber implements EventSubscriberInterface
         $request->attributes->set('_format', $format ?: self::FALLBACK_FORMAT);
     }
 
-    public function onControllerView(ViewEvent $event)
+    public function onControllerView(ViewEvent $event): void
     {
         $request = $event->getRequest();
         $routeName = $request->attributes->get('_route');

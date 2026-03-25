@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\Component\Middleware;
 
 use Cortex\Component\Middleware\Middleware;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Component\Middleware\Middleware
- */
+#[CoversClass(Middleware::class)]
 class MiddlewareTest extends TestCase
 {
     // =======================================================================

@@ -7,11 +7,10 @@ namespace Cortex\Tests\Unit\Component\Model\Query;
 use Cortex\Component\Model\ModelCollection;
 use Cortex\Component\Model\Query\ModelQuery;
 use Cortex\ValueObject\RegisteredClass;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Component\Model\Query\ModelQuery
- */
+#[CoversClass(ModelQuery::class)]
 class ModelQueryTest extends TestCase
 {
     private function createQuery(): ModelQuery

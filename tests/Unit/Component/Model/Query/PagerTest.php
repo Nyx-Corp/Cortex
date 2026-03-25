@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\Component\Model\Query;
 
 use Cortex\Component\Model\Query\Pager;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Component\Model\Query\Pager
- */
+#[CoversClass(Pager::class)]
 class PagerTest extends TestCase
 {
     // =======================================================================
@@ -69,7 +69,7 @@ class PagerTest extends TestCase
         $this->assertEquals(50, $pager->limit);
     }
 
-    /** @dataProvider offsetLimitProvider */
+    #[DataProvider('offsetLimitProvider')]
     public function testOffsetAndLimitCalculations(int $page, int $nbPerPage, int $expectedOffset, int $expectedLimit): void
     {
         $pager = new Pager($page, nbPerPage: $nbPerPage);
@@ -197,7 +197,7 @@ class PagerTest extends TestCase
         $pager->getPages();
     }
 
-    /** @dataProvider pageCountProvider */
+    #[DataProvider('pageCountProvider')]
     public function testGetPagesCount(int $nbRecords, int $nbPerPage, int $expectedPageCount): void
     {
         $pager = new Pager(1, nbPerPage: $nbPerPage);

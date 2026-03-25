@@ -20,6 +20,7 @@ use Cortex\Component\Model\Query\ModelQuery;
 use Cortex\ValueObject\RegisteredClass;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 // Test fixtures
@@ -42,10 +43,8 @@ class TestClub
     }
 }
 
-/**
- * @covers \Cortex\Bridge\Doctrine\DbalAdapter
- * @covers \Cortex\Bridge\Doctrine\DbalMappingConfiguration
- */
+#[CoversClass(DbalAdapter::class)]
+#[CoversClass(DbalMappingConfiguration::class)]
 class DbalAdapterTest extends TestCase
 {
     private Connection $connection;

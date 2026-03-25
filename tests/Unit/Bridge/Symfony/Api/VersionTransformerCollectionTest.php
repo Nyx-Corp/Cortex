@@ -6,11 +6,10 @@ namespace Cortex\Tests\Unit\Bridge\Symfony\Api;
 
 use Cortex\Bridge\Symfony\Api\VersionTransformerCollection;
 use Cortex\Bridge\Symfony\Api\VersionTransformerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Bridge\Symfony\Api\VersionTransformerCollection
- */
+#[CoversClass(VersionTransformerCollection::class)]
 class VersionTransformerCollectionTest extends TestCase
 {
     // =======================================================================

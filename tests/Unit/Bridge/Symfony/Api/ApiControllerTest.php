@@ -7,6 +7,7 @@ namespace Cortex\Tests\Unit\Bridge\Symfony\Api;
 use Cortex\Bridge\Symfony\Api\ApiController;
 use Cortex\Bridge\Symfony\Api\VersionTransformerCollection;
 use Cortex\Bridge\Symfony\Api\VersionTransformerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
@@ -14,9 +15,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @covers \Cortex\Bridge\Symfony\Api\ApiController
- */
+#[CoversClass(ApiController::class)]
 class ApiControllerTest extends TestCase
 {
     private FormFactoryInterface $formFactory;

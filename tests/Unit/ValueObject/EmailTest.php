@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\ValueObject;
 
 use Cortex\ValueObject\Email;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\ValueObject\Email
- */
+#[CoversClass(Email::class)]
 class EmailTest extends TestCase
 {
     // =======================================================================
     // VALID EMAIL TESTS
     // =======================================================================
 
-    /** @dataProvider validEmailsProvider */
+    #[DataProvider('validEmailsProvider')]
     public function testValidEmails(string $email): void
     {
         $emailObject = new Email($email);
@@ -43,7 +43,7 @@ class EmailTest extends TestCase
     // INVALID EMAIL TESTS
     // =======================================================================
 
-    /** @dataProvider invalidEmailsProvider */
+    #[DataProvider('invalidEmailsProvider')]
     public function testInvalidEmailsThrow(string $email): void
     {
         $this->expectException(\InvalidArgumentException::class);

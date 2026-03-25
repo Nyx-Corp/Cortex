@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\Component\Mapper;
 
 use Cortex\Component\Mapper\Relation;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Component\Mapper\Relation
- */
+#[CoversClass(Relation::class)]
 class RelationTest extends TestCase
 {
     // =======================================================================

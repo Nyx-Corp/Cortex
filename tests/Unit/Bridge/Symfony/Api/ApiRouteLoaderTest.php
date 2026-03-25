@@ -6,11 +6,10 @@ namespace Cortex\Tests\Unit\Bridge\Symfony\Api;
 
 use Cortex\Bridge\Symfony\Api\ApiController;
 use Cortex\Bridge\Symfony\Api\ApiRouteLoader;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Bridge\Symfony\Api\ApiRouteLoader
- */
+#[CoversClass(ApiRouteLoader::class)]
 class ApiRouteLoaderTest extends TestCase
 {
     // =======================================================================

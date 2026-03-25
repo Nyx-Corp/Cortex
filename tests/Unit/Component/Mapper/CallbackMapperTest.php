@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\Component\Mapper;
 
 use Cortex\Component\Mapper\CallbackMapper;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Cortex\Component\Mapper\CallbackMapper
- */
+#[CoversClass(CallbackMapper::class)]
 class CallbackMapperTest extends TestCase
 {
     // =======================================================================
