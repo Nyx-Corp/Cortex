@@ -101,6 +101,10 @@ class ArrayMapper implements Mapper
                 }
 
                 if (isset($this->mapping[$destKey]) && Value::Json === $this->mapping[$destKey]) {
+                    if (null === $value) {
+                        $result[$destKey] = null;
+                        continue;
+                    }
                     $jsonValue = new JsonString($value);
                     $result[$destKey] = is_string($value) ? $jsonValue->decode() : (string) $jsonValue;
                     continue;
