@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Cortex\Tests\Unit\Bridge\Symfony\Serializer;
 
 use Cortex\Bridge\Symfony\Serializer\RepresentationRegistry;
-use Cortex\Component\Mapper\ArrayMapper;
 use Cortex\Component\Mapper\ModelRepresentation;
 use PHPUnit\Framework\TestCase;
 

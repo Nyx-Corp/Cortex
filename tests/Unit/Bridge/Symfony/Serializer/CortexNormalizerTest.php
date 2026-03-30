@@ -496,7 +496,8 @@ class Article
         public readonly ?string $excerpt = null,
         public readonly ?Category $category = null,
         public readonly array $tags = [],
-    ) {}
+    ) {
+    }
 }
 
 class Category
@@ -505,5 +506,6 @@ class Category
         public readonly string $uuid,
         public readonly string $name,
         public readonly string $color,
-    ) {}
+    ) {
+    }
 }

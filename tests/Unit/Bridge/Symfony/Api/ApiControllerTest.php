@@ -14,19 +14,61 @@ use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[CoversClass(ApiController::class)]
 class ApiControllerTest extends TestCase
 {
     private FormFactoryInterface $formFactory;
     private VersionTransformerCollection $transformers;
+    private SerializerInterface $serializer;
     private ApiController $controller;
 
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->transformers = new VersionTransformerCollection([]);
-        $this->controller = new ApiController($this->formFactory, $this->transformers);
+        $this->serializer = new class implements SerializerInterface {
+            public function serialize($data, string $format, array $context = []): string
+            {
+                return json_encode($data);
+            }
+
+            public function deserialize($data, string $type, string $format, array $context = []): mixed
+            {
+                return json_decode($data, true);
+            }
+
+            public function normalize($data, ?string $format = null, array $context = []): mixed
+            {
+                return $this->doNormalize($data);
+            }
+
+            private function doNormalize(mixed $data): mixed
+            {
+                if ($data instanceof \DateTimeInterface) {
+                    return $data->format('c');
+                }
+                if ($data instanceof \BackedEnum) {
+                    return $data->value;
+                }
+                if (is_object($data) && !$data instanceof \stdClass) {
+                    return (array) $data;
+                }
+                if (is_array($data)) {
+                    return array_map(fn ($item) => $this->doNormalize($item), $data);
+                }
+                if (is_object($data)) {
+                    $normalized = [];
+                    foreach ((array) $data as $key => $value) {
+                        $normalized[$key] = $this->doNormalize($value);
+                    }
+                    return $normalized;
+                }
+                return $data;
+            }
+        };
+        $this->controller = new ApiController($this->formFactory, $this->transformers, $this->serializer);
     }
 
     // =======================================================================
@@ -324,7 +366,7 @@ class ApiControllerTest extends TestCase
             ->willReturnArgument(0);
 
         $this->transformers = new VersionTransformerCollection([$transformer]);
-        $this->controller = new ApiController($this->formFactory, $this->transformers);
+        $this->controller = new ApiController($this->formFactory, $this->transformers, $this->serializer);
 
         $submittedData = null;
         $form = $this->createMock(FormInterface::class);

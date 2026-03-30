@@ -524,7 +524,7 @@ class DbalAdapterTest extends TestCase
         $modelQuery = $this->createModelQuery()
             ->filterBy('uuid', 'club-uuid-789')
             ->limit(0)
-;
+        ;
 
         $chain = $this->createLastMiddleware();
 
@@ -608,7 +608,7 @@ class DbalAdapterTest extends TestCase
         $modelQuery = $this->createModelQuery()
             ->filterBy('uuid', 'club-uuid-disabled')
             ->limit(0)
-;
+        ;
 
         $chain = $this->createLastMiddleware();
 
@@ -657,7 +657,7 @@ class DbalAdapterTest extends TestCase
         $modelQuery = $this->createModelQuery()
             ->filterBy('uuid', ['club-1', 'club-2'])
             ->limit(0)
-;
+        ;
 
         $chain = $this->createLastMiddleware();
 

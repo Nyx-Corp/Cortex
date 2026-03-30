@@ -28,7 +28,8 @@ class CortexNormalizer implements NormalizerInterface, DenormalizerInterface
         private readonly RepresentationRegistry $registry,
         private readonly EventDispatcherInterface $dispatcher,
         private readonly LoggerInterface $logger,
-    ) {}
+    ) {
+    }
 
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
@@ -54,7 +55,7 @@ class CortexNormalizer implements NormalizerInterface, DenormalizerInterface
         $mappedData = $this->safeMap($mapper, $rawData);
 
         $groupDef = $representation->groups()[$group] ?? null;
-        if ($groupDef === null) {
+        if (null === $groupDef) {
             return $mappedData;
         }
 
@@ -71,11 +72,11 @@ class CortexNormalizer implements NormalizerInterface, DenormalizerInterface
 
             $value = $hasMapped ? $mappedData[$field] : $rawData[$field];
 
-            if ($optional && $value === null) {
+            if ($optional && null === $value) {
                 continue;
             }
 
-            if ($subGroup !== null) {
+            if (null !== $subGroup) {
                 $filtered[$field] = $this->propagate($rawData[$field] ?? $value, $format, $subGroup);
 
                 continue;
@@ -129,7 +130,7 @@ class CortexNormalizer implements NormalizerInterface, DenormalizerInterface
             if (str_starts_with($spec, '@')) {
                 $inheritedGroup = substr($spec, 1);
                 $inheritedDef = $allGroups[$inheritedGroup] ?? null;
-                if ($inheritedDef !== null) {
+                if (null !== $inheritedDef) {
                     $fields = array_merge($fields, $this->resolveGroup($representation, $inheritedDef));
                 }
 

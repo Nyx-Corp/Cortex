@@ -50,10 +50,7 @@ class RepresentationRegistry
         ) {
             $groups = $representation->groups();
             if (!isset($groups['store'])) {
-                throw new \LogicException(sprintf(
-                    'ModelRepresentation for "%s" must define a "store" group (required by DbalMapper).',
-                    $modelClass,
-                ));
+                throw new \LogicException(sprintf('ModelRepresentation for "%s" must define a "store" group (required by DbalMapper).', $modelClass));
             }
             $this->storeValidated[$modelClass] = true;
         }

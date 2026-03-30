@@ -132,7 +132,7 @@ class ModelQuery
      */
     public function applyFilterQuery(string $query, array $fieldMap = []): self
     {
-        $parsed = (new FilterQueryParser())->parse($query);
+        $parsed = new FilterQueryParser()->parse($query);
 
         $filters = [] !== $fieldMap ? $parsed->mapFilters($fieldMap) : $parsed->filters;
 
