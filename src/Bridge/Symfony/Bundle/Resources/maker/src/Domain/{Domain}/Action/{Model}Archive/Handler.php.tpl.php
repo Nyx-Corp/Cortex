@@ -9,9 +9,9 @@
 namespace Domain\<?php echo $Domain; ?>\Action\<?php echo $Model; ?>Archive;
 
 use Cortex\Component\Action\ActionHandler;
-use Cortex\Component\Date\DateTimeFactory;
 use Cortex\Component\Event\EmitsActionEvents;
 use Cortex\Component\Event\EventDispatcherAwareInterface;
+use Symfony\Component\Clock\ClockInterface;
 use Domain\<?php echo $Domain; ?>\Persistence\<?php echo $Model; ?>Store;
 
 class Handler implements ActionHandler, EventDispatcherAwareInterface
@@ -19,7 +19,7 @@ class Handler implements ActionHandler, EventDispatcherAwareInterface
     use EmitsActionEvents;
 
     public function __construct(
-        private DateTimeFactory $dateTimeFactory,
+        private ClockInterface $clock,
         private <?php echo $Model; ?>Store $store,
     ) {
     }
@@ -30,7 +30,7 @@ class Handler implements ActionHandler, EventDispatcherAwareInterface
         $model = $command-><?php echo $model; ?>;
 
         if ($command->isArchived) {
-            $model->archive($this->dateTimeFactory->now());
+            $model->archive($this->clock->now());
         } else {
             $model->restore();
         }

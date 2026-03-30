@@ -1,0 +1,2 @@
+rules:
+    - Cortex\Bridge\PHPStan\Rules\ForbidCatchAllClassNamesRule
