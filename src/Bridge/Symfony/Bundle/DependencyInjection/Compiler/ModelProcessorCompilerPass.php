@@ -4,7 +4,9 @@ namespace Cortex\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use Cortex\Bridge\Symfony\Controller\ModelFactoryValueResolver;
 use Cortex\Bridge\Symfony\Model\Attribute\Middleware as MiddlewareAttribute;
+use Cortex\Bridge\Symfony\Serializer\RepresentationRegistry;
 use Cortex\Component\Collection\AsyncCollection;
+use Cortex\Component\Mapper\ModelRepresentation;
 use Cortex\Component\Middleware\Middleware;
 use Cortex\Component\Model\Attribute\Model;
 use Cortex\Component\Model\Factory\Mapper\ModelMapper;
@@ -104,6 +106,16 @@ class ModelProcessorCompilerPass implements CompilerPassInterface
                 );
             }
 
+            // Model Representation
+            if (is_subclass_of($class, ModelRepresentation::class)) {
+                if (!$modelAttribute = $this->getModelClassAttribute($definition->getClass())) {
+                    continue;
+                }
+
+                $modelClass = (string) $modelAttribute->model;
+                $models[$modelClass]['representation'] = new Reference($id);
+            }
+
             // Model Middleware
             if (is_subclass_of($class, ModelMiddleware::class)) {
                 $ref = new \ReflectionClass($definition->getClass());
@@ -171,5 +183,22 @@ class ModelProcessorCompilerPass implements CompilerPassInterface
         $container->getDefinition(ModelFactoryValueResolver::class)
             ->setArgument(0, $valueResolversFactoryMapping)
         ;
+
+        // register Representations into RepresentationRegistry
+        if ($container->hasDefinition(RepresentationRegistry::class)) {
+            $registry = $container->getDefinition(RepresentationRegistry::class);
+
+            foreach ($models as $modelClass => $model) {
+                if (!isset($model['representation'])) {
+                    continue;
+                }
+
+                $registry->addMethodCall('register', [$modelClass, $model['representation']]);
+
+                if (isset($model['middlewares'])) {
+                    $registry->addMethodCall('requireStoreGroup', [$modelClass]);
+                }
+            }
+        }
     }
 }

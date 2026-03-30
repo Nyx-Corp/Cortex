@@ -45,7 +45,7 @@ class AsyncCollection implements \Iterator, \Countable, \JsonSerializable
 
             // Valider que le callable retourne bien un iterable
             if (!is_iterable($result)) {
-                throw new \InvalidArgumentException(sprintf('Callable passed to AsyncCollection must return an iterable, %s returned.', is_object($result) ? get_class($result) : gettype($result)));
+                throw new \InvalidArgumentException(sprintf('Callable passed to AsyncCollection must return an iterable, %s returned.', get_debug_type($result)));
             }
 
             yield from $result;

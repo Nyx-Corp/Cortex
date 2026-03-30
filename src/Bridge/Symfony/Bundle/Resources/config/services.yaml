@@ -11,6 +11,8 @@ services:
             tags: ['cortex.api.version_transformer']
         Mcp\Capability\Registry\Loader\LoaderInterface:
             tags: ['mcp.loader']
+        Cortex\Component\Mapper\ModelRepresentation:
+            tags: ['cortex.model_representation']
 
     # ControllerInterface tagging is handled by ControllerTaggingPass
 

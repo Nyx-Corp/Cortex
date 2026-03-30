@@ -87,7 +87,7 @@ class RegisteredClassTest extends TestCase
         $iterator = new \ArrayIterator([]);
 
         // isInstanceOf expects a class string, not an object instance
-        $this->assertTrue($registered->isInstanceOf(get_class($iterator)));
+        $this->assertTrue($registered->isInstanceOf($iterator::class));
     }
 
     // =======================================================================

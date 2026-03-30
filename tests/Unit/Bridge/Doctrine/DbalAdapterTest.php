@@ -142,7 +142,7 @@ class DbalAdapterTest extends TestCase
         $this->connection->method('executeQuery')->willReturn($mockResult);
         $this->preloader->method('has')->willReturn(false);
 
-        $modelQuery = $this->createModelQuery()->limit(0)->paginate(null);
+        $modelQuery = $this->createModelQuery()->limit(0);
 
         $chain = $this->createLastMiddleware();
 
@@ -173,7 +173,7 @@ class DbalAdapterTest extends TestCase
         $this->connection->method('executeQuery')->willReturn($mockResult);
         $this->preloader->method('has')->willReturn(false);
 
-        $modelQuery = $this->createModelQuery()->limit(0)->paginate(null);
+        $modelQuery = $this->createModelQuery()->limit(0);
 
         $chain = $this->createLastMiddleware();
 
@@ -355,7 +355,7 @@ class DbalAdapterTest extends TestCase
 
         $this->connection->method('executeQuery')->willReturn($mockResult);
 
-        $modelQuery = $this->createModelQuery()->limit(0)->paginate(null);
+        $modelQuery = $this->createModelQuery()->limit(0);
 
         $chain = $this->createLastMiddleware();
 
@@ -433,7 +433,7 @@ class DbalAdapterTest extends TestCase
 
         $this->connection->method('executeQuery')->willReturn($mockResult);
 
-        $modelQuery = $this->createModelQuery()->limit(0)->paginate(null);
+        $modelQuery = $this->createModelQuery()->limit(0);
 
         $chain = $this->createLastMiddleware();
 
@@ -524,7 +524,7 @@ class DbalAdapterTest extends TestCase
         $modelQuery = $this->createModelQuery()
             ->filterBy('uuid', 'club-uuid-789')
             ->limit(0)
-            ->paginate(null);
+;
 
         $chain = $this->createLastMiddleware();
 
@@ -608,7 +608,7 @@ class DbalAdapterTest extends TestCase
         $modelQuery = $this->createModelQuery()
             ->filterBy('uuid', 'club-uuid-disabled')
             ->limit(0)
-            ->paginate(null);
+;
 
         $chain = $this->createLastMiddleware();
 
@@ -657,7 +657,7 @@ class DbalAdapterTest extends TestCase
         $modelQuery = $this->createModelQuery()
             ->filterBy('uuid', ['club-1', 'club-2'])
             ->limit(0)
-            ->paginate(null);
+;
 
         $chain = $this->createLastMiddleware();
 
@@ -963,7 +963,7 @@ class DbalAdapterTest extends TestCase
 
         $this->connection->method('executeQuery')->willReturn($mockResult);
 
-        $modelQuery = $this->createModelQuery()->limit(0)->paginate(null);
+        $modelQuery = $this->createModelQuery()->limit(0);
         $chain = $this->createLastMiddleware();
 
         iterator_to_array($adapter->onModelQuery($chain, $modelQuery));
@@ -1040,7 +1040,7 @@ class DbalAdapterTest extends TestCase
 
         $this->connection->method('executeQuery')->willReturn($mockResult);
 
-        $modelQuery = $this->createModelQuery()->limit(0)->paginate(null);
+        $modelQuery = $this->createModelQuery()->limit(0);
         $chain = $this->createLastMiddleware();
 
         $results = iterator_to_array($adapter->onModelQuery($chain, $modelQuery));

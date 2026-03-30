@@ -41,8 +41,10 @@ trait DbalModelAdapterTrait
                 yield from $this->getDbal()->onModelSync($chain, $command);
                 break;
             case $command instanceof RemoveCommand:
+                yield from $this->getDbal()->onModelRemove($chain, $command);
+                break;
             case $command instanceof CreationCommand:
-                yield from ($chain->next)();
+                yield from $chain->isLast ? [] : ($chain->next)();
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unsupported command type: %s', get_debug_type($command)));

@@ -28,7 +28,7 @@ class AlertEventSubscriber implements EventSubscriberInterface
         }
 
         $session = $request->getSession();
-        $eventClass = get_class($event);
+        $eventClass = $event::class;
 
         // Parse domain and action from event namespace
         // Convention: Domain\{Domain}\Action\{ModelAction}\Event

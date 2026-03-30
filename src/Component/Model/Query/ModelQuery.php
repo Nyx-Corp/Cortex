@@ -30,8 +30,6 @@ class ModelQuery
 
         $this->filters = $filters ?? new StructuredMap();
         $this->tags = $tags ?? new StructuredMap();
-
-        $this->pager = new Pager(1);
     }
 
     public function filterBy(string $attribute, mixed $value): self
@@ -120,6 +118,33 @@ class ModelQuery
         foreach ($tags as $attribute => $value) {
             $this->tags->set($attribute, $value);
         }
+
+        return $this;
+    }
+
+    /**
+     * Apply a Gmail-style filter query string.
+     *
+     * Syntax: "field:value sort:name_desc limit:5"
+     *
+     * @param string                $query    Gmail-style query string
+     * @param array<string, string> $fieldMap Raw field names → DB column names
+     */
+    public function applyFilterQuery(string $query, array $fieldMap = []): self
+    {
+        $parsed = (new FilterQueryParser())->parse($query);
+
+        $filters = [] !== $fieldMap ? $parsed->mapFilters($fieldMap) : $parsed->filters;
+
+        foreach ($filters as $column => $value) {
+            $this->filterBy($column, $value);
+        }
+
+        if (null !== $parsed->sort) {
+            $this->sort($parsed->sort);
+        }
+
+        $this->limit($parsed->limit);
 
         return $this;
     }

@@ -71,6 +71,8 @@ final class ActionMaker extends CortexMaker
             ->addOption('controller', 'null', InputOption::VALUE_REQUIRED, 'Controller (model|form|list)', 'model')
             ->addOption('mcp-tool', null, InputOption::VALUE_NONE, 'Generate MCP Tool wrapper')
             ->addOption('output-subpath', null, InputOption::VALUE_OPTIONAL, 'Subpath for controllers (Admin, Front, Api)', '')
+            ->addOption('root-path', null, InputOption::VALUE_REQUIRED, 'Root path for generated files (e.g., src/Lib/Synapse/src)')
+            ->addOption('root-namespace', null, InputOption::VALUE_REQUIRED, 'Root namespace (e.g., Synapse) — rewrites Domain\\, Infrastructure\\, Application\\ prefixes')
         ;
     }
 
@@ -89,13 +91,15 @@ final class ActionMaker extends CortexMaker
         $subpath = $subpathUnicode->snake()->toString();
         $subpath_namespace = '' !== $Subpath ? '\\'.$Subpath : '';
 
+        ['destPath' => $destPath, 'namespaceReplacements' => $nsReplacements, 'pathTransformer' => $rootPathTransformer] = $this->resolveRootPath($input, $generator);
+
         $this->pathCollection
             ->filter(fn (SplFileInfo $file) => in_array(
                 $file->getRelativePathname(),
                 $sourcePath,
             ))
             ->mirror(
-                $generator->getRootDirectory(),
+                $destPath,
                 [
                     '{model}' => $modelUnicode->snake()->toString(),
                     '{Model}' => $Model = $modelUnicode->camel()->title()->toString(),
@@ -117,6 +121,8 @@ final class ActionMaker extends CortexMaker
                         $actionUnicode->snake()->replace('_', '-')->toString()
                     ),
                 ],
+                pathTransformer: $rootPathTransformer,
+                contentReplacements: $nsReplacements,
             )
             ->generate(fn (string $generatedFilepath) => $io->text(sprintf(
                 '  ✓ <info>created</info> <comment>%s</comment>',

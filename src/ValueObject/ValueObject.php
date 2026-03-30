@@ -13,7 +13,7 @@ abstract class ValueObject implements \Stringable
 
     public function equals($other): bool
     {
-        return is_a(get_class($other), static::class, true)
+        return is_a($other::class, static::class, true)
             && $this->value === $other->value;
     }
 

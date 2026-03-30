@@ -500,7 +500,7 @@ class ModelCollection extends AsyncCollection
 ### Pourquoi la propagation du query ?
 
 Après un chaînage `->filter()->map()`, le template peut toujours accéder à :
-- `$collection->query->pager` : Information de pagination
+- `$collection->query->pager` : Information de pagination (null par defaut, renseigne par le Decorator ou un appel explicite a `->paginate()`)
 - `$collection->query->sorter` : Tri actuel
 - `$collection->query->filters` : Filtres appliqués
 

@@ -219,6 +219,8 @@ flowchart LR
     RESOLVE --> FV
 ```
 
+> **Pagination opt-in** : `ModelQuery` n'a pas de pager par defaut. Sans appel explicite a `->paginate(new Pager(...))`, toutes les lignes sont retournees. Le `ModelQueryDecorator` pose automatiquement un pager depuis les parametres de la requete HTTP (`?page=1&limit=20`).
+
 ### Structure
 
 ```php

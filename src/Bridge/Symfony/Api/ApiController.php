@@ -8,12 +8,14 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ApiController
 {
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
         private readonly VersionTransformerCollection $transformers,
+        private readonly SerializerInterface $serializer,
     ) {
     }
 
@@ -79,7 +81,7 @@ class ApiController
             $result = $this->transformers->transformResponse($commandClass, $result, $version);
 
             return $this->respond(
-                $this->serialize($result),
+                $this->serializer->normalize($result),
                 Response::HTTP_OK,
                 $version,
                 $isDeprecated,
@@ -108,36 +110,4 @@ class ApiController
         return $response;
     }
 
-    private function serialize(mixed $value): mixed
-    {
-        if (is_object($value)) {
-            if ($value instanceof \BackedEnum) {
-                return $value->value;
-            }
-
-            if ($value instanceof \DateTimeInterface) {
-                return $value->format('c');
-            }
-
-            if ($value instanceof \Stringable) {
-                $vars = get_object_vars($value);
-                if (empty($vars)) {
-                    return (string) $value;
-                }
-            }
-
-            $result = [];
-            foreach (get_object_vars($value) as $key => $val) {
-                $result[$key] = $this->serialize($val);
-            }
-
-            return $result;
-        }
-
-        if (is_array($value)) {
-            return array_map(fn ($v) => $this->serialize($v), $value);
-        }
-
-        return $value;
-    }
 }

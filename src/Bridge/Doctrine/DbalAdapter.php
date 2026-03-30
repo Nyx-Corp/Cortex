@@ -9,6 +9,7 @@ use Cortex\Component\Json\JsonString;
 use Cortex\Component\Middleware\Middleware;
 use Cortex\Component\Model\Query\ModelQuery;
 use Cortex\Component\Model\Query\Operator;
+use Cortex\Component\Model\Store\RemoveCommand;
 use Cortex\Component\Model\Store\SyncCommand;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
@@ -246,21 +247,32 @@ class DbalAdapter
 
     public function sync(array $data): string
     {
+        $updateColumns = array_filter(
+            array_keys($data),
+            fn (string $key): bool => $key !== $this->configuration->primaryKey
+        );
+
+        if (count($data) <= 1 || [] === $updateColumns) {
+            $upsertClause = '';
+        } elseif ($this->dbalConnection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform) {
+            $upsertClause = sprintf(
+                'ON CONFLICT (%s) DO UPDATE SET %s',
+                $this->configuration->primaryKey,
+                implode(', ', array_map(fn ($key) => sprintf('%s=EXCLUDED.%s', $key, $key), $updateColumns))
+            );
+        } else {
+            $upsertClause = sprintf(
+                'ON DUPLICATE KEY UPDATE %s',
+                implode(', ', array_map(fn ($key) => sprintf('%s=:%s', $key, $key), $updateColumns))
+            );
+        }
+
         return trim(sprintf(
             'INSERT INTO %s (%s) VALUES (%s) %s',
             $this->configuration->table,
             implode(', ', array_keys($data)),
             implode(', ', array_map(fn ($key) => ':'.$key, array_keys($data))),
-            count($data) <= 1 ? '' : sprintf(
-                'ON DUPLICATE KEY UPDATE %s',
-                implode(', ', array_map(
-                    fn ($key) => sprintf('%s=:%s', $key, $key),
-                    array_filter(
-                        array_keys($data),      // don't update primary key
-                        fn (string $key): bool => $key !== $this->configuration->primaryKey
-                    )
-                ))
-            )
+            $upsertClause
         ));
     }
 
@@ -705,5 +717,28 @@ class DbalAdapter
         ));
 
         yield $syncBag;
+    }
+
+    public function onModelRemove(Middleware $chain, RemoveCommand $command): \Generator
+    {
+        $model = $command->model;
+        $pk = $this->configuration->primaryKey;
+
+        // Extract primary key value from the model
+        $data = $this->configuration->modelToTableMapper?->map($model)
+            ?? get_object_vars($model)
+        ;
+
+        $removeBag = $chain->isLast ?
+            [] :
+            iterator_to_array(($chain->next)())
+        ;
+
+        $removeBag[$this->configuration->dataChannel] = iterator_to_array($this->query(
+            $this->delete(),
+            [$pk => $data[$pk] ?? null]
+        ));
+
+        yield $removeBag;
     }
 }

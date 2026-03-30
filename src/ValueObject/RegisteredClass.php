@@ -26,7 +26,7 @@ class RegisteredClass extends ValueObject
     public function assertIsInstanceOf(object|string $objectOrClass): object|string
     {
         if (!$this->isInstanceOf($objectOrClass)) {
-            throw new \InvalidArgumentException(sprintf('"%s" registered class is not a "%s".', $this->value, is_object($objectOrClass) ? get_class($objectOrClass) : $objectOrClass));
+            throw new \InvalidArgumentException(sprintf('"%s" registered class is not a "%s".', $this->value, is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass));
         }
 
         return $objectOrClass;
@@ -40,7 +40,7 @@ class RegisteredClass extends ValueObject
     public function assertInstanceOf(object|string $objectOrClass): object|string
     {
         if (!$this->instanceOf($objectOrClass)) {
-            throw new \InvalidArgumentException(sprintf('Expected instance of "%s", got "%s".', $this->value, is_object($objectOrClass) ? get_class($objectOrClass) : $objectOrClass));
+            throw new \InvalidArgumentException(sprintf('Expected instance of "%s", got "%s".', $this->value, is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass));
         }
 
         return $objectOrClass;

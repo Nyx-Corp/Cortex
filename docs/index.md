@@ -1,6 +1,6 @@
 # Cortex Framework Documentation
 
-Cortex est un framework DDD (Domain-Driven Design) pour PHP 8.4+ et Symfony 7.4. Il fournit des abstractions pour la transformation de données, les collections lazy, la persistence DBAL et l'intégration Symfony.
+Cortex est un framework DDD (Domain-Driven Design) pour PHP 8.5+ et Symfony 8.0. Il fournit des abstractions pour la transformation de données, les collections lazy, la persistence DBAL, la normalisation avec groupes securises, et l'intégration Symfony.
 
 ## Architecture Globale
 
@@ -286,6 +286,7 @@ public function __invoke(PersonCollection $persons): array
 ## Documentation Détaillée
 
 - **[ArrayMapper](./array-mapper.md)** - Transformation de données bidirectionnelle
+- **[ModelRepresentation](./representation.md)** - Normalisation avec groupes, heritage, propagation et security
 - **[AsyncCollection](./async-collection.md)** - Collections lazy avec context propagation
 - **[Bridge/Doctrine](./bridge-doctrine.md)** - Persistence DBAL avec JOINs et preloading
 - **[Bridge/Symfony](./bridge-symfony.md)** - Intégration Symfony complète

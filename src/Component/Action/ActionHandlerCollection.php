@@ -23,7 +23,7 @@ class ActionHandlerCollection
 
     public function handleCommand(object $command): object
     {
-        $commandClass = get_class($command);
+        $commandClass = $command::class;
         if (!is_callable($this->commandMapping[$commandClass])) {
             throw new \InvalidArgumentException(sprintf('No registered handler for given command, "%s" given.', $commandClass));
         }

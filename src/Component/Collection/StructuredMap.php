@@ -101,7 +101,7 @@ class StructuredMap implements \IteratorAggregate, \Countable
         }
 
         if (!($this->validation[$mappedKey])($value)) {
-            throw new \InvalidArgumentException(sprintf('Validation failed for key "%s" : "%s" given.', $mappedKey, is_object($value) ? get_class($value) : gettype($value)));
+            throw new \InvalidArgumentException(sprintf('Validation failed for key "%s" : "%s" given.', $mappedKey, get_debug_type($value)));
         }
 
         return $this;

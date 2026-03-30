@@ -90,6 +90,8 @@ final class CrudMaker extends CortexMaker
             ->addArgument('model', InputArgument::REQUIRED, 'CRUD related model')
             ->addOption('mcp-tool', null, InputOption::VALUE_NONE, 'Generate MCP Tools (List, Create, Edit, Archive)')
             ->addOption('output-subpath', null, InputOption::VALUE_OPTIONAL, 'Subpath for controllers/templates (Admin, Front, Api)', '')
+            ->addOption('root-path', null, InputOption::VALUE_REQUIRED, 'Root path for generated files (e.g., src/Lib/Synapse/src)')
+            ->addOption('root-namespace', null, InputOption::VALUE_REQUIRED, 'Root namespace (e.g., Synapse) — rewrites Domain\\, Infrastructure\\, Application\\ prefixes')
         ;
     }
 
@@ -124,13 +126,22 @@ final class CrudMaker extends CortexMaker
                     : $path)
             : null;
 
+        ['destPath' => $destPath, 'namespaceReplacements' => $nsReplacements, 'pathTransformer' => $rootPathTransformer] = $this->resolveRootPath($input, $generator);
+
+        // Chain subpath + root-path transformers
+        $combinedTransformer = match (true) {
+            null !== $pathTransformer && null !== $rootPathTransformer => static fn (string $p) => $rootPathTransformer($pathTransformer($p)),
+            null !== $rootPathTransformer => $rootPathTransformer,
+            default => $pathTransformer,
+        };
+
         $this->pathCollection
             ->filter(fn (SplFileInfo $file) => in_array(
                 $file->getRelativePathname(),
                 $sourcePath,
             ))
             ->mirror(
-                $generator->getRootDirectory(),
+                $destPath,
                 [
                     '{model}' => $modelUnicode->snake()->toString(),
                     '{Model}' => $Model = $modelUnicode->camel()->title()->toString(),
@@ -162,7 +173,8 @@ final class CrudMaker extends CortexMaker
                         $modelUnicode->snake()->replace('_', '-')->toString()
                     ),
                 ],
-                pathTransformer: $pathTransformer,
+                pathTransformer: $combinedTransformer,
+                contentReplacements: $nsReplacements,
             )
             ->generate(fn (string $generatedFilepath) => $io->text(sprintf(
                 '  ✓ <info>created</info> <comment>%s</comment>',

@@ -95,7 +95,7 @@ class CommandMapperExtension extends AbstractTypeExtension
 
         // 2. #[Action] attribute mapping (injected by compiler pass)
         $formType = $form->getConfig()->getType()->getInnerType();
-        $formTypeClass = get_class($formType);
+        $formTypeClass = $formType::class;
 
         return $this->actionAttributeMapping[$formTypeClass] ?? null;
     }

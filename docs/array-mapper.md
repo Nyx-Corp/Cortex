@@ -4,6 +4,9 @@
 
 **Fichier source** : `src/Component/Mapper/ArrayMapper.php`
 
+**Voir aussi** : [ModelRepresentation](./representation.md) — systeme de normalisation
+avec groupes, heritage, propagation et security qui s'appuie sur ArrayMapper.
+
 ## Table des matières
 
 1. [Vue d'ensemble](#vue-densemble)
@@ -15,6 +18,7 @@
 7. [Méthode mapValue()](#méthode-mapvalue)
 8. [Exemples Complets](#exemples-complets)
 9. [Cas d'usage Avancés](#cas-dusage-avancés)
+10. [Différences avec Symfony Serializer](#différences-avec-symfony-serializer)
 
 ---
 
@@ -620,3 +624,97 @@ $array = $json->decode();  // ['key' => 'value']
 $json = new JsonString(['key' => 'value']);
 $string = (string) $json;  // '{"key":"value"}'
 ```
+
+---
+
+## Differences avec Symfony Serializer
+
+Cortex `ArrayMapper` et Symfony `Serializer/Normalizer` font tous les deux du mapping
+array <-> object. Le choix de design est different.
+
+### Ou vit le mapping ?
+
+**Cortex** — dans l'infrastructure, explicite :
+
+```php
+// Infrastructure/Doctrine/PageMapper.php
+$toModel = new ArrayMapper([
+    'uuid'      => fn(string $v) => new Uuid($v),
+    'status'    => PageStatus::class,
+    'metadata'  => Value::Json,
+    'isActive'  => Value::Bool,
+    'createdAt' => Value::Date,
+], format: Strategy::AutoMapCamel);
+```
+
+**Sf Serializer** — sur le modele, via attributs PHP :
+
+```php
+// Domain/Model/Page.php
+class Page {
+    #[Groups(['list', 'detail'])]
+    public Uuid $uuid;
+
+    #[SerializedName('is_active')]
+    public bool $isActive;
+
+    #[Ignore]
+    private string $internalCache;
+}
+```
+
+Le Serializer Sf couple le Domain au format de serialisation. Dans une architecture DDD,
+le modele ne doit rien savoir de comment il est persiste ou presente. C'est la
+responsabilite de l'infrastructure.
+
+### Comment la transformation fonctionne
+
+| | Cortex ArrayMapper | Sf ObjectNormalizer |
+|---|---|---|
+| **Mecanisme** | Lookup table, 1-2 passes O(n) | Chain of Responsibility, n champs x m normalizers |
+| **Discovery** | Aucune — tout est declare | Reflection + TypeInfo + PropertyAccessor |
+| **Reflection** | Zero au runtime | Au premier appel, puis cache statique |
+| **Bidirectionnalite** | Explicite : 2 mappers separes par sens | Implicite : 1 normalizer fait les 2 sens |
+| **Type conversions** | `Value::Bool`, `Value::Date`, `Value::Json`, enum, callable | Normalizers dedies (DateTimeNormalizer, UidNormalizer, BackedEnumNormalizer...) |
+| **Relations** | `Relation::toUuid()` / `Relation::toModel()` | Recursion automatique + `#[MaxDepth]` |
+
+### Pourquoi pas le Serializer ?
+
+1. **DDD** — le mapping est un detail d'infrastructure. Mettre `#[Groups]`, `#[SerializedName]`
+   ou `#[Ignore]` sur un modele Domain, c'est coupler la presentation au metier.
+
+2. **Explicite > magique** — on lit le mapper, on sait exactement ce qui se passe. Pas de
+   "quel normalizer dans la chaine a intercepte ma valeur ?".
+
+3. **Bidirectionnalite consciente** — deux mappers distincts forcent a penser les deux sens
+   de la transformation. Le Serializer fait normalize/denormalize avec le meme code, ce qui
+   masque les asymetries (un champ serialise mais pas deserialise se decouvre au runtime).
+
+4. **Performance** — ~25% plus rapide en warm (benchmark sur un modele 13 champs avec dates,
+   enums, bools, json, uuid). Pas de Reflection au runtime, pas de chain traversal. Le cout
+   est O(n) constant et previsible.
+
+5. **Agnostique** — `ArrayMapper` transforme des arrays/objects. Il ne suppose pas de format
+   de sortie (JSON, XML) ni de source (DB, API, webhook, message). Chaque adapter definit
+   son propre mapper.
+
+### Ce que le Serializer Sf apporte en plus
+
+- **Multi-format** — JSON, XML, CSV, YAML via les Encoders.
+- **Groups** — filtrer dynamiquement les champs par contexte (`admin` vs `public`).
+- **Circular references** — detection et handler natif.
+- **Polymorphisme** — `#[DiscriminatorMap]` pour les hierarchies de classe.
+- **Ecosystem** — API Platform, Messenger et tout Sf s'appuient dessus.
+
+### Quand utiliser quoi
+
+| Couche | Outil |
+|--------|-------|
+| Source externe (DB, API, webhook) <-> Domain Model | **Cortex ArrayMapper** |
+| Domain Model <-> API JSON publique multi-format | Sf Serializer (via un Normalizer custom qui delegue au mapper) |
+| DTO <-> Domain Model | **Cortex ArrayMapper** ou Sf ObjectMapper |
+| Export bulk (CSV, rapports) | Sf Serializer + encoders |
+
+Les deux systemes sont complementaires. L'ArrayMapper gere la transformation metier
+dans l'infra, le Serializer peut se brancher au-dessus pour les besoins de presentation
+multi-format sans polluer le domaine.

@@ -57,6 +57,8 @@ final class ModelMaker extends CortexMaker
             ->addArgument('domain', InputArgument::REQUIRED, 'Domaine du modèle')
             ->addArgument('model', InputArgument::REQUIRED, 'Nom du modèle')
             ->addOption('dbal', null, InputOption::VALUE_NONE, 'Generate a dbal structure')
+            ->addOption('root-path', null, InputOption::VALUE_REQUIRED, 'Root path for generated files (e.g., src/Lib/Synapse/src)')
+            ->addOption('root-namespace', null, InputOption::VALUE_REQUIRED, 'Root namespace (e.g., Synapse) — rewrites Domain\\ and Infrastructure\\ prefixes')
         ;
     }
 
@@ -65,13 +67,15 @@ final class ModelMaker extends CortexMaker
         $domainUnicode = u($input->getArgument('domain'));
         $modelUnicode = u($input->getArgument('model'));
 
+        ['destPath' => $destPath, 'namespaceReplacements' => $nsReplacements, 'pathTransformer' => $rootPathTransformer] = $this->resolveRootPath($input, $generator);
+
         $this->pathCollection
             ->filter(fn (SplFileInfo $file) => in_array(
                 $file->getRelativePathname(),
                 self::getGeneratedPaths($input->getOption('dbal'))
             ))
             ->mirror(
-                $generator->getRootDirectory(),
+                $destPath,
                 [
                     '{model}' => $model = $modelUnicode->snake()->toString(),
                     '{Model}' => $Model = $modelUnicode->camel()->title()->toString(),
@@ -80,6 +84,8 @@ final class ModelMaker extends CortexMaker
                     '{table}' => sprintf('%s_%s', $domain, $model),
                 ],
                 ['{datetime}' => [date('YmdHis')]],
+                pathTransformer: $rootPathTransformer,
+                contentReplacements: $nsReplacements,
             )
             ->generate(fn (string $generatedFilepath) => $io->text(sprintf(
                 '  ✓ <info>created</info> <comment>%s</comment>',

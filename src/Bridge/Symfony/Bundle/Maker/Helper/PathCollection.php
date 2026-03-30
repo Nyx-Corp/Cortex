@@ -141,9 +141,10 @@ class PathCollection extends FileCollection
     /**
      * @param array<string, string>       $replacements
      * @param array<string, list<string>> $fileVariants
-     * @param \Closure|null               $pathTransformer Optional callable to transform output paths (e.g., for subpath support)
+     * @param \Closure|null               $pathTransformer     Optional callable to transform output paths (e.g., for subpath support)
+     * @param array<string, string>       $contentReplacements Optional str_replace applied to rendered content (e.g., namespace rewriting for --root-path)
      */
-    public function mirror(string $destPath, array $replacements, array $fileVariants = [], ?\Closure $pathTransformer = null): self
+    public function mirror(string $destPath, array $replacements, array $fileVariants = [], ?\Closure $pathTransformer = null, array $contentReplacements = []): self
     {
         return $this
             ->each(function (SplFileInfo $file) use ($fileVariants, $replacements) {
@@ -185,13 +186,22 @@ class PathCollection extends FileCollection
                 ),
             ])
             ->filter(fn (array $fileInfo) => !$this->filesystem->exists($fileInfo['dest_path']))
-            ->map(function (array $fileInfo) {
+            ->map(function (array $fileInfo) use ($contentReplacements) {
                 $destFolder = dirname($fileInfo['dest_path']);
                 if (!$this->filesystem->exists($destFolder)) {
                     $this->filesystem->mkdir($destFolder, 0o755);
                 }
 
                 $content = $this->renderContent($fileInfo['file'], $fileInfo['replacements']);
+
+                if (!empty($contentReplacements)) {
+                    $content = str_replace(
+                        array_keys($contentReplacements),
+                        array_values($contentReplacements),
+                        $content,
+                    );
+                }
+
                 $this->filesystem->dumpFile($fileInfo['dest_path'], $content);
 
                 return $fileInfo['dest_path'];
