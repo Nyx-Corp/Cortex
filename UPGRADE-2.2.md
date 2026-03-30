@@ -71,3 +71,114 @@ $parsed = $parser->parse('type:page sort:name_desc');
 ```
 
 Voir `docs/filter-query-parser.md` pour la documentation complete.
+
+---
+
+## CurrentDateFactory / CurrentDate — suppression
+
+Classes supprimees :
+- `Cortex\ValueObject\CurrentDateFactory`
+- `Cortex\ValueObject\CurrentDate`
+- `Cortex\Component\Date\DateTimeFactory`
+
+Migration : utiliser `ClockInterface` de Symfony + `Clock::get()->now()`. Dans les tests, utiliser `ClockSensitiveTrait`.
+
+### Avant
+
+```php
+use Cortex\ValueObject\CurrentDateFactory;
+
+public function __construct(private CurrentDateFactory $dateFactory) {}
+
+public function execute(): void
+{
+    $now = ($this->dateFactory)();
+}
+```
+
+### Apres
+
+```php
+use Psr\Clock\ClockInterface;
+
+public function __construct(private ClockInterface $clock) {}
+
+public function execute(): void
+{
+    $now = $this->clock->now();
+}
+```
+
+### Migration
+
+1. Chercher `CurrentDateFactory` dans `services.yaml` et le code source, supprimer ou remplacer.
+2. Injecter `ClockInterface` a la place.
+3. Dans les tests, utiliser `ClockSensitiveTrait` pour mocker l'heure.
+
+---
+
+## JoinDefinition — FK par convention
+
+`JoinDefinition` detecte maintenant automatiquement la FK selon la convention `{relationName}_uuid`. Le parametre `localKey` n'est plus obligatoire.
+
+Breaking : `getLocalKey()` retourne desormais la cle conventionnelle quand `localKey` est null (comportement indefini auparavant).
+
+Nouveautes :
+- `withRelationName(string)` — retourne une copie avec le nom de relation (utilise par `DbalMappingConfiguration`)
+- `withParentAlias(string)` — pour les jointures imbriquees
+- Les collections (`AsyncCollection`) sont exclues automatiquement de la decouverte de colonnes
+- Les types classe sont auto-detectes comme relations (sauf VOs, enums, dates, UIDs)
+
+### Avant
+
+```php
+new JoinDefinition(
+    factory: $this->orgFactory,
+    joinConfig: $this->orgMapper->getConfiguration(),
+    localKey: 'organisation_uuid',  // obligatoire
+)
+```
+
+### Apres
+
+```php
+// Convention : FK = {relation}_uuid — localKey auto-detecte
+new JoinDefinition(
+    factory: $this->orgFactory,
+    joinConfig: $this->orgMapper->getConfiguration(),
+)
+```
+
+### Migration
+
+Si votre `localKey` existant correspond deja a la convention `{relation}_uuid`, supprimez-le.
+
+---
+
+## PHPUnit 11+ requis
+
+Les tests utilisent desormais les attributs PHP natifs au lieu des annotations docblock.
+
+### Avant
+
+```php
+/**
+ * @covers \MyClass
+ * @dataProvider myProvider
+ */
+```
+
+### Apres
+
+```php
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+
+#[CoversClass(MyClass::class)]
+// ...
+#[DataProvider('myProvider')]
+```
+
+### Migration
+
+Lancer `vendor/bin/rector` avec le ruleset PHPUnit 11, ou remplacer les annotations manuellement.
